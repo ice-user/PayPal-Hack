@@ -347,6 +347,8 @@ def _baseline(situation: dict, x: dict, rec_id: str) -> dict:
 def _apply_writer(rec: dict, writer: Callable[[dict], dict]) -> dict:
     """Let an LLM rewrite prose only. Anything else it returns is ignored."""
     out = writer(rec) or {}
+    if not out:
+        return rec  # writer declined or was rejected: keep the rules prose and engine label
     new = dict(rec)
     if isinstance(out.get("diagnosis_detail"), str):
         new["diagnosis_detail"] = out["diagnosis_detail"][:1200]

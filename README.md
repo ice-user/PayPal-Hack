@@ -20,6 +20,10 @@ Built for the PayPal AI Hackathon. **Work in progress.**
   action. If PayPal does not allow that action at that moment, or no real dispute is linked
   (the synthetic situations B and C), execution is **simulated** and labelled. See
   [docs/SPIKE1_RESULT.md](docs/SPIKE1_RESULT.md).
+- An optional AI writer (`PRECEDENT_LLM_WRITER=1` plus Anthropic credentials, model
+  `claude-opus-5-5`) may only reword the explanations. It cannot change actions, amounts or
+  citations. Its text is rejected if it adds a number that is not in the data, or uses
+  causal words.
 - The outcome clock is **simulated**. Its results become `live_simulated` cases pending
   review, which never drive a forecast.
 - Outcomes are "observed" or "followed", never "caused". Not financial advice.

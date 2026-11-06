@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 from intelligence import gate_reference  # noqa: E402
 from intelligence.cases import load_cases, usable  # noqa: E402
 from intelligence.consultant import DIAGNOSIS, recommend  # noqa: E402
+from intelligence.llm_writer import make_writer  # noqa: E402
 from intelligence.retrieve_baseline import retrieve  # noqa: E402
 from intelligence.schema import thresholds, validate  # noqa: E402
 
@@ -95,9 +96,10 @@ def static_bundle(situation: dict, cases: list[dict], mode: str) -> dict:
     return bundle
 
 
-def plan(situation: dict, cases: list[dict], mode: str) -> tuple[dict, list[dict]]:
+def plan(situation: dict, cases: list[dict], mode: str, writer=None) -> tuple[dict, list[dict]]:
     precedents = retrieve(situation, cases, k=6)
-    rec = recommend(situation, precedents, mode=mode, created_at=situation["window"]["end"] + "T09:00:00Z")
+    rec = recommend(situation, precedents, mode=mode, writer=writer,
+                    created_at=situation["window"]["end"] + "T09:00:00Z")
     return rec, gate_reference.decide(rec)
 
 
@@ -109,12 +111,16 @@ class Service:
                                  max_external_per_hour=thresholds()["rate_limit"]["max_external_actions_per_hour"])
         self.cases = usable(load_cases())
         self.situations = {k: demo_situation(k) for k in DEMO}
+        self._plans: dict[tuple[str, str], tuple[dict, list[dict]]] = {}
 
     def _plan(self, key: str, mode: str) -> tuple[dict, dict, list[dict]]:
         if key not in self.situations or mode not in MODES:
             raise ActionError(404, f"Unknown situation {key!r} or mode {mode!r}.")
         situation = self.situations[key]
-        rec, decisions = plan(situation, self.cases, mode)
+        cache_key = (key, mode)
+        if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
+            self._plans[cache_key] = plan(situation, self.cases, mode, writer=make_writer(situation))
+        rec, decisions = self._plans[cache_key]
         self.executor.register(rec, decisions)
         return situation, rec, decisions
 
