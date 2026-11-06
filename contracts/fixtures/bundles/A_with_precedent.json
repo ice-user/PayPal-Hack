@@ -81,7 +81,7 @@
       {
         "case_id": "case_a04_tracking_number_mismatch",
         "title": "Wrong tracking numbers uploaded for one carrier",
-        "similarity": 0.902,
+        "similarity": 0.863,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -100,7 +100,7 @@
       {
         "case_id": "case_a01_regional_carrier_scan_gap",
         "title": "Regional carrier stopped posting delivery scans",
-        "similarity": 0.87,
+        "similarity": 0.832,
         "matched_on": [
           "carrier concentration",
           "fulfilment delay",
@@ -120,7 +120,7 @@
       {
         "case_id": "case_a06_po_box_undeliverable",
         "title": "Carrier could not deliver to PO boxes",
-        "similarity": 0.856,
+        "similarity": 0.818,
         "matched_on": [
           "carrier concentration",
           "fulfilment delay",
@@ -141,7 +141,7 @@
       {
         "case_id": "case_a03_carrier_switch_after_hub_outage",
         "title": "Carrier hub outage stranded one lane",
-        "similarity": 0.854,
+        "similarity": 0.817,
         "matched_on": [
           "carrier concentration",
           "fulfilment delay",
@@ -161,7 +161,7 @@
       {
         "case_id": "case_a02_signature_on_high_value",
         "title": "High-value parcels lost on one carrier's last mile",
-        "similarity": 0.825,
+        "similarity": 0.789,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -235,7 +235,7 @@
       "Carrier could not deliver to PO boxes (authored, illustrative): Illustrative: address validation at checkout and messages to affected buyers. No measured numbers.",
       "No measured precedents match this pattern, so no numeric forecast is shown."
     ],
-    "confidence": 0.73,
+    "confidence": 0.7,
     "evidence_quality": "illustrative",
     "abstain": false,
     "abstain_reason": null,

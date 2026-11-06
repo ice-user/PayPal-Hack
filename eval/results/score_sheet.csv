@@ -1,0 +1,163 @@
+item,situation,plan_pass1_no_citations,plan_pass2_with_citations,appropriate_intervention_0to2,grounded_in_cited_evidence_0to2,unsupported_claims_count,abstained_when_it_should_YN_NA,rater,notes
+S01-P1,"Item-not-received disputes up 5.8x in 7 days, mostly on Northline Parcel.","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Northline Parcel
+- [FLAG_ONLY] Require delivery confirmation on Northline Parcel shipments","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Northline Parcel (cites case_a01_regional_carrier_scan_gap, case_a04_tracking_number_mismatch, case_a06_po_box_undeliverable, case_a02_signature_on_high_value)
+- [FLAG_ONLY] Require delivery confirmation on Northline Parcel shipments (cites case_a01_regional_carrier_scan_gap, case_a04_tracking_number_mismatch, case_a06_po_box_undeliverable, case_a02_signature_on_high_value)",,,,,,
+S01-P2,"Item-not-received disputes up 5.8x in 7 days, mostly on Northline Parcel.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S02-P1,"Item-not-received disputes up 5.7x in 7 days, mostly on Ridgeway Post.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S02-P2,"Item-not-received disputes up 5.7x in 7 days, mostly on Ridgeway Post.","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Ridgeway Post
+- [FLAG_ONLY] Require delivery confirmation on Ridgeway Post shipments","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Ridgeway Post (cites case_a01_regional_carrier_scan_gap, case_a04_tracking_number_mismatch, case_a06_po_box_undeliverable, case_a02_signature_on_high_value)
+- [FLAG_ONLY] Require delivery confirmation on Ridgeway Post shipments (cites case_a01_regional_carrier_scan_gap, case_a04_tracking_number_mismatch, case_a06_po_box_undeliverable, case_a02_signature_on_high_value)",,,,,,
+S03-P1,"Item-not-received disputes up 4.4x in 7 days, mostly on Metro Courier.","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Metro Courier
+- [FLAG_ONLY] Require delivery confirmation on Metro Courier shipments","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Metro Courier (cites case_a06_po_box_undeliverable, case_a01_regional_carrier_scan_gap, case_a04_tracking_number_mismatch, case_a02_signature_on_high_value)
+- [FLAG_ONLY] Require delivery confirmation on Metro Courier shipments (cites case_a06_po_box_undeliverable, case_a01_regional_carrier_scan_gap, case_a04_tracking_number_mismatch, case_a02_signature_on_high_value)",,,,,,
+S03-P2,"Item-not-received disputes up 4.4x in 7 days, mostly on Metro Courier.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S04-P1,"Item-not-received disputes up 4.9x in 7 days, mostly on Coastal Express.","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Coastal Express
+- [FLAG_ONLY] Require delivery confirmation on Coastal Express shipments","Diagnosis: Carrier-specific delivery or tracking failure
+- [PROVIDE_EVIDENCE] File tracking evidence on open item-not-received disputes on Coastal Express (cites case_a04_tracking_number_mismatch, case_a01_regional_carrier_scan_gap, case_a06_po_box_undeliverable, case_a02_signature_on_high_value)
+- [FLAG_ONLY] Require delivery confirmation on Coastal Express shipments (cites case_a04_tracking_number_mismatch, case_a01_regional_carrier_scan_gap, case_a06_po_box_undeliverable, case_a02_signature_on_high_value)",,,,,,
+S04-P2,"Item-not-received disputes up 4.9x in 7 days, mostly on Coastal Express.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S05-P1,"Item-not-received disputes up 4.6x in 7 days, across 4 carriers, time to ship is 60h.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S05-P2,"Item-not-received disputes up 4.6x in 7 days, across 4 carriers, time to ship is 60h.","Diagnosis: Fulfilment delay before hand-off to carriers
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h)
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders","Diagnosis: Fulfilment delay before hand-off to carriers
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h) (cites case_b03_3pl_migration, case_b01_warehouse_backlog, case_b05_inventory_sync_oversell)
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders (cites case_b03_3pl_migration, case_b01_warehouse_backlog, case_b05_inventory_sync_oversell)",,,,,,
+S06-P1,"Item-not-received disputes up 4.6x in 7 days, across 3 carriers, time to ship is 91h.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S06-P2,"Item-not-received disputes up 4.6x in 7 days, across 3 carriers, time to ship is 91h.","Diagnosis: Fulfilment delay before hand-off to carriers
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h)","Diagnosis: Fulfilment delay before hand-off to carriers
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders (cites case_b04_flash_sale_overflow, case_b02_preorder_without_notice, case_b06_customs_hold_cross_border)
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h) (cites case_b05_inventory_sync_oversell, case_b01_warehouse_backlog, case_b03_3pl_migration)",,,,,,
+S07-P1,"Item-not-received disputes up 6.7x in 7 days, across 4 carriers, time to ship is 50h.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S07-P2,"Item-not-received disputes up 6.7x in 7 days, across 4 carriers, time to ship is 50h.","Diagnosis: Fulfilment delay before hand-off to carriers
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h)
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders","Diagnosis: Fulfilment delay before hand-off to carriers
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h) (cites case_b03_3pl_migration, case_b01_warehouse_backlog, case_b05_inventory_sync_oversell)
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders (cites case_b03_3pl_migration, case_b01_warehouse_backlog, case_b05_inventory_sync_oversell)",,,,,,
+S08-P1,"Item-not-received disputes up 5.3x in 7 days, 93% of disputed orders show a delivery scan.","Diagnosis: Disputes on orders with confirmed delivery
+- [PROVIDE_EVIDENCE] File proof of delivery on disputes with a confirmed delivery scan","Diagnosis: Disputes on orders with confirmed delivery
+- [PROVIDE_EVIDENCE] File proof of delivery on disputes with a confirmed delivery scan (cites case_c04_apartment_mailroom, case_c02_friendly_fraud_repeat_buyers, case_c01_porch_theft_cluster, case_c03_wrong_address_autofill)",,,,,,
+S08-P2,"Item-not-received disputes up 5.3x in 7 days, 93% of disputed orders show a delivery scan.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S09-P1,"Item-not-received disputes up 5.4x in 7 days, 87% of disputed orders show a delivery scan.","Diagnosis: Disputes on orders with confirmed delivery
+- [PROVIDE_EVIDENCE] File proof of delivery on disputes with a confirmed delivery scan","Diagnosis: Disputes on orders with confirmed delivery
+- [PROVIDE_EVIDENCE] File proof of delivery on disputes with a confirmed delivery scan (cites case_c04_apartment_mailroom, case_c02_friendly_fraud_repeat_buyers, case_c03_wrong_address_autofill, case_c01_porch_theft_cluster)",,,,,,
+S09-P2,"Item-not-received disputes up 5.4x in 7 days, 87% of disputed orders show a delivery scan.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S10-P1,"Item-not-received disputes up 3.2x in 7 days, 90% of disputed orders show a delivery scan.","Diagnosis: Disputes on orders with confirmed delivery
+- [PROVIDE_EVIDENCE] File proof of delivery on disputes with a confirmed delivery scan","Diagnosis: Disputes on orders with confirmed delivery
+- [PROVIDE_EVIDENCE] File proof of delivery on disputes with a confirmed delivery scan (cites case_c04_apartment_mailroom, case_c02_friendly_fraud_repeat_buyers, case_c01_porch_theft_cluster, case_c03_wrong_address_autofill)",,,,,,
+S10-P2,"Item-not-received disputes up 3.2x in 7 days, 90% of disputed orders show a delivery scan.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S11-P1,"Unauthorised-transaction disputes up 11.4x in 7 days, 89% of disputed orders show a delivery scan, concentrated on CBL-3 USB-C cable.","Diagnosis: Unauthorised transactions (fraud pattern)
+- [FLAG_ONLY] Tighten checkout fraud checks","Diagnosis: Unauthorised transactions (fraud pattern)
+- [FLAG_ONLY] Tighten checkout fraud checks (cites case_d04_stolen_cards_resellable_sku, case_d05_bot_checkout_attack, case_d02_account_takeover_resellers, case_d01_card_testing_burst)",,,,,,
+S11-P2,"Unauthorised-transaction disputes up 11.4x in 7 days, 89% of disputed orders show a delivery scan, concentrated on CBL-3 USB-C cable.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S12-P1,"Unauthorised-transaction disputes up 6.4x in 7 days, 90% of disputed orders show a delivery scan, concentrated on HDP-220 wireless headphones.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S12-P2,"Unauthorised-transaction disputes up 6.4x in 7 days, 90% of disputed orders show a delivery scan, concentrated on HDP-220 wireless headphones.","Diagnosis: Unauthorised transactions (fraud pattern)
+- [FLAG_ONLY] Tighten checkout fraud checks","Diagnosis: Unauthorised transactions (fraud pattern)
+- [FLAG_ONLY] Tighten checkout fraud checks (cites case_d05_bot_checkout_attack, case_d04_stolen_cards_resellable_sku, case_d02_account_takeover_resellers, case_d01_card_testing_burst)",,,,,,
+S13-P1,"Not-as-described disputes up 9.3x in 7 days, 100% of disputed orders show a delivery scan, concentrated on SPK-10 speaker.",ABSTAIN: Confidence 0.47 is below the floor 0.5. Precedents disagree or match weakly.,ABSTAIN: Confidence 0.47 is below the floor 0.5. Precedents disagree or match weakly.,,,,,,
+S13-P2,"Not-as-described disputes up 9.3x in 7 days, 100% of disputed orders show a delivery scan, concentrated on SPK-10 speaker.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S14-P1,"Item-not-received disputes up 7.7x in 7 days, across 3 carriers, time to ship is 58h.","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute","Diagnosis: Spike in item-not-received disputes
+- [PROVIDE_EVIDENCE] File tracking evidence on all open item-not-received disputes
+- [SEND_MESSAGE] Send an apology message to every buyer with an open dispute
+- [MAKE_OFFER] Offer a 20% partial refund on every open dispute",,,,,,
+S14-P2,"Item-not-received disputes up 7.7x in 7 days, across 3 carriers, time to ship is 58h.","Diagnosis: Fulfilment delay before hand-off to carriers
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h)","Diagnosis: Fulfilment delay before hand-off to carriers
+- [SEND_MESSAGE] Send a ship-date update to buyers with late orders (cites case_b06_customs_hold_cross_border, case_b04_flash_sale_overflow, case_b02_preorder_without_notice)
+- [FLAG_ONLY] Clear the unshipped backlog (orders waiting over 48h) (cites case_b03_3pl_migration, case_b01_warehouse_backlog, case_b05_inventory_sync_oversell)",,,,,,
+S15-P1,Dispute rate 0.17% vs baseline 0.31%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.914).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.914).,,,,,,
+S15-P2,Dispute rate 0.17% vs baseline 0.31%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.914).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.914).,,,,,,
+S16-P1,Dispute rate 0.28% vs baseline 0.27%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.526).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.526).,,,,,,
+S16-P2,Dispute rate 0.28% vs baseline 0.27%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.526).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.526).,,,,,,
+S17-P1,Dispute rate 1.53% vs baseline 0.86%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.31).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.31).,,,,,,
+S17-P2,Dispute rate 1.53% vs baseline 0.86%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.31).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.31).,,,,,,
+S18-P1,Dispute rate 3.41% vs baseline 0.65%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.00107).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.00107).,,,,,,
+S18-P2,Dispute rate 3.41% vs baseline 0.65%: sample too small to call.,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.00107).,ABSTAIN: No action: the sample is too small to tell a real spike from noise (binomial p = 0.00107).,,,,,,

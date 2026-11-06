@@ -14,6 +14,7 @@ FEATURES: dict[str, tuple[float, str]] = {
     "carriers_elevated": (1.5, "number of carriers elevated"),
     "inr_share": (1.0, "item-not-received share"),
     "unauthorised_share": (1.0, "unauthorised share"),
+    "snad_share": (1.0, "not-as-described share"),
     "concentration_sku": (1.0, "SKU concentration"),
     "trend_slope": (0.5, "trend"),
 }
@@ -37,6 +38,7 @@ def situation_vector(situation: dict) -> dict[str, float]:
         "carriers_elevated": None if f.get("carriers_elevated") is None else _clip(f["carriers_elevated"] / 5),
         "inr_share": mix.get("ITEM_NOT_RECEIVED"),
         "unauthorised_share": mix.get("UNAUTHORISED"),
+        "snad_share": mix.get("NOT_AS_DESCRIBED"),
         "trend_slope": f.get("trend_slope"),
     }
     return {k: float(x) for k, x in v.items() if x is not None}
@@ -52,6 +54,7 @@ def case_vector(case: dict) -> dict[str, float]:
         "carriers_elevated": None if f.get("carriers_elevated") is None else _clip(f["carriers_elevated"] / 5),
         "inr_share": f.get("inr_share"),
         "unauthorised_share": f.get("unauthorised_share"),
+        "snad_share": f.get("snad_share"),
         "trend_slope": f.get("trend_slope"),
     }
     return {k: float(x) for k, x in v.items() if x is not None}

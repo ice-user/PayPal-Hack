@@ -79,7 +79,7 @@
       {
         "case_id": "case_c04_apartment_mailroom",
         "title": "Apartment mailroom misplacement",
-        "similarity": 0.858,
+        "similarity": 0.823,
         "matched_on": [
           "carrier concentration",
           "fulfilment delay",
@@ -100,7 +100,7 @@
       {
         "case_id": "case_c02_friendly_fraud_repeat_buyers",
         "title": "Repeat buyers disputing delivered orders",
-        "similarity": 0.817,
+        "similarity": 0.783,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -120,7 +120,7 @@
       {
         "case_id": "case_c01_porch_theft_cluster",
         "title": "Disputes on parcels marked delivered",
-        "similarity": 0.772,
+        "similarity": 0.74,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -136,7 +136,7 @@
       {
         "case_id": "case_c03_wrong_address_autofill",
         "title": "Checkout autofill sent parcels to old addresses",
-        "similarity": 0.759,
+        "similarity": 0.727,
         "matched_on": [
           "carrier concentration",
           "fulfilment delay",
@@ -154,7 +154,7 @@
       {
         "case_id": "case_c05_low_value_delivered_refund",
         "title": "Low-value delivered orders disputed",
-        "similarity": 0.751,
+        "similarity": 0.72,
         "matched_on": [
           "carrier concentration",
           "fulfilment delay",
@@ -208,7 +208,7 @@
       "Disputes on parcels marked delivered (authored, illustrative): Illustrative: proof of delivery (scan, location, photo) was filed on each dispute. No measured numbers.",
       "No measured precedents match this pattern, so no numeric forecast is shown."
     ],
-    "confidence": 0.58,
+    "confidence": 0.56,
     "evidence_quality": "illustrative",
     "abstain": false,
     "abstain_reason": null,

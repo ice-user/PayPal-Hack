@@ -57,7 +57,8 @@
         "ship_delay_hours_p50": {"type": "number", "minimum": 0},
         "disputed_orders_delivered_share": {"$ref": "#/$defs/rate"},
         "trend_slope": {"type": "number", "minimum": 0, "maximum": 1},
-        "unauthorised_share": {"$ref": "#/$defs/rate"}
+        "unauthorised_share": {"$ref": "#/$defs/rate"},
+        "snad_share": {"$ref": "#/$defs/rate", "description": "Share of disputes that were not-as-described."}
       }
     },
     "narrative": {"type": "string", "maxLength": 1200},

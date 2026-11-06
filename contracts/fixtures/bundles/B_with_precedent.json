@@ -80,7 +80,7 @@
       {
         "case_id": "case_b01_warehouse_backlog",
         "title": "Warehouse backlog delayed all carriers",
-        "similarity": 0.903,
+        "similarity": 0.863,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -100,7 +100,7 @@
       {
         "case_id": "case_b03_3pl_migration",
         "title": "Migration to a new fulfilment partner",
-        "similarity": 0.891,
+        "similarity": 0.852,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -120,7 +120,7 @@
       {
         "case_id": "case_b05_inventory_sync_oversell",
         "title": "Inventory sync bug oversold stock",
-        "similarity": 0.823,
+        "similarity": 0.787,
         "matched_on": [
           "carrier concentration",
           "number of carriers elevated",
@@ -137,7 +137,7 @@
       {
         "case_id": "case_b06_customs_hold_cross_border",
         "title": "Cross-border parcels held at customs",
-        "similarity": 0.802,
+        "similarity": 0.767,
         "matched_on": [
           "share of disputed orders delivered",
           "fulfilment delay",
@@ -157,7 +157,7 @@
       {
         "case_id": "case_b04_flash_sale_overflow",
         "title": "Flash sale overwhelmed packing capacity",
-        "similarity": 0.8,
+        "similarity": 0.765,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -219,7 +219,7 @@
       "Inventory sync bug oversold stock (authored, illustrative): Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
       "No measured precedents match this pattern, so no numeric forecast is shown."
     ],
-    "confidence": 0.71,
+    "confidence": 0.68,
     "evidence_quality": "illustrative",
     "abstain": false,
     "abstain_reason": null,
