@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SituationRecord",
+  "type": "object",
+  "description": "Situation record produced by Person A (intelligence) to describe the current dispute spike context",
+  "required": ["dispute_rate", "trend", "reason_mix", "concentration", "open_disputes", "response_time", "narrative"],
+  "properties": {
+    "dispute_rate": {
+      "type": "number",
+      "description": "Current 7-day dispute rate per 100 orders",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "baseline_rate": {
+      "type": "number",
+      "description": "Merchant's 30-day baseline dispute rate per 100 orders",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "trend": {
+      "type": "string",
+      "enum": ["improving", "stable", "degrading"],
+      "description": "Direction of dispute rate change"
+    },
+    "reason_mix": {
+      "type": "object",
+      "description": "Breakdown of dispute reasons",
+      "properties": {
+        "item_not_received": {"type": "number", "minimum": 0, "maximum": 100},
+        "item_not_as_described": {"type": "number", "minimum": 0, "maximum": 100},
+        "duplicate": {"type": "number", "minimum": 0, "maximum": 100},
+        "unrecognized": {"type": "number", "minimum": 0, "maximum": 100},
+        "subscription_cancelled": {"type": "number", "minimum": 0, "maximum": 100}
+      },
+      "additionalProperties": false
+    },
+    "concentration": {
+      "type": "object",
+      "description": "Carrier and SKU concentration",
+      "properties": {
+        "top_carrier": {"type": "string", "description": "Carrier with most disputed orders"},
+        "top_sku": {"type": "string", "description": "SKU with most disputed orders"},
+        "carrier_count": {"type": "integer", "description": "Number of elevated carriers"},
+        "sku_count": {"type": "integer", "description": "Number of elevated SKUs"}
+      },
+      "required": ["top_carrier", "top_sku", "carrier_count", "sku_count"],
+      "additionalProperties": false
+    },
+    "open_disputes": {
+      "type": "integer",
+      "description": "Number of currently open disputes",
+      "minimum": 0
+    },
+    "response_time": {
+      "type": "number",
+      "description": "Median response time in days for seller actions",
+      "minimum": 0
+    },
+    "narrative": {
+      "type": "string",
+      "description": "Short free-form narrative describing the spike context"
+    },
+    "scenario": {
+      "type": "string",
+      "enum": ["one_carrier_delays", "many_carriers_delays", "delivered_orders"],
+      "description": "Which of the three demo scenarios this represents"
+    }
+  },
+  "additionalProperties": false
+}
