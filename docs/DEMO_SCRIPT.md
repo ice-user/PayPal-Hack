@@ -22,7 +22,7 @@ wherever the screen says it.
 | 1:50 to 2:15 | Switch A, B, C quickly | "Same symptom, different causes. Spread across carriers with slow shipping, it fixes the backlog and messages buyers. Parcels marked delivered, it files proof of delivery." |
 | 2:15 to 2:35 | Flip toggle to Without precedent | "Without precedents, the same system gives the same generic advice every time, refunds included. The policy gate blocks all of it, because nothing backs it up." |
 | 2:35 to 2:50 | Back to A, Advance 14 days (simulated), outcome box | "Advancing a simulated clock records what followed, and saves it as a new case for review. Simulated, labelled, and never used for a forecast." |
-| 2:50 to 2:58 | Ablation summary table | "Across 18 test situations, precedent found the right cause 12 of 13 times; without it, none. When its playbook was missing, it abstained." |
+| 2:50 to 2:58 | Ablation summary table | "On a held-out test set, precedent found the right cause 9 of 13 times; without it, none. Every miss was a refusal to act, not a wrong action. When its playbook was missing, it abstained." |
 
 **Do not**
 - Do not show numbers that are not on screen.

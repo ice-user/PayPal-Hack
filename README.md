@@ -26,7 +26,9 @@ flowchart LR
   E --> A[(Audit log)]
 ```
 
-Results so far: [eval/results/summary.md](eval/results/summary.md). Submission draft:
+Results so far: the held-out test is in [eval/results/test/summary.md](eval/results/test/summary.md);
+the development set is in [eval/results/summary.md](eval/results/summary.md); the run log is in
+[eval/README.md](eval/README.md). Submission draft:
 [docs/SUBMISSION.md](docs/SUBMISSION.md). Demo script: [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
 ## Honest labels

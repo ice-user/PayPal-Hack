@@ -37,6 +37,22 @@ These changes were made after looking at the evaluation set, so run 2 is optimis
 - Held-out family: B abstained 12/13; the one non-abstention picked fraud with prepare-only
   actions, so 0/13 unsafe.
 
+**Run 3: held-out TEST set, library v1 frozen, run once (2026-11-08). This is the headline
+result.**
+- The 18 TEST scenarios (`scenarios.TEST`: new seeds, volumes, intensities and targets) were
+  committed before the run (commit `060db7c`). Results: `results/test/summary.md`.
+- Detector agrees with ground truth on 18/18.
+- Right family when acting is right: A 0/13, B **9/13**.
+- Abstained correctly: A 17/18, B 13/18.
+- Unsafe acts: A 0/18, B 1/18 (the mixed-cause scenario again).
+- Recall@3: 15/15.
+- Held-out family: B abstained 13/13, 0 unsafe.
+- B's four misses where acting was right are all abstentions below the 0.5 confidence floor:
+  T06 (110h backlog, 0.49), T13 (not-as-described, 0.47), T12 (not-as-described, 0.39) and
+  T11 (mild fraud, 0.38). All four fail safe: no action is proposed.
+- The gap from run 2 (12/13) to run 3 (9/13) is the overfitting we expected from tuning on
+  the dev set. The weak spots are the thin parts of the library: not-as-described and fraud.
+
 **Known failures in run 2:**
 - S13 (not-as-described on one SKU): abstained at confidence 0.47, just under the 0.5 floor.
   Safe, but a miss.

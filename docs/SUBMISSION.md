@@ -69,20 +69,22 @@ the policy gate blocks it.
   - the LLM guards.
 
 ### Evaluation
-- **Ablation:** 18 synthetic scenarios with a planted cause, run with and without precedent
+- **Ablation:** synthetic scenarios with a planted cause, each run with and without precedent
   retrieval.
-- **Right cause, when acting is right:**
-  - without precedent: 0 of 13;
-  - with precedent: 12 of 13.
-- **Held-out check:** we removed every case of the true cause from the library. The system
-  with precedent then abstained in 12 of 13 scenarios. The other one proposed only a
-  prepare-only flag, so nothing would have reached a buyer or PayPal.
-- **Retriever:** a case of the true cause was in the top 3 in 15 of 15 scenarios.
+- **Held-out test set:** 18 scenarios, committed before the run and run once after the case
+  library was frozen.
+  - Right cause, when acting is right: without precedent 0 of 13; with precedent 9 of 13.
+  - All four misses were abstentions, so the system proposed nothing rather than the wrong fix.
+  - Removing every case of the true cause made it abstain in 13 of 13.
+  - The detector matched ground truth in 18 of 18.
+- **Development set:** 12 of 13 right causes. We tuned on it, so we report the test set as the
+  headline.
+- **Retriever:** a case of the true cause was in the top 3 in 15 of 15 test scenarios.
 - **Honest caveats:**
   - The same team wrote the scenarios and the authored cases, so agreement partly reflects
     internal consistency.
-  - We fixed the library after the first run and logged both runs.
-  - The mixed-cause scenario is the one unsafe act: it is read as a single cause.
+  - The one unsafe act, in both sets, is a scenario with two simultaneous causes. It is read
+    as a single cause.
 - **Human rating:** a two-rater blind rubric is prepared (`eval/RUBRIC.md`).
   [Fill in the scores and inter-rater agreement once rated.]
 
