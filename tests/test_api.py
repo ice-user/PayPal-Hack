@@ -146,6 +146,18 @@ def test_webhook_bad_signature_rejected_and_replay_ignored():
     assert client.post("/api/paypal/webhook", json=event, headers={}).status_code == 400  # missing headers
 
 
+def test_real_execution_switch_forces_simulation():
+    fake = FakePayPal(allowed=["provide_evidence", "send_message"])
+    svc = Service(store=Store(":memory:"),
+                  adapter=PayPalAdapter(env=dict(ENV, PRECEDENT_REAL_EXECUTION="0"), transport=fake))
+    api_module._service = svc
+    client = TestClient(api_module.app)
+    aid = first_needs_approval(client.get("/api/bundles/A").json())
+    b = client.post("/api/actions/approve", json={"situation": "A", "action_id": aid}).json()
+    assert b["action_states"][aid]["execution_mode"] == "simulated" and "switched off" in b["action_states"][aid]["detail"]
+    assert fake.writes() == []
+
+
 def test_adapter_refuses_live_host():
     with pytest.raises(ValueError):
         PayPalAdapter(env=dict(ENV, PAYPAL_BASE_URL="https://api-m.paypal.com"))

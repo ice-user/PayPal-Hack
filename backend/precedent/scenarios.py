@@ -19,6 +19,48 @@ DEMO = {
                   expected={"family": "delivered", "anomalous": True, "should_abstain": False}),
 }
 
+# Held-out TEST set. Written on 2026-11-08 after the case library was frozen at v1, and run
+# once. Seeds, volumes, intensities and targets differ from ABLATION. Do not tune the
+# Consultant, retriever or cases on these results; log a new run instead.
+TEST = [
+    Scenario("t_carrier_coastal_strong", "carrier", seed=901, extra_rate=0.06, target_carrier="Coastal Express",
+             expected={"family": "carrier", "anomalous": True, "should_abstain": False}),
+    Scenario("t_carrier_northline_bigshop", "carrier", seed=902, orders_per_day=520, extra_rate=0.03,
+             target_carrier="Northline Parcel", expected={"family": "carrier", "anomalous": True, "should_abstain": False}),
+    Scenario("t_carrier_ridgeway_lowvol", "carrier", seed=903, orders_per_day=120, extra_rate=0.08,
+             target_carrier="Ridgeway Post", expected={"family": "carrier", "anomalous": True, "should_abstain": False}),
+    Scenario("t_fulfilment_45h", "fulfilment", seed=911, extra_rate=0.025, delay_hours=45,
+             expected={"family": "fulfilment", "anomalous": True, "should_abstain": False}),
+    Scenario("t_fulfilment_75h_bigshop", "fulfilment", seed=912, orders_per_day=480, extra_rate=0.012, delay_hours=75,
+             expected={"family": "fulfilment", "anomalous": True, "should_abstain": False}),
+    Scenario("t_fulfilment_110h", "fulfilment", seed=913, extra_rate=0.012, delay_hours=110,
+             expected={"family": "fulfilment", "anomalous": True, "should_abstain": False}),
+    Scenario("t_delivered_lowvol", "delivered", seed=921, orders_per_day=150, extra_rate=0.02,
+             expected={"family": "delivered", "anomalous": True, "should_abstain": False}),
+    Scenario("t_delivered_bigshop", "delivered", seed=922, orders_per_day=500, extra_rate=0.008,
+             expected={"family": "delivered", "anomalous": True, "should_abstain": False}),
+    Scenario("t_delivered_heavy", "delivered", seed=923, extra_rate=0.025,
+             expected={"family": "delivered", "anomalous": True, "should_abstain": False}),
+    Scenario("t_fraud_charger", "fraud", seed=931, extra_rate=0.07, target_sku="CHG-65 charger",
+             expected={"family": "fraud", "anomalous": True, "should_abstain": False}),
+    Scenario("t_fraud_case_mild", "fraud", seed=932, extra_rate=0.04, target_sku="CSE-9 phone case",
+             expected={"family": "fraud", "anomalous": True, "should_abstain": False}),
+    Scenario("t_snad_headphones", "snad", seed=941, extra_rate=0.10, target_sku="HDP-220 wireless headphones",
+             expected={"family": "listing", "anomalous": True, "should_abstain": False}),
+    Scenario("t_snad_charger", "snad", seed=942, extra_rate=0.14, target_sku="CHG-65 charger",
+             expected={"family": "listing", "anomalous": True, "should_abstain": False}),
+    Scenario("t_mixed_ridgeway", "mixed", seed=951, extra_rate=0.05, target_carrier="Ridgeway Post", delay_hours=65,
+             expected={"family": None, "anomalous": True, "should_abstain": True}),
+    Scenario("t_quiet_bigshop", "none", seed=961, orders_per_day=500,
+             expected={"family": None, "anomalous": False, "should_abstain": True}),
+    Scenario("t_quiet_lowvol", "none", seed=962, orders_per_day=120,
+             expected={"family": None, "anomalous": False, "should_abstain": True}),
+    Scenario("t_small_fulfilment", "fulfilment", seed=971, orders_per_day=18, extra_rate=0.03, delay_hours=70,
+             expected={"family": "fulfilment", "anomalous": False, "should_abstain": True}),
+    Scenario("t_small_fraud", "fraud", seed=972, orders_per_day=22, extra_rate=0.08, target_sku="CBL-3 USB-C cable",
+             expected={"family": "fraud", "anomalous": False, "should_abstain": True}),
+]
+
 ABLATION = [
     # carrier failures
     Scenario("carrier_northline_strong", "carrier", seed=101, extra_rate=0.05, target_carrier="Northline Parcel",

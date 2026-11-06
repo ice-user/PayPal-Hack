@@ -58,6 +58,9 @@ class PayPalAdapter:
         self._secret = env.get("PAYPAL_CLIENT_SECRET", "")
         self.base = env.get("PAYPAL_BASE_URL", SANDBOX)
         self.webhook_id = env.get("PAYPAL_WEBHOOK_ID", "")
+        # Public deployments set PRECEDENT_REAL_EXECUTION=0 so anonymous visitors can only
+        # trigger labelled simulations. Reads stay real.
+        self.real_execution = env.get("PRECEDENT_REAL_EXECUTION", "1") != "0"
         if self.base != SANDBOX:
             raise ValueError("Refusing to run against a non-sandbox PayPal host.")
         self._token: tuple[str, float] | None = None
@@ -130,6 +133,8 @@ class PayPalAdapter:
         dispute_ids = action["params"].get("dispute_ids") or []
         if not self.configured:
             return self._sim(action, "PayPal sandbox credentials are not configured.")
+        if not self.real_execution:
+            return self._sim(action, "real PayPal execution is switched off on this deployment (PRECEDENT_REAL_EXECUTION=0).")
         if not dispute_ids:
             return self._sim(action, "No real sandbox dispute is linked to this action (the order feed is synthetic).")
         results, sims = [], []

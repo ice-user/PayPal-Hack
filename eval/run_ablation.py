@@ -31,7 +31,7 @@ from intelligence.cases import load_cases, usable  # noqa: E402
 from intelligence.consultant import DIAGNOSIS, FAMILY, recommend  # noqa: E402
 from intelligence.retrieve_baseline import retrieve  # noqa: E402
 from precedent.orders import generate  # noqa: E402
-from precedent.scenarios import ABLATION  # noqa: E402
+from precedent.scenarios import ABLATION, TEST  # noqa: E402
 from precedent.situation_builder import build  # noqa: E402
 
 OUT = ROOT / "eval" / "results"
@@ -61,14 +61,15 @@ def plan_text(rec: dict, *, with_citations: bool) -> str:
     return "\n".join(lines)
 
 
-def run() -> dict:
+def run(scenarios=ABLATION, prefix: str = "S") -> dict:
     cases = usable(load_cases())
     rows = []
-    for i, s in enumerate(ABLATION, start=1):
-        situation = build(generate(s), situation_id=f"sit_abl_{i:02d}", label=s.name)
+    for i, s in enumerate(scenarios, start=1):
+        situation = build(generate(s), situation_id=f"sit_abl_{prefix.lower()}{i:02d}", label=s.name)
         prec = retrieve(situation, cases, k=6)
         exp = s.expected
-        row = {"id": f"S{i:02d}", "scenario": s.name, "kind": s.kind, "expected": exp,
+        row = {"id": f"{prefix}{i:02d}", "scenario": s.name, "kind": s.kind, "expected": exp,
+               "detector_correct": situation["features"]["anomaly"]["is_anomalous"] == exp["anomalous"],
                "narrative": situation["narrative"], "features": situation["features"], "systems": {},
                "top3": [(p["case"]["case_id"], p["similarity"]) for p in prec[:3]]}
         if exp["family"]:
@@ -100,7 +101,7 @@ def run() -> dict:
     return {"cases_in_library": len(cases), "rows": rows}
 
 
-def summarise(result: dict) -> str:
+def summarise(result: dict, title: str = "Ablation results (automatic sanity checks)") -> str:
     rows = result["rows"]
     act_rows = [r for r in rows if not r["expected"]["should_abstain"]]
     abst_rows = [r for r in rows if r["expected"]["should_abstain"]]
@@ -109,7 +110,9 @@ def summarise(result: dict) -> str:
     def pct(n, d):
         return f"{n}/{d} ({(100 * n / d):.0f}%)" if d else "n/a"
 
-    lines = ["# Ablation results (automatic sanity checks)", "",
+    det = sum(r["detector_correct"] for r in rows)
+    lines = [f"# {title}", "",
+             f"Detector agrees with ground truth on {det}/{len(rows)} scenarios.", "",
              f"Scenarios: {len(rows)} ({len(act_rows)} where acting is right, {len(abst_rows)} where abstaining is right). "
              f"Case library: {result['cases_in_library']} approved cases (authored and public; none measured).", "",
              "| Check | System A: no precedent | System B: with precedent |", "|---|---|---|"]
@@ -151,7 +154,7 @@ def summarise(result: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def score_sheet(result: dict) -> None:
+def score_sheet(result: dict, out: Path) -> None:
     """Blind sheet: plans shown as Plan 1 / Plan 2 in random order; key kept separately."""
     rng = random.Random(2026)
     sheet, key = [], []
@@ -170,20 +173,25 @@ def score_sheet(result: dict) -> None:
                 "rater": "", "notes": "",
             })
             key.append({"item": item, "system": system, "mode": r["systems"][system]["mode"]})
-    with open(OUT / "score_sheet.csv", "w", newline="", encoding="utf-8") as f:
+    with open(out / "score_sheet.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(sheet[0]))
         w.writeheader()
         w.writerows(sheet)
-    (OUT / "score_sheet_KEY_do_not_open_before_rating.json").write_text(json.dumps(key, indent=2), encoding="utf-8", newline="\n")
+    (out / "score_sheet_KEY_do_not_open_before_rating.json").write_text(json.dumps(key, indent=2), encoding="utf-8", newline="\n")
 
 
 def main() -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    result = run()
-    (OUT / "ablation_runs.json").write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
-    summary = summarise(result)
-    (OUT / "summary.md").write_text(summary, encoding="utf-8", newline="\n")
-    score_sheet(result)
+    which = sys.argv[1] if len(sys.argv) > 1 else "dev"
+    if which == "test":
+        out, scenarios, prefix, title = OUT / "test", TEST, "T", "Held-out TEST set (run once, library v1 frozen)"
+    else:
+        out, scenarios, prefix, title = OUT, ABLATION, "S", "Ablation results (automatic sanity checks)"
+    out.mkdir(parents=True, exist_ok=True)
+    result = run(scenarios, prefix)
+    (out / "ablation_runs.json").write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
+    summary = summarise(result, title)
+    (out / "summary.md").write_text(summary, encoding="utf-8", newline="\n")
+    score_sheet(result, out)
     print(summary)
 
 

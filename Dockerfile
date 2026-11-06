@@ -14,7 +14,9 @@ RUN cd frontend && VITE_API_BASE=/ npx tsc --noEmit -p . && VITE_API_BASE=/ npx 
 
 FROM python:3.12-slim
 WORKDIR /app
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PRECEDENT_STATIC_DIR=/app/frontend/dist
+# Public by default: approvals simulate instead of calling PayPal. Set PRECEDENT_REAL_EXECUTION=1
+# only on a private deployment you control.
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PRECEDENT_STATIC_DIR=/app/frontend/dist PRECEDENT_REAL_EXECUTION=0
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY contracts ./contracts

@@ -10,6 +10,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 5.8x in 7 days, mostly on Northline Parcel.",
       "features": {
         "transactions_7d": 1820,
@@ -73,8 +74,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_01_np",
-            "situation_id": "sit_abl_01",
+            "recommendation_id": "rec_abl_s01_np",
+            "situation_id": "sit_abl_s01",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -153,8 +154,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_01_wp",
-            "situation_id": "sit_abl_01",
+            "recommendation_id": "rec_abl_s01_wp",
+            "situation_id": "sit_abl_s01",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -366,6 +367,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 5.7x in 7 days, mostly on Ridgeway Post.",
       "features": {
         "transactions_7d": 1772,
@@ -428,8 +430,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_02_np",
-            "situation_id": "sit_abl_02",
+            "recommendation_id": "rec_abl_s02_np",
+            "situation_id": "sit_abl_s02",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -508,8 +510,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_02_wp",
-            "situation_id": "sit_abl_02",
+            "recommendation_id": "rec_abl_s02_wp",
+            "situation_id": "sit_abl_s02",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -710,6 +712,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 4.4x in 7 days, mostly on Metro Courier.",
       "features": {
         "transactions_7d": 1807,
@@ -771,8 +774,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_03_np",
-            "situation_id": "sit_abl_03",
+            "recommendation_id": "rec_abl_s03_np",
+            "situation_id": "sit_abl_s03",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -851,8 +854,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_03_wp",
-            "situation_id": "sit_abl_03",
+            "recommendation_id": "rec_abl_s03_wp",
+            "situation_id": "sit_abl_s03",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -1059,6 +1062,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 4.9x in 7 days, mostly on Coastal Express.",
       "features": {
         "transactions_7d": 1838,
@@ -1122,8 +1126,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_04_np",
-            "situation_id": "sit_abl_04",
+            "recommendation_id": "rec_abl_s04_np",
+            "situation_id": "sit_abl_s04",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -1202,8 +1206,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_04_wp",
-            "situation_id": "sit_abl_04",
+            "recommendation_id": "rec_abl_s04_wp",
+            "situation_id": "sit_abl_s04",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -1413,6 +1417,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 4.6x in 7 days, across 4 carriers, time to ship is 60h.",
       "features": {
         "transactions_7d": 1788,
@@ -1477,8 +1482,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_05_np",
-            "situation_id": "sit_abl_05",
+            "recommendation_id": "rec_abl_s05_np",
+            "situation_id": "sit_abl_s05",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -1557,8 +1562,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_05_wp",
-            "situation_id": "sit_abl_05",
+            "recommendation_id": "rec_abl_s05_wp",
+            "situation_id": "sit_abl_s05",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -1755,6 +1760,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 4.6x in 7 days, across 3 carriers, time to ship is 91h.",
       "features": {
         "transactions_7d": 1875,
@@ -1818,8 +1824,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_06_np",
-            "situation_id": "sit_abl_06",
+            "recommendation_id": "rec_abl_s06_np",
+            "situation_id": "sit_abl_s06",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -1898,8 +1904,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_06_wp",
-            "situation_id": "sit_abl_06",
+            "recommendation_id": "rec_abl_s06_wp",
+            "situation_id": "sit_abl_s06",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -2093,6 +2099,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 6.7x in 7 days, across 4 carriers, time to ship is 50h.",
       "features": {
         "transactions_7d": 1779,
@@ -2156,8 +2163,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_07_np",
-            "situation_id": "sit_abl_07",
+            "recommendation_id": "rec_abl_s07_np",
+            "situation_id": "sit_abl_s07",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -2236,8 +2243,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_07_wp",
-            "situation_id": "sit_abl_07",
+            "recommendation_id": "rec_abl_s07_wp",
+            "situation_id": "sit_abl_s07",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -2430,6 +2437,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 5.3x in 7 days, 93% of disputed orders show a delivery scan.",
       "features": {
         "transactions_7d": 1836,
@@ -2493,8 +2501,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_08_np",
-            "situation_id": "sit_abl_08",
+            "recommendation_id": "rec_abl_s08_np",
+            "situation_id": "sit_abl_s08",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -2573,8 +2581,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_08_wp",
-            "situation_id": "sit_abl_08",
+            "recommendation_id": "rec_abl_s08_wp",
+            "situation_id": "sit_abl_s08",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -2764,6 +2772,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 5.4x in 7 days, 87% of disputed orders show a delivery scan.",
       "features": {
         "transactions_7d": 1840,
@@ -2826,8 +2835,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_09_np",
-            "situation_id": "sit_abl_09",
+            "recommendation_id": "rec_abl_s09_np",
+            "situation_id": "sit_abl_s09",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -2906,8 +2915,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_09_wp",
-            "situation_id": "sit_abl_09",
+            "recommendation_id": "rec_abl_s09_wp",
+            "situation_id": "sit_abl_s09",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -3094,6 +3103,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 3.2x in 7 days, 90% of disputed orders show a delivery scan.",
       "features": {
         "transactions_7d": 1933,
@@ -3157,8 +3167,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_10_np",
-            "situation_id": "sit_abl_10",
+            "recommendation_id": "rec_abl_s10_np",
+            "situation_id": "sit_abl_s10",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -3237,8 +3247,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_10_wp",
-            "situation_id": "sit_abl_10",
+            "recommendation_id": "rec_abl_s10_wp",
+            "situation_id": "sit_abl_s10",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -3422,6 +3432,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Unauthorised-transaction disputes up 11.4x in 7 days, 89% of disputed orders show a delivery scan, concentrated on CBL-3 USB-C cable.",
       "features": {
         "transactions_7d": 1845,
@@ -3485,8 +3496,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_11_np",
-            "situation_id": "sit_abl_11",
+            "recommendation_id": "rec_abl_s11_np",
+            "situation_id": "sit_abl_s11",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -3565,8 +3576,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_11_wp",
-            "situation_id": "sit_abl_11",
+            "recommendation_id": "rec_abl_s11_wp",
+            "situation_id": "sit_abl_s11",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -3757,6 +3768,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Unauthorised-transaction disputes up 6.4x in 7 days, 90% of disputed orders show a delivery scan, concentrated on HDP-220 wireless headphones.",
       "features": {
         "transactions_7d": 1911,
@@ -3820,8 +3832,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_12_np",
-            "situation_id": "sit_abl_12",
+            "recommendation_id": "rec_abl_s12_np",
+            "situation_id": "sit_abl_s12",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -3900,8 +3912,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_12_wp",
-            "situation_id": "sit_abl_12",
+            "recommendation_id": "rec_abl_s12_wp",
+            "situation_id": "sit_abl_s12",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -4093,6 +4105,7 @@
         "anomalous": true,
         "should_abstain": false
       },
+      "detector_correct": true,
       "narrative": "Not-as-described disputes up 9.3x in 7 days, 100% of disputed orders show a delivery scan, concentrated on SPK-10 speaker.",
       "features": {
         "transactions_7d": 1802,
@@ -4157,8 +4170,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_13_np",
-            "situation_id": "sit_abl_13",
+            "recommendation_id": "rec_abl_s13_np",
+            "situation_id": "sit_abl_s13",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -4237,8 +4250,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_13_wp",
-            "situation_id": "sit_abl_13",
+            "recommendation_id": "rec_abl_s13_wp",
+            "situation_id": "sit_abl_s13",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -4410,6 +4423,7 @@
         "anomalous": true,
         "should_abstain": true
       },
+      "detector_correct": true,
       "narrative": "Item-not-received disputes up 7.7x in 7 days, across 3 carriers, time to ship is 58h.",
       "features": {
         "transactions_7d": 1777,
@@ -4474,8 +4488,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_14_np",
-            "situation_id": "sit_abl_14",
+            "recommendation_id": "rec_abl_s14_np",
+            "situation_id": "sit_abl_s14",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "Spike in item-not-received disputes",
@@ -4554,8 +4568,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_14_wp",
-            "situation_id": "sit_abl_14",
+            "recommendation_id": "rec_abl_s14_wp",
+            "situation_id": "sit_abl_s14",
             "mode": "with_precedent",
             "grounding": "precedent",
             "precedents": [
@@ -4744,6 +4758,7 @@
         "anomalous": false,
         "should_abstain": true
       },
+      "detector_correct": true,
       "narrative": "Dispute rate 0.17% vs baseline 0.31%: sample too small to call.",
       "features": {
         "transactions_7d": 1787,
@@ -4807,8 +4822,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_15_np",
-            "situation_id": "sit_abl_15",
+            "recommendation_id": "rec_abl_s15_np",
+            "situation_id": "sit_abl_s15",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "No actionable anomaly",
@@ -4839,8 +4854,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_15_wp",
-            "situation_id": "sit_abl_15",
+            "recommendation_id": "rec_abl_s15_wp",
+            "situation_id": "sit_abl_s15",
             "mode": "with_precedent",
             "grounding": "precedent",
             "diagnosis": "No actionable anomaly",
@@ -4997,6 +5012,7 @@
         "anomalous": false,
         "should_abstain": true
       },
+      "detector_correct": true,
       "narrative": "Dispute rate 0.28% vs baseline 0.27%: sample too small to call.",
       "features": {
         "transactions_7d": 1808,
@@ -5060,8 +5076,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_16_np",
-            "situation_id": "sit_abl_16",
+            "recommendation_id": "rec_abl_s16_np",
+            "situation_id": "sit_abl_s16",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "No actionable anomaly",
@@ -5092,8 +5108,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_16_wp",
-            "situation_id": "sit_abl_16",
+            "recommendation_id": "rec_abl_s16_wp",
+            "situation_id": "sit_abl_s16",
             "mode": "with_precedent",
             "grounding": "precedent",
             "diagnosis": "No actionable anomaly",
@@ -5252,6 +5268,7 @@
         "anomalous": false,
         "should_abstain": true
       },
+      "detector_correct": true,
       "narrative": "Dispute rate 1.53% vs baseline 0.86%: sample too small to call.",
       "features": {
         "transactions_7d": 131,
@@ -5313,8 +5330,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_17_np",
-            "situation_id": "sit_abl_17",
+            "recommendation_id": "rec_abl_s17_np",
+            "situation_id": "sit_abl_s17",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "No actionable anomaly",
@@ -5345,8 +5362,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_17_wp",
-            "situation_id": "sit_abl_17",
+            "recommendation_id": "rec_abl_s17_wp",
+            "situation_id": "sit_abl_s17",
             "mode": "with_precedent",
             "grounding": "precedent",
             "diagnosis": "No actionable anomaly",
@@ -5491,6 +5508,7 @@
         "anomalous": false,
         "should_abstain": true
       },
+      "detector_correct": true,
       "narrative": "Dispute rate 3.41% vs baseline 0.65%: sample too small to call.",
       "features": {
         "transactions_7d": 176,
@@ -5553,8 +5571,8 @@
         "A": {
           "mode": "no_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_18_np",
-            "situation_id": "sit_abl_18",
+            "recommendation_id": "rec_abl_s18_np",
+            "situation_id": "sit_abl_s18",
             "mode": "no_precedent",
             "grounding": "none",
             "diagnosis": "No actionable anomaly",
@@ -5585,8 +5603,8 @@
         "B": {
           "mode": "with_precedent",
           "recommendation": {
-            "recommendation_id": "rec_abl_18_wp",
-            "situation_id": "sit_abl_18",
+            "recommendation_id": "rec_abl_s18_wp",
+            "situation_id": "sit_abl_s18",
             "mode": "with_precedent",
             "grounding": "precedent",
             "diagnosis": "No actionable anomaly",

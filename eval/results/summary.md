@@ -1,5 +1,7 @@
 # Ablation results (automatic sanity checks)
 
+Detector agrees with ground truth on 18/18 scenarios.
+
 Scenarios: 18 (13 where acting is right, 5 where abstaining is right). Case library: 31 approved cases (authored and public; none measured).
 
 | Check | System A: no precedent | System B: with precedent |
