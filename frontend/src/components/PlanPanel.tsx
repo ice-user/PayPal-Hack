@@ -17,6 +17,7 @@ interface Props {
   onApprove: (a: Action) => void;
   onReject: (a: Action) => void;
   onOpenCase: (caseId: string) => void;
+  onReview?: (caseId: string, decision: "approved" | "rejected") => void;
 }
 
 function ParamsLine({ a }: { a: Action }) {
@@ -49,7 +50,7 @@ function StateLine({ view, auto }: { view: ActionView; auto: boolean }) {
   return null;
 }
 
-export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onReject, onOpenCase }: Props) {
+export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onReject, onOpenCase, onReview }: Props) {
   const byId = Object.fromEntries(decisions.map((d) => [d.action_id, d]));
   return (
     <section className="panel" aria-labelledby="plan-h">
@@ -97,8 +98,24 @@ export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onR
           <p>
             7-day dispute rate <strong className="num">{rate(outcome.before)}</strong> before,{" "}
             <strong className="num">{rate(outcome.after)}</strong> after. Simulated replay, not a real measurement.
-            {outcome.new_case_id && <> Recorded as <code>{outcome.new_case_id}</code>, pending review.</>}
           </p>
+          {outcome.new_case_id && (
+            <div className="review">
+              <span>
+                Recorded as{" "}
+                <button className="linklike" onClick={() => onOpenCase(outcome.new_case_id!)}><code>{outcome.new_case_id}</code></button>
+                {outcome.case_review_status === "approved" && <> · added to the case library as a simulated case (it can inform a diagnosis, never a forecast)</>}
+                {outcome.case_review_status === "rejected" && <> · discarded</>}
+                {(outcome.case_review_status ?? "pending") === "pending" && <> · waiting for your review</>}
+              </span>
+              {(outcome.case_review_status ?? "pending") === "pending" && onReview && (
+                <span className="buttons">
+                  <button className="btn primary" disabled={busy !== null} onClick={() => onReview(outcome.new_case_id!, "approved")}>Add to case library</button>
+                  <button className="btn" disabled={busy !== null} onClick={() => onReview(outcome.new_case_id!, "rejected")}>Discard</button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
       )}
 

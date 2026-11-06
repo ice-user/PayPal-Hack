@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Action, ActionState, Bundle, LiveDispute, Mode, TimelineEvent } from "./types";
-import { advanceClock, approveAction, dataMode, getBundle, getLiveDispute, listSituations, rejectAction } from "./api";
+import {
+  advanceClock, approveAction, dataMode, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
+  type AuditEvent,
+} from "./api";
+import { AuditLog } from "./components/AuditLog";
 import thresholds from "@contracts/thresholds.json";
 import { SituationPanel } from "./components/SituationPanel";
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
@@ -36,6 +40,12 @@ export default function App() {
   const [busy, setBusy] = useState<string | null>(null);
   const [live, setLive] = useState<{ dispute?: LiveDispute; error?: string } | null>(null);
   const [openCase, setOpenCase] = useState<string | null>(null);
+  const [audit, setAudit] = useState<AuditEvent[]>([]);
+
+  useEffect(() => {
+    if (!API || !bundle) return;
+    getAudit(25).then(setAudit).catch(() => setAudit([]));
+  }, [bundle]);
 
   // Fixture mode keeps action states per recommendation in the browser.
   const [localStates, setLocalStates] = useState<Record<string, Record<string, ActionState>>>({});
@@ -113,6 +123,12 @@ export default function App() {
     setLocal(recId, a.action_id, "rejected");
   };
 
+  const review = (caseId: string, decision: "approved" | "rejected") =>
+    run("review", async () => {
+      await reviewCase(caseId, decision);
+      return getBundle(key, mode);
+    });
+
   const canAdvance =
     API && !!bundle && !bundle.outcome &&
     bundle.policy_decisions.some((d) => d.decision === "NEEDS_APPROVAL" && views[d.action_id]?.state === "succeeded");
@@ -178,6 +194,7 @@ export default function App() {
               onApprove={approve}
               onReject={reject}
               onOpenCase={setOpenCase}
+              onReview={API ? review : undefined}
             />
           </main>
           <Timeline
@@ -194,7 +211,9 @@ export default function App() {
         </>
       )}
 
-      <CaseDrawer caseId={openCase} onClose={() => setOpenCase(null)} />
+      {API && audit.length > 0 && <AuditLog events={audit} />}
+
+      <CaseDrawer caseId={openCase} onClose={() => setOpenCase(null)} apiMode={API} />
 
       <footer className="foot">
         Decision support with cited precedents, not financial advice. Outcomes are observed, never claimed as caused.

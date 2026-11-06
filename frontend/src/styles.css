@@ -264,6 +264,16 @@ code { font: 12px/1.4 ui-monospace, "Cascadia Mono", Consolas, monospace; }
 .prov-inferred { background: var(--warn-soft); color: var(--warn); }
 .prov-authored { background: var(--sim-soft); color: var(--sim); }
 .prov-empty { background: var(--surface-2); color: var(--ink-3); }
+.review { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 13px; }
+.review .buttons { margin-top: 0; }
+.audit { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; }
+.audit summary { cursor: pointer; font-weight: 600; }
+.audit ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; font-size: 12.5px; }
+.audit li { display: grid; grid-template-columns: 170px 110px 220px 1fr; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+@media (max-width: 900px) { .audit li { grid-template-columns: 1fr; gap: 2px; } }
+.audit time { color: var(--ink-3); }
+.audit-actor { color: var(--ink-2); }
+.audit-detail { color: var(--ink-2); overflow-wrap: anywhere; }
 .foot { margin-top: 18px; color: var(--ink-3); font-size: 12px; text-align: center; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

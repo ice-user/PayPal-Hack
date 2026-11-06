@@ -36,7 +36,8 @@
         "after": {"type": "number"},
         "horizon_days": {"type": "integer"},
         "simulated": {"const": true},
-        "new_case_id": {"type": "string"}
+        "new_case_id": {"type": "string"},
+        "case_review_status": {"type": "string", "enum": ["pending", "approved", "rejected"]}
       }
     },
     "timeline": {

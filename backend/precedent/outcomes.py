@@ -32,6 +32,17 @@ def simulate(scenario: Scenario, chosen_family: str | None, *, horizon_days: int
     return {"fit": fit, "after_rate": after["dispute_rate_7d"], "after_features": after, "horizon_days": horizon_days}
 
 
+def _chosen_intervention(rec: dict) -> str:
+    """The intervention most cited by the recommendation's actions."""
+    cited = [c for a in rec["actions"] for c in a["supporting_cases"]]
+    by_id = {p["case_id"]: p["intervention"] for p in rec["precedents"]}
+    counts: dict[str, int] = {}
+    for cid in cited:
+        if cid in by_id:
+            counts[by_id[cid]] = counts.get(by_id[cid], 0) + 1
+    return max(counts, key=counts.get) if counts else "fraud_screening"
+
+
 def live_simulated_case(rec: dict, situation: dict, before: float, after: float, horizon: int, n: int) -> dict:
     f = situation["features"]
     return {
@@ -54,7 +65,7 @@ def live_simulated_case(rec: dict, situation: dict, before: float, after: float,
         },
         "narrative": situation["narrative"],
         "diagnosis": rec["diagnosis"],
-        "intervention": rec["precedents"][0]["intervention"] if rec["precedents"] else "fraud_screening",
+        "intervention": _chosen_intervention(rec),
         "actions": sorted({a["type"] for a in rec["actions"]}) or ["FLAG_ONLY"],
         "outcome": {"summary": (f"Simulated: 7-day dispute rate {before * 100:.2f}% before, {after * 100:.2f}% after "
                                 f"{horizon} simulated days. Not a real-world measurement."),

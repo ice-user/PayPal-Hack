@@ -58,5 +58,19 @@ export const rejectAction = (situation: string, mode: Mode, action_id: string) =
 export const advanceClock = (situation: string, mode: Mode, days = 14) =>
   call<Bundle>("/api/sim/advance", { method: "POST", body: JSON.stringify({ situation, mode, days }) });
 
+export const reviewCase = (caseId: string, decision: "approved" | "rejected") =>
+  call<unknown>(`/api/cases/${encodeURIComponent(caseId)}/review`, { method: "POST", body: JSON.stringify({ decision }) });
+
+export const fetchCase = <T,>(caseId: string) => call<T>(`/api/cases/${encodeURIComponent(caseId)}`);
+
+export interface AuditEvent {
+  id: number;
+  at: string;
+  actor: string;
+  event: string;
+  payload: Record<string, unknown>;
+}
+export const getAudit = (limit = 25) => call<{ events: AuditEvent[] }>(`/api/audit?limit=${limit}`).then((r) => r.events);
+
 export const getLiveDispute = (id: string) =>
   call<{ source: string; dispute: LiveDispute }>(`/api/paypal/disputes/${encodeURIComponent(id)}`).then((r) => r.dispute);

@@ -138,4 +138,16 @@ class Store:
                             (case["case_id"], json.dumps(case), now()))
 
     def pending_cases(self) -> list[dict]:
+        """All live_simulated cases recorded by the outcome tracker, whatever their review status."""
         return [json.loads(r["body"]) for r in self.db.execute("SELECT body FROM pending_cases ORDER BY created_at")]
+
+    def review_case(self, case_id: str, decision: str) -> dict | None:
+        row = self.db.execute("SELECT body FROM pending_cases WHERE case_id=?", (case_id,)).fetchone()
+        if row is None:
+            return None
+        case = json.loads(row["body"])
+        case["review_status"] = decision
+        case["tags"] = [t for t in case.get("tags", []) if t != "pending_review"] + [f"review_{decision}"]
+        with self._lock, self.db:
+            self.db.execute("UPDATE pending_cases SET body=? WHERE case_id=?", (json.dumps(case), case_id))
+        return case

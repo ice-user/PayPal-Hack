@@ -119,10 +119,26 @@ class Service:
         situation = self.situations[key]
         cache_key = (key, mode)
         if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
-            self._plans[cache_key] = plan(situation, self.cases, mode, writer=make_writer(situation))
+            self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation))
         rec, decisions = self._plans[cache_key]
         self.executor.register(rec, decisions)
         return situation, rec, decisions
+
+    def library(self) -> list[dict]:
+        """Static approved cases plus live_simulated cases a human approved. Simulated cases
+        can inform diagnosis but never a numeric forecast (effects use measured cases only)."""
+        return self.cases + [c for c in self.store.pending_cases() if c["review_status"] == "approved"]
+
+    def review_case(self, case_id: str, decision: str) -> dict:
+        if decision not in ("approved", "rejected"):
+            raise ActionError(400, "decision must be 'approved' or 'rejected'")
+        case = self.store.review_case(case_id, decision)
+        if case is None:
+            raise ActionError(404, f"No pending case {case_id}")
+        validate("case", case)
+        self.store.audit("merchant", "case_reviewed", {"case_id": case_id, "decision": decision})
+        self._plans.clear()  # the library changed: re-plan on next request
+        return case
 
     def bundle(self, key: str, mode: str) -> dict:
         situation, rec, decisions = self._plan(key, mode)
@@ -133,9 +149,11 @@ class Service:
         outcome = None
         if outs:
             o = outs[-1]
+            case_id = f"case_ls_{rec['recommendation_id'].removeprefix('rec_').lower()}_{len(outs)}"
+            case = next((c for c in self.store.pending_cases() if c["case_id"] == case_id), None)
             outcome = {"metric": o["metric"], "before": o["before"], "after": o["after"],
-                       "horizon_days": o["horizon_days"], "simulated": True,
-                       "new_case_id": f"case_ls_{rec['recommendation_id'].removeprefix('rec_').lower()}_{len(outs)}"}
+                       "horizon_days": o["horizon_days"], "simulated": True, "new_case_id": case_id,
+                       "case_review_status": case["review_status"] if case else "pending"}
         bundle = {"situation": situation, "recommendation": rec, "policy_decisions": decisions,
                   "action_states": states, "outcome": outcome,
                   "timeline": timeline(situation, rec, decisions, states, outcome)}

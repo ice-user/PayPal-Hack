@@ -122,6 +122,7 @@ export interface Outcome {
   horizon_days: number;
   simulated: true;
   new_case_id?: string;
+  case_review_status?: "pending" | "approved" | "rejected";
 }
 
 export interface Bundle {

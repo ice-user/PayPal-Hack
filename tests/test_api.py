@@ -114,6 +114,24 @@ def test_simulated_clock_requires_an_executed_action_and_records_pending_case(bl
     assert pending[0]["case_id"] not in {c["case_id"] for c in svc.cases}  # never retrievable until reviewed
 
 
+def test_reviewed_simulated_case_joins_library_but_never_drives_numbers(blocked_pp):
+    client, svc = make_client(blocked_pp)
+    aid = first_needs_approval(client.get("/api/bundles/A").json())
+    client.post("/api/actions/approve", json={"situation": "A", "action_id": aid})
+    b = client.post("/api/sim/advance", json={"situation": "A"}).json()
+    cid = b["outcome"]["new_case_id"]
+    assert b["outcome"]["case_review_status"] == "pending"
+    assert client.post(f"/api/cases/{cid}/review", json={"decision": "maybe"}).status_code == 400
+    r = client.post(f"/api/cases/{cid}/review", json={"decision": "approved"})
+    assert r.status_code == 200 and r.json()["review_status"] == "approved"
+    b2 = client.get("/api/bundles/A").json()
+    assert b2["outcome"]["case_review_status"] == "approved"
+    sim = [p for p in b2["recommendation"]["precedents"] if p["case_id"] == cid]
+    assert sim and sim[0]["provenance"] == "live_simulated" and sim[0]["evidence_quality"] == "simulated"
+    assert b2["recommendation"]["predicted_effect"] is None  # simulated cases never produce numbers
+    assert any(e["event"] == "case_reviewed" for e in client.get("/api/audit").json()["events"])
+
+
 def test_webhook_bad_signature_rejected_and_replay_ignored():
     bad = FakePayPal(verify="FAILURE")
     client, _ = make_client(bad)

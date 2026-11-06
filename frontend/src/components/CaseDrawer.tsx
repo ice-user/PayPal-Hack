@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
-import { getCase } from "../cases";
+import { useEffect, useRef, useState } from "react";
+import { fetchCase } from "../api";
+import { getCase, type CaseRecord } from "../cases";
 import { ACTION_LABEL, INTERVENTION_LABEL } from "../format";
 import { ProvenanceBadge, QualityBadge } from "./Badges";
 
@@ -10,9 +11,17 @@ const FIELD_LABEL: Record<string, string> = {
   empty: "Not available",
 };
 
-export function CaseDrawer({ caseId, onClose }: { caseId: string | null; onClose: () => void }) {
+export function CaseDrawer({ caseId, onClose, apiMode }: { caseId: string | null; onClose: () => void; apiMode: boolean }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const c = caseId ? getCase(caseId) : undefined;
+  const [remote, setRemote] = useState<CaseRecord | undefined>(undefined);
+  const local = caseId ? getCase(caseId) : undefined;
+  const c = local ?? (remote?.case_id === caseId ? remote : undefined);
+
+  // Cases recorded by the outcome tracker exist only in the backend.
+  useEffect(() => {
+    if (!caseId || local || !apiMode) return;
+    fetchCase<CaseRecord>(caseId).then(setRemote).catch(() => setRemote(undefined));
+  }, [caseId, local, apiMode]);
 
   useEffect(() => {
     const d = ref.current;

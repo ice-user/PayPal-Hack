@@ -89,11 +89,22 @@ def advance(req: AdvanceRequest) -> dict:
     return _guard(service().advance, req.situation, req.mode, req.days)
 
 
+class ReviewRequest(BaseModel):
+    decision: str = Field(examples=["approved"])
+
+
+@app.post("/api/cases/{case_id}/review")
+def review_case(case_id: str, req: ReviewRequest) -> dict:
+    """A human approves or rejects a live_simulated case before it can be retrieved."""
+    return _guard(service().review_case, case_id, req.decision)
+
+
 @app.post("/api/demo/reset")
 def demo_reset() -> dict:
     """Clear approvals, outcomes and pending cases (not the audit log). Does not touch PayPal."""
     s = service()
     s.store.reset_demo()
+    s._plans.clear()
     s.store.audit("operator", "demo_reset", {})
     return {"ok": True}
 
