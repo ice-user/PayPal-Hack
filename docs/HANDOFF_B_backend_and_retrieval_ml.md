@@ -1,5 +1,29 @@
 # Handoff: Person B (backend and retrieval ML)
 
+> **Status update (overnight 7 to 8 Nov):** with Person A's go-ahead, a first working
+> version of most of this list was built in `backend/precedent/`. Please review and extend it
+> rather than rebuild. `docs/STATUS_2026-11-07.md` has the details.
+>
+> | Item | State |
+> |---|---|
+> | Spike 1 | **PASS.** A real seller message was sent; see `docs/SPIKE1_RESULT.md` |
+> | Order feed generator, Situation Builder | Done: `orders.py`, `situation_builder.py`, `scenarios.py` |
+> | API, DB, audit log | Done: `api.py`, `service.py`, `store.py` (FastAPI, SQLite) |
+> | Policy gate, executor | Done: `intelligence/gate_reference.py` (tiers) plus `executor.py` (state machine, idempotency, rate limit) |
+> | PayPal adapter | Done: `paypal_adapter.py`, with a re-check before execute and a labelled simulation fallback |
+> | Outcome tracker | Done: `outcomes.py` (simulated clock), plus a human review of the new case |
+> | Webhook receiver | Code and tests done. **Not live:** needs a public URL and `PAYPAL_WEBHOOK_ID` |
+> | Retriever | Baseline structured retriever only (`intelligence/retrieve_baseline.py`). **Hybrid text retrieval is still yours** |
+> | Tests, Recall@3 | 61 tests; Recall@3 is in `eval/run_ablation.py` |
+> | Hosting | `Dockerfile` ready, not deployed. **Yours:** pick a host, set secrets, deploy |
+>
+> **Most useful next steps for you:**
+> 1. Deploy the container and register a sandbox webhook.
+> 2. Add hybrid retrieval: narrative embeddings fused with the structured score, keeping
+>    `similarity` comparable to the 0.6 threshold.
+> 3. Confirm or change `contracts/thresholds.json`.
+> 4. Optionally, API dispute creation with buyer consent (Log in with PayPal).
+
 Read first: `docs/BRIEF.md` (decisions and rules), then `docs/DESIGN.md` (sections
 2, 3, 5, 7, 7a, 8, 9). This file is your task list.
 

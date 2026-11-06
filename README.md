@@ -9,6 +9,26 @@ and a human click, executes them through the PayPal Sandbox. The same symptom
 
 Built for the PayPal AI Hackathon. **Work in progress.**
 
+## How it works
+
+```mermaid
+flowchart LR
+  F[Order and fulfilment feed<br/>synthetic, seeded] --> S[Situation Builder<br/>binomial test, Wilson CI,<br/>carrier / SKU / delay / delivered]
+  S --> R[Retriever<br/>similar cases, matched_on / differs_on]
+  L[(Case library<br/>public, authored,<br/>reviewed sandbox cases)] --> R
+  R --> C[Consultant<br/>precedent vote, fixed action enum,<br/>abstains when weak]
+  C --> G{Policy gate<br/>AUTO / NEEDS APPROVAL / BLOCKED}
+  G -->|human click| E[Executor<br/>idempotent state machine]
+  E --> P[PayPal adapter<br/>re-reads dispute, real call if allowed,<br/>else labelled simulation]
+  P --> PP[(PayPal Sandbox<br/>Disputes API)]
+  E --> O[Outcome tracker<br/>simulated clock]
+  O -->|human review| L
+  E --> A[(Audit log)]
+```
+
+Results so far: [eval/results/summary.md](eval/results/summary.md). Submission draft:
+[docs/SUBMISSION.md](docs/SUBMISSION.md). Demo script: [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+
 ## Honest labels
 
 - The demo merchant's order feed is **synthetic**. Detection statistics run on it for real.
