@@ -18,12 +18,14 @@ from intelligence.schema import thresholds, validate  # noqa: E402
 from .executor import CLIENT_STATE, ActionError, Executor  # noqa: E402
 from .orders import generate  # noqa: E402
 from .outcomes import live_simulated_case, simulate  # noqa: E402
-from .paypal_adapter import PayPalAdapter  # noqa: E402
+from .paypal_adapter import PayPalAdapter, load_env  # noqa: E402
 from .scenarios import DEMO  # noqa: E402
 from .situation_builder import build  # noqa: E402
 from .store import Store  # noqa: E402
 
-REAL_SANDBOX_DISPUTE = "PP-R-BTL-10196893"  # created by hand in the sandbox, see docs/SPIKE1_RESULT.md
+# The real sandbox dispute linked to demo situation A (created by hand, see docs/SPIKE1_RESULT.md).
+# Override with DEMO_DISPUTE_ID in backend/.env when you make a fresh one for recording.
+REAL_SANDBOX_DISPUTE = load_env().get("DEMO_DISPUTE_ID") or "PP-R-BTL-10196893"
 MODES = ("with_precedent", "no_precedent")
 DIAG_TO_FAMILY = {v: k for k, v in DIAGNOSIS.items()}
 

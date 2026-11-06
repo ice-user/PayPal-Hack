@@ -16,6 +16,7 @@ interface Props {
   outcome: Outcome | null;
   onApprove: (a: Action) => void;
   onReject: (a: Action) => void;
+  onOpenCase: (caseId: string) => void;
 }
 
 function ParamsLine({ a }: { a: Action }) {
@@ -48,7 +49,7 @@ function StateLine({ view, auto }: { view: ActionView; auto: boolean }) {
   return null;
 }
 
-export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onReject }: Props) {
+export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onReject, onOpenCase }: Props) {
   const byId = Object.fromEntries(decisions.map((d) => [d.action_id, d]));
   return (
     <section className="panel" aria-labelledby="plan-h">
@@ -127,7 +128,10 @@ export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onR
                 {a.supporting_cases.length > 0 && (
                   <div className="chips">
                     <span className="label">Cites</span>
-                    {a.supporting_cases.map((c) => <code key={c} className="chip cite">{c}</code>)}
+                    {a.supporting_cases.map((c) => (
+                      <button key={c} className="chip cite linklike" onClick={() => onOpenCase(c)}
+                        aria-label={`Open case ${c}`}><code>{c}</code></button>
+                    ))}
                   </div>
                 )}
                 {d?.decision === "NEEDS_APPROVAL" && state === "proposed" && (

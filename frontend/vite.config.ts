@@ -6,7 +6,10 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { "@contracts": path.resolve(__dirname, "../contracts") },
+    alias: {
+      "@contracts": path.resolve(__dirname, "../contracts"),
+      "@cases": path.resolve(__dirname, "../cases"),
+    },
   },
   server: {
     port: 5173,

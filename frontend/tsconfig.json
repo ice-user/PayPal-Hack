@@ -14,7 +14,7 @@
     "noEmit": true,
     "types": ["vite/client"],
     "baseUrl": ".",
-    "paths": { "@contracts/*": ["../contracts/*"] }
+    "paths": { "@contracts/*": ["../contracts/*"], "@cases/*": ["../cases/*"] }
   },
   "include": ["src"]
 }

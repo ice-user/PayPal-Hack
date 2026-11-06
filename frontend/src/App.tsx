@@ -6,6 +6,7 @@ import { SituationPanel } from "./components/SituationPanel";
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
 import { PlanPanel, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
+import { CaseDrawer } from "./components/CaseDrawer";
 
 const situations = listSituations();
 const API = dataMode === "api";
@@ -34,6 +35,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [live, setLive] = useState<{ dispute?: LiveDispute; error?: string } | null>(null);
+  const [openCase, setOpenCase] = useState<string | null>(null);
 
   // Fixture mode keeps action states per recommendation in the browser.
   const [localStates, setLocalStates] = useState<Record<string, Record<string, ActionState>>>({});
@@ -166,7 +168,7 @@ export default function App() {
           </div>
           <main className="grid">
             <SituationPanel situation={bundle.situation} live={live} apiMode={API} />
-            <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} />
+            <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} onOpenCase={setOpenCase} />
             <PlanPanel
               rec={bundle.recommendation}
               decisions={bundle.policy_decisions}
@@ -175,6 +177,7 @@ export default function App() {
               outcome={bundle.outcome ?? null}
               onApprove={approve}
               onReject={reject}
+              onOpenCase={setOpenCase}
             />
           </main>
           <Timeline
@@ -190,6 +193,8 @@ export default function App() {
           />
         </>
       )}
+
+      <CaseDrawer caseId={openCase} onClose={() => setOpenCase(null)} />
 
       <footer className="foot">
         Decision support with cited precedents, not financial advice. Outcomes are observed, never claimed as caused.

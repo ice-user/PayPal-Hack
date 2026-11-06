@@ -5,9 +5,10 @@ import { ProvenanceBadge, QualityBadge } from "./Badges";
 interface Props {
   rec: Recommendation;
   similarityMin: number;
+  onOpenCase: (caseId: string) => void;
 }
 
-export function PrecedentsPanel({ rec, similarityMin }: Props) {
+export function PrecedentsPanel({ rec, similarityMin, onOpenCase }: Props) {
   const usedIds = new Set(rec.actions.flatMap((a) => a.supporting_cases));
   return (
     <section className="panel" aria-labelledby="precedents-h">
@@ -29,7 +30,10 @@ export function PrecedentsPanel({ rec, similarityMin }: Props) {
             return (
               <li key={p.case_id} className={`case ${below ? "below" : ""} ${used ? "used" : ""}`}>
                 <div className="case-top">
-                  <span className="case-title">{p.title}</span>
+                  <button className="case-title linklike" onClick={() => onOpenCase(p.case_id)}
+                    aria-label={`Open case details: ${p.title}`}>
+                    {p.title}
+                  </button>
                   <span className="sim num" title="Similarity to the current situation">{Math.round(p.similarity * 100)}</span>
                 </div>
                 <div className="sim-track" aria-hidden="true">
