@@ -135,6 +135,14 @@ def paypal_dispute(dispute_id: str) -> dict:
         raise HTTPException(502 if e.status >= 500 else e.status, f"PayPal said {e.status}") from e
 
 
+def _mount_dashboard() -> None:
+    """In the deployed container the built dashboard is served from the same origin."""
+    static_dir = os.environ.get("PRECEDENT_STATIC_DIR")
+    if static_dir and os.path.isdir(static_dir):
+        from fastapi.staticfiles import StaticFiles
+        app.mount("/", StaticFiles(directory=static_dir, html=True), name="dashboard")
+
+
 @app.post("/api/paypal/webhook")
 async def paypal_webhook(request: Request) -> dict:
     s = service()
@@ -148,3 +156,6 @@ async def paypal_webhook(request: Request) -> dict:
     s.store.audit("paypal", "webhook_received", {"event_type": event.get("event_type"),
                                                  "resource_id": (event.get("resource") or {}).get("dispute_id")})
     return {"ok": True, "replay": False}
+
+
+_mount_dashboard()  # last, so /api routes take precedence

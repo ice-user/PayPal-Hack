@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+!frontend/.env.api
+**/*.db
+**/__pycache__
+.claude
+backend/spike1

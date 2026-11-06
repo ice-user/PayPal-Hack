@@ -73,6 +73,21 @@ Then open http://localhost:5173.
 
 **Ablation:** `python eval/run_ablation.py` (see `eval/README.md`).
 
+**Deploy (one container, API and dashboard on one URL):**
+
+```bash
+docker build -t precedent .
+docker run -p 8000:8000 --env-file backend/.env precedent
+```
+
+Any host that runs a Dockerfile works (for example Render or Fly.io). Set the PayPal
+variables from `backend/.env.example` as secrets in the host's settings; never bake them
+into the image. Not yet built here (Docker is not installed on the dev machine). The
+same-origin setup was checked locally by serving the built dashboard from the API.
+
+On Windows Git Bash, prefix local builds that set `VITE_API_BASE=/` with
+`MSYS_NO_PATHCONV=1`. Otherwise Bash rewrites `/` into a Windows path.
+
 ## Licence
 
 MIT, see [LICENSE](LICENSE).

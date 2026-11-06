@@ -8,14 +8,16 @@ import indexJson from "@contracts/fixtures/index.json";
  * - API mode: set VITE_API_BASE (e.g. http://localhost:8000). Bundles, approvals, the
  *   simulated clock and live dispute reads go to the backend (backend/precedent/api.py).
  */
-const API_BASE: string | undefined = import.meta.env.VITE_API_BASE;
+// "/" means same origin (the deployed container serves the API and the dashboard together).
+const RAW_BASE: string | undefined = import.meta.env.VITE_API_BASE;
+const API_BASE: string | undefined = RAW_BASE === undefined ? undefined : RAW_BASE.replace(/\/+$/, "");
 
 const fixtureBundles = import.meta.glob("@contracts/fixtures/bundles/*.json", {
   eager: true,
   import: "default",
 }) as Record<string, Bundle>;
 
-export const dataMode: "fixtures" | "api" = API_BASE ? "api" : "fixtures";
+export const dataMode: "fixtures" | "api" = API_BASE !== undefined ? "api" : "fixtures";
 
 export function listSituations(): SituationIndexEntry[] {
   return (indexJson as { situations: SituationIndexEntry[] }).situations;
@@ -40,7 +42,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function getBundle(key: string, mode: Mode): Promise<Bundle> {
-  if (API_BASE) return call<Bundle>(`/api/bundles/${encodeURIComponent(key)}?mode=${mode}`);
+  if (API_BASE !== undefined) return call<Bundle>(`/api/bundles/${encodeURIComponent(key)}?mode=${mode}`);
   const hit = Object.entries(fixtureBundles).find(([path]) => path.endsWith(`/${key}_${mode}.json`));
   if (!hit) throw new Error(`No fixture for situation ${key} in mode ${mode}`);
   // Clone so local approve/reject state never mutates the imported fixture.
