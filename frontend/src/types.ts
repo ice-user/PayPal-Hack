@@ -108,11 +108,38 @@ export interface TimelineEvent {
   detail: string;
 }
 
+export interface ServerActionState {
+  state: ActionState;
+  server_state: string;
+  execution_mode?: "real" | "simulated" | null;
+  detail?: string | null;
+}
+
+export interface Outcome {
+  metric: string;
+  before: number;
+  after: number;
+  horizon_days: number;
+  simulated: true;
+  new_case_id?: string;
+}
+
 export interface Bundle {
   situation: SituationRecord;
   recommendation: Recommendation;
   policy_decisions: PolicyDecision[];
   timeline: TimelineEvent[];
+  action_states?: Record<string, ServerActionState>;
+  outcome?: Outcome | null;
+}
+
+export interface LiveDispute {
+  dispute_id: string;
+  status: string;
+  dispute_state: string | null;
+  stage: string | null;
+  allowed: string[];
+  update_time?: string;
 }
 
 export interface SituationIndexEntry {
@@ -122,4 +149,4 @@ export interface SituationIndexEntry {
 }
 
 /** Client-side state of one action after the user acts on it. */
-export type ActionState = "proposed" | "approved" | "executing" | "succeeded" | "rejected";
+export type ActionState = "proposed" | "approved" | "executing" | "succeeded" | "failed" | "rejected";

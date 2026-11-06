@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { TimelineEvent } from "../types";
 import { SimulatedTag } from "./Badges";
 
@@ -9,10 +10,13 @@ const LABEL: Record<string, string> = {
   measured: "Measured",
 };
 
-export function Timeline({ events }: { events: TimelineEvent[] }) {
+export function Timeline({ events, action }: { events: TimelineEvent[]; action?: ReactNode }) {
   return (
     <section className="timeline" aria-labelledby="timeline-h">
-      <h2 id="timeline-h" className="visually-hidden">Timeline</h2>
+      <div className="timeline-head">
+        <h2 id="timeline-h">Timeline</h2>
+        {action}
+      </div>
       <ol>
         {events.map((e) => (
           <li key={e.step} className={`tl-step tl-${e.status}`}>

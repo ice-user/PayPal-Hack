@@ -122,6 +122,15 @@ class Store:
         except sqlite3.IntegrityError:
             return True
 
+    # ---- demo reset ----
+    def reset_demo(self) -> None:
+        """Clear actions, outcomes and pending cases so the demo can be run again.
+        The audit log is kept (and records the reset)."""
+        with self._lock, self.db:
+            self.db.execute("DELETE FROM actions")
+            self.db.execute("DELETE FROM outcomes")
+            self.db.execute("DELETE FROM pending_cases")
+
     # ---- pending cases ----
     def add_pending_case(self, case: dict) -> None:
         with self._lock, self.db:

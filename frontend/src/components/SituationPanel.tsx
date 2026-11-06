@@ -1,4 +1,4 @@
-import type { SituationRecord } from "../types";
+import type { LiveDispute, SituationRecord } from "../types";
 import { pct, pValue, rate, REASON_LABEL } from "../format";
 import { Sparkline } from "./Sparkline";
 import { SimulatedTag } from "./Badges";
@@ -18,7 +18,13 @@ function Meter({ label, value, note }: { label: string; value: number; note?: st
   );
 }
 
-export function SituationPanel({ situation }: { situation: SituationRecord }) {
+interface Props {
+  situation: SituationRecord;
+  live: { dispute?: LiveDispute; error?: string } | null;
+  apiMode: boolean;
+}
+
+export function SituationPanel({ situation, live, apiMode }: Props) {
   const f = situation.features;
   const reasons = Object.entries(f.reason_mix).sort((a, b) => b[1] - a[1]);
   const sandboxIds = situation.paypal_dispute_ids ?? [];
@@ -89,7 +95,21 @@ export function SituationPanel({ situation }: { situation: SituationRecord }) {
       {sandboxIds.length > 0 && (
         <div className="sandbox-link">
           <span className="badge real">PayPal sandbox</span>
-          Linked dispute <code>{sandboxIds.join(", ")}</code>, read live from the sandbox API.
+          Linked dispute <code>{sandboxIds.join(", ")}</code>
+          {!apiMode && <>. Live status is read in API mode.</>}
+          {apiMode && live?.dispute && (
+            <div className="live">
+              <div>Live status: <strong>{live.dispute.status.replaceAll("_", " ").toLowerCase()}</strong>
+                {live.dispute.stage && <> · {live.dispute.stage.toLowerCase()} stage</>}</div>
+              <div>
+                Seller can now:{" "}
+                {live.dispute.allowed.length
+                  ? live.dispute.allowed.map((a) => <span key={a} className="chip">{a.replaceAll("_", " ")}</span>)
+                  : <em>nothing (PayPal is reviewing; this usually reopens within minutes)</em>}
+              </div>
+            </div>
+          )}
+          {apiMode && live?.error && <div className="live muted-text">Could not read live status: {live.error}</div>}
         </div>
       )}
     </section>

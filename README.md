@@ -15,9 +15,13 @@ Built for the PayPal AI Hackathon. **Work in progress.**
 - The case library is currently **authored** playbook cases, labelled `illustrative`.
   None of them carries outcome numbers, so the app shows **no numeric forecast**.
   Numeric effects are only ever computed from `measured_observational` cases.
-- PayPal: token, payments and dispute reads are **real sandbox calls**. Seller actions on
-  our sandbox dispute are currently refused by PayPal (`UNDER_PAYPAL_REVIEW`), so
-  execution is **simulated** and labelled. See [docs/SPIKE1_RESULT.md](docs/SPIKE1_RESULT.md).
+- PayPal: token, dispute reads and seller actions are **real sandbox calls**. A real seller
+  message was sent on our sandbox dispute. The adapter re-reads the dispute before every
+  action. If PayPal does not allow that action at that moment, or no real dispute is linked
+  (the synthetic situations B and C), execution is **simulated** and labelled. See
+  [docs/SPIKE1_RESULT.md](docs/SPIKE1_RESULT.md).
+- The outcome clock is **simulated**. Its results become `live_simulated` cases pending
+  review, which never drive a forecast.
 - Outcomes are "observed" or "followed", never "caused". Not financial advice.
 
 ## Layout
@@ -29,19 +33,45 @@ Built for the PayPal AI Hackathon. **Work in progress.**
 | `intelligence/` | Consultant, baseline retriever, effects rule, reference policy gate, stats |
 | `scripts/build_fixtures.py` | Builds and validates the demo fixtures from the pipeline |
 | `frontend/` | React + Vite dashboard (runs on fixtures, or a real API via `VITE_API_BASE`) |
+| `backend/precedent/` | API (FastAPI), executor, PayPal adapter, order-feed generator, Situation Builder, outcome tracker, SQLite store |
 | `backend/spike1/` | PayPal sandbox spike scripts (credentials in `backend/.env`, never committed) |
+| `eval/` | Ablation runner, rubric, blind score sheet, results |
+| `data/reference/` | Platform-wide public figures (context, not precedents) |
 | `docs/` | Brief, design, handoffs, spike results |
 
 ## Run
 
+**Tests and fixtures**
+
 ```bash
-pip install jsonschema pytest
+pip install jsonschema pytest fastapi uvicorn httpx
 python scripts/build_fixtures.py
 python -m pytest -q
+```
+
+**Dashboard on fixtures (no backend):**
+
+```bash
 cd frontend && npm install && npm run dev
 ```
 
 Then open http://localhost:5173.
+
+**Full app (backend + dashboard in API mode):**
+1. Put sandbox credentials in `backend/.env` (see `backend/.env.example`).
+2. Start the API:
+   ```bash
+   python -m uvicorn precedent.api:app --app-dir backend --port 8000
+   ```
+3. Start the dashboard in API mode:
+   ```bash
+   cd frontend && npm run dev:api
+   ```
+4. Open http://localhost:5174. API docs are at http://localhost:8000/docs.
+5. To run the demo again: `POST /api/demo/reset`. This clears approvals and outcomes, not
+   PayPal.
+
+**Ablation:** `python eval/run_ablation.py` (see `eval/README.md`).
 
 ## Licence
 

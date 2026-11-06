@@ -1,11 +1,19 @@
-import type { Action, ActionState, PolicyDecision, Recommendation } from "../types";
+import type { Action, ActionState, Outcome, PolicyDecision, Recommendation } from "../types";
 import { ACTION_LABEL, money, pct, QUALITY_LABEL, rate } from "../format";
 import { DecisionBadge, SimulatedTag, TierBadge } from "./Badges";
+
+export interface ActionView {
+  state: ActionState;
+  mode?: "real" | "simulated";
+  detail?: string;
+}
 
 interface Props {
   rec: Recommendation;
   decisions: PolicyDecision[];
-  states: Record<string, ActionState>;
+  views: Record<string, ActionView>;
+  busy: string | null;
+  outcome: Outcome | null;
   onApprove: (a: Action) => void;
   onReject: (a: Action) => void;
 }
@@ -23,16 +31,24 @@ function ParamsLine({ a }: { a: Action }) {
   return bits.length ? <div className="params">{bits.join(" · ")}</div> : null;
 }
 
-function StateLine({ state }: { state: ActionState }) {
+function StateLine({ view, auto }: { view: ActionView; auto: boolean }) {
+  const { state, mode, detail } = view;
   if (state === "approved" || state === "executing")
-    return <div className="state running">Executing through the sandbox adapter… <SimulatedTag /></div>;
+    return <div className="state running">Executing through the PayPal sandbox adapter…</div>;
+  if (state === "succeeded" && auto) return null;
   if (state === "succeeded")
-    return <div className="state ok">Executed <SimulatedTag title="Seller actions are blocked for our sandbox dispute, so execution is simulated. See docs/SPIKE1_RESULT.md." /></div>;
+    return (
+      <div className="state ok">
+        {mode === "real" ? <span className="badge real">PayPal sandbox</span> : <SimulatedTag />}
+        <span>{detail?.replace(/^Simulated:\s*/, "") ?? "Executed in the browser only (fixture mode)."}</span>
+      </div>
+    );
+  if (state === "failed") return <div className="state failed">Failed: {detail}</div>;
   if (state === "rejected") return <div className="state rejected">Rejected by you. Nothing was sent.</div>;
   return null;
 }
 
-export function PlanPanel({ rec, decisions, states, onApprove, onReject }: Props) {
+export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onReject }: Props) {
   const byId = Object.fromEntries(decisions.map((d) => [d.action_id, d]));
   return (
     <section className="panel" aria-labelledby="plan-h">
@@ -74,6 +90,17 @@ export function PlanPanel({ rec, decisions, states, onApprove, onReject }: Props
         )}
       </div>
 
+      {outcome && (
+        <div className="outcome-box" role="status">
+          <div className="stat-label">Outcome after {outcome.horizon_days} days <SimulatedTag /></div>
+          <p>
+            7-day dispute rate <strong className="num">{rate(outcome.before)}</strong> before,{" "}
+            <strong className="num">{rate(outcome.after)}</strong> after. Simulated replay, not a real measurement.
+            {outcome.new_case_id && <> Recorded as <code>{outcome.new_case_id}</code>, pending review.</>}
+          </p>
+        </div>
+      )}
+
       {rec.abstain ? (
         <div className="abstain" role="status">
           <strong>Abstained.</strong> {rec.abstain_reason}
@@ -82,7 +109,8 @@ export function PlanPanel({ rec, decisions, states, onApprove, onReject }: Props
         <ol className="actions">
           {rec.actions.map((a) => {
             const d = byId[a.action_id];
-            const state = states[a.action_id] ?? "proposed";
+            const view = views[a.action_id] ?? { state: "proposed" as ActionState };
+            const state = view.state;
             return (
               <li key={a.action_id} className={`action decision-border-${d?.decision.toLowerCase()}`}>
                 <div className="action-top">
@@ -104,14 +132,16 @@ export function PlanPanel({ rec, decisions, states, onApprove, onReject }: Props
                 )}
                 {d?.decision === "NEEDS_APPROVAL" && state === "proposed" && (
                   <div className="buttons">
-                    <button className="btn primary" onClick={() => onApprove(a)}>Approve</button>
-                    <button className="btn" onClick={() => onReject(a)}>Reject</button>
+                    <button className="btn primary" disabled={busy !== null} onClick={() => onApprove(a)}>
+                      {busy === a.action_id ? "Working…" : "Approve"}
+                    </button>
+                    <button className="btn" disabled={busy !== null} onClick={() => onReject(a)}>Reject</button>
                   </div>
                 )}
-                {d?.decision === "AUTO" && state === "proposed" && (
+                {d?.decision === "AUTO" && (
                   <div className="state ok">Prepared automatically. Nothing leaves the system.</div>
                 )}
-                <StateLine state={state} />
+                <StateLine view={view} auto={d?.decision === "AUTO"} />
               </li>
             );
           })}

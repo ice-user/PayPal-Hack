@@ -21,7 +21,9 @@ app = FastAPI(title="Precedent API", version="0.1.0",
               description="Dispute consultant for PayPal merchants. Synthetic order feed; PayPal sandbox only.")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("PRECEDENT_CORS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
+    allow_origins=os.environ.get(
+        "PRECEDENT_CORS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
+    ).split(","),
     allow_methods=["GET", "POST"], allow_headers=["Content-Type"],
 )
 
@@ -85,6 +87,15 @@ def reject(req: ActionRequest) -> dict:
 @app.post("/api/sim/advance")
 def advance(req: AdvanceRequest) -> dict:
     return _guard(service().advance, req.situation, req.mode, req.days)
+
+
+@app.post("/api/demo/reset")
+def demo_reset() -> dict:
+    """Clear approvals, outcomes and pending cases (not the audit log). Does not touch PayPal."""
+    s = service()
+    s.store.reset_demo()
+    s.store.audit("operator", "demo_reset", {})
+    return {"ok": True}
 
 
 @app.get("/api/cases/{case_id}")

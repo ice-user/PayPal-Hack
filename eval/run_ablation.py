@@ -170,7 +170,7 @@ def score_sheet(result: dict) -> None:
                 "rater": "", "notes": "",
             })
             key.append({"item": item, "system": system, "mode": r["systems"][system]["mode"]})
-    with open(OUT / "score_sheet.csv", "w", newline="", encoding="utf-8", newline="\n") as f:
+    with open(OUT / "score_sheet.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(sheet[0]))
         w.writeheader()
         w.writerows(sheet)

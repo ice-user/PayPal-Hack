@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Action, ActionState, Bundle, Mode, TimelineEvent } from "./types";
-import { dataMode, getBundle, listSituations } from "./api";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Action, ActionState, Bundle, LiveDispute, Mode, TimelineEvent } from "./types";
+import { advanceClock, approveAction, dataMode, getBundle, getLiveDispute, listSituations, rejectAction } from "./api";
 import thresholds from "@contracts/thresholds.json";
 import { SituationPanel } from "./components/SituationPanel";
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
-import { PlanPanel } from "./components/PlanPanel";
+import { PlanPanel, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
 
 const situations = listSituations();
+const API = dataMode === "api";
 
-/** Fold the user's approve/reject clicks into the fixture timeline. */
+/** Fixture mode only: fold the user's clicks into the static timeline. */
 function liveTimeline(base: TimelineEvent[], states: Record<string, ActionState>): TimelineEvent[] {
   const vals = Object.values(states);
   const approved = vals.filter((s) => s !== "rejected" && s !== "proposed").length;
@@ -19,7 +20,7 @@ function liveTimeline(base: TimelineEvent[], states: Record<string, ActionState>
     if (e.step === "approved" && (approved || rejected))
       return { ...e, status: approved ? "done" : "skipped", detail: `${approved} approved, ${rejected} rejected by you.` };
     if (e.step === "executed" && done)
-      return { ...e, status: "done", detail: `${done} action(s) executed. Sandbox seller actions are simulated (see docs/SPIKE1_RESULT.md).` };
+      return { ...e, status: "done", detail: `${done} action(s) executed in the browser only (fixture mode). Run the API for sandbox calls.` };
     return e;
   });
 }
@@ -29,20 +30,22 @@ export default function App() {
   const [mode, setMode] = useState<Mode>("with_precedent");
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  // Action states are kept per recommendation, so flipping the toggle never leaks an
-  // approval from one plan into another, and flipping back keeps what you did.
-  const [allStates, setAllStates] = useState<Record<string, Record<string, ActionState>>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const [live, setLive] = useState<{ dispute?: LiveDispute; error?: string } | null>(null);
+
+  // Fixture mode keeps action states per recommendation in the browser.
+  const [localStates, setLocalStates] = useState<Record<string, Record<string, ActionState>>>({});
   const timers = useRef<number[]>([]);
   const recId = bundle?.recommendation.recommendation_id ?? "";
-  const states = allStates[recId] ?? {};
-
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
+    setNotice(null);
     setBundle(null);
     getBundle(key, mode)
       .then((b) => !cancelled && setBundle(b))
@@ -53,17 +56,64 @@ export default function App() {
     };
   }, [key, mode]);
 
-  const timeline = useMemo(() => (bundle ? liveTimeline(bundle.timeline, states) : []), [bundle, states]);
+  const disputeId = bundle?.situation.paypal_dispute_ids?.[0];
+  const refreshLive = useCallback(() => {
+    if (!API || !disputeId) return setLive(null);
+    getLiveDispute(disputeId)
+      .then((d) => setLive({ dispute: d }))
+      .catch((e: Error) => setLive({ error: e.message }));
+  }, [disputeId]);
+  useEffect(refreshLive, [refreshLive]);
 
-  const setState = (rid: string, actionId: string, st: ActionState) =>
-    setAllStates((all) => ({ ...all, [rid]: { ...(all[rid] ?? {}), [actionId]: st } }));
+  const views: Record<string, ActionView> = useMemo(() => {
+    if (!bundle) return {};
+    if (API) {
+      return Object.fromEntries(
+        Object.entries(bundle.action_states ?? {}).map(([id, s]) => [
+          id,
+          { state: s.state, mode: s.execution_mode ?? undefined, detail: s.detail ?? undefined },
+        ]),
+      );
+    }
+    return Object.fromEntries(Object.entries(localStates[recId] ?? {}).map(([id, st]) => [id, { state: st }]));
+  }, [bundle, localStates, recId]);
+
+  const timeline = useMemo(() => {
+    if (!bundle) return [];
+    if (API) return bundle.timeline;
+    return liveTimeline(bundle.timeline, localStates[recId] ?? {});
+  }, [bundle, localStates, recId]);
+
+  const setLocal = (rid: string, actionId: string, st: ActionState) =>
+    setLocalStates((all) => ({ ...all, [rid]: { ...(all[rid] ?? {}), [actionId]: st } }));
+
+  const run = async (label: string, fn: () => Promise<Bundle>) => {
+    setBusy(label);
+    setNotice(null);
+    try {
+      setBundle(await fn());
+      refreshLive();
+    } catch (e) {
+      setNotice((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const approve = (a: Action) => {
+    if (API) return run(a.action_id, () => approveAction(key, mode, a.action_id));
     const rid = recId;
-    setState(rid, a.action_id, "approved");
-    timers.current.push(window.setTimeout(() => setState(rid, a.action_id, "succeeded"), 1200));
+    setLocal(rid, a.action_id, "executing");
+    timers.current.push(window.setTimeout(() => setLocal(rid, a.action_id, "succeeded"), 1200));
   };
-  const reject = (a: Action) => setState(recId, a.action_id, "rejected");
+  const reject = (a: Action) => {
+    if (API) return run(a.action_id, () => rejectAction(key, mode, a.action_id));
+    setLocal(recId, a.action_id, "rejected");
+  };
+
+  const canAdvance =
+    API && !!bundle && !bundle.outcome &&
+    bundle.policy_decisions.some((d) => d.decision === "NEEDS_APPROVAL" && views[d.action_id]?.state === "succeeded");
 
   return (
     <div className="app">
@@ -96,14 +146,17 @@ export default function App() {
         </div>
       </header>
 
-      {dataMode === "fixtures" && (
-        <div className="banner">
-          Fixture mode: data comes from <code>contracts/fixtures</code>. The order feed is synthetic, cases are authored and labelled, and execution is simulated.
-        </div>
-      )}
+      <div className="banner">
+        {API ? (
+          <>API mode: plans, approvals and the outcome clock run on the backend. Approved actions are sent to the PayPal sandbox when the dispute allows them; otherwise they are simulated and labelled. The order feed is synthetic.</>
+        ) : (
+          <>Fixture mode: data comes from <code>contracts/fixtures</code>. The order feed is synthetic, cases are labelled, and execution is simulated in the browser.</>
+        )}
+      </div>
 
       {loading && <div className="loading" role="status">Loading situation…</div>}
       {error && <div className="error" role="alert">Could not load this situation: {error}</div>}
+      {notice && <div className="notice" role="alert">{notice}</div>}
 
       {bundle && !error && (
         <>
@@ -112,17 +165,29 @@ export default function App() {
             {bundle.situation.narrative}
           </div>
           <main className="grid">
-            <SituationPanel situation={bundle.situation} />
+            <SituationPanel situation={bundle.situation} live={live} apiMode={API} />
             <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} />
             <PlanPanel
               rec={bundle.recommendation}
               decisions={bundle.policy_decisions}
-              states={states}
+              views={views}
+              busy={busy}
+              outcome={bundle.outcome ?? null}
               onApprove={approve}
               onReject={reject}
             />
           </main>
-          <Timeline events={timeline} />
+          <Timeline
+            events={timeline}
+            action={
+              canAdvance ? (
+                <button className="btn primary" disabled={busy !== null}
+                  onClick={() => run("advance", () => advanceClock(key, mode, 14))}>
+                  {busy === "advance" ? "Advancing…" : "Advance 14 days (simulated)"}
+                </button>
+              ) : null
+            }
+          />
         </>
       )}
 
