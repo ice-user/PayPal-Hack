@@ -2,74 +2,74 @@
   "situation": {
     "situation_id": "sit_demo_B",
     "merchant_id": "m_demo_electronics",
-    "label": "B: many carriers, slow shipping",
     "window": {
-      "start": "2026-10-28",
+      "start": "2026-10-31",
       "end": "2026-11-06"
     },
     "source": "synthetic_order_feed",
     "features": {
-      "transactions_7d": 1910,
-      "disputes_7d": 29,
-      "gmv_7d": 141722.0,
-      "dispute_rate_7d": 0.01518,
+      "transactions_7d": 1811,
+      "disputes_7d": 32,
+      "gmv_7d": 102700.0,
+      "dispute_rate_7d": 0.01767,
       "dispute_rate_7d_ci95": [
-        0.01059,
-        0.02172
+        0.01254,
+        0.02484
       ],
-      "transactions_30d_baseline": 7700,
-      "disputes_30d_baseline": 25,
-      "dispute_rate_30d_baseline": 0.00325,
+      "transactions_30d_baseline": 7751,
+      "disputes_30d_baseline": 22,
+      "dispute_rate_30d_baseline": 0.00284,
       "baseline_ci95": [
-        0.0022,
-        0.00479
+        0.00188,
+        0.00429
       ],
-      "rate_ratio": 4.68,
+      "rate_ratio": 6.23,
       "anomaly": {
         "method": "binomial_vs_baseline",
-        "p_value": 2.42e-11,
+        "p_value": 1.22e-15,
         "is_anomalous": true,
         "min_sample_met": true
       },
-      "trend_slope": 0.66,
+      "trend_slope": 0.65,
       "daily_dispute_rate": [
-        0.0032,
-        0.0036,
-        0.0043,
-        0.0053,
-        0.0065,
-        0.0079,
-        0.0095,
-        0.0112,
-        0.0131,
-        0.0152
+        0.0,
+        0.004,
+        0.0,
+        0.0268,
+        0.007,
+        0.0192,
+        0.0217,
+        0.022,
+        0.0078,
+        0.0206
       ],
       "reason_mix": {
-        "ITEM_NOT_RECEIVED": 0.7,
-        "UNAUTHORISED": 0.09,
-        "NOT_AS_DESCRIBED": 0.09,
-        "OTHER": 0.12
+        "ITEM_NOT_RECEIVED": 0.875,
+        "UNAUTHORISED": 0.062,
+        "OTHER": 0.031,
+        "NOT_AS_DESCRIBED": 0.031
       },
       "concentration": {
-        "sku": 0.21,
-        "carrier": 0.33,
-        "country": 0.92,
+        "sku": 0.25,
+        "carrier": 0.344,
+        "country": 0.875,
         "top_sku": "HDP-220 wireless headphones",
-        "top_carrier": "Coastal Express",
+        "top_carrier": "Ridgeway Post",
         "top_country": "US"
       },
       "carriers_elevated": 4,
-      "ship_delay_hours_p50": 61,
-      "disputed_orders_delivered_share": 0.08,
-      "avg_amount": 74.2,
+      "ship_delay_hours_p50": 61.9,
+      "disputed_orders_delivered_share": 0.156,
+      "avg_amount": 56.71,
       "median_response_hours": 52,
-      "open_disputes": 26,
+      "open_disputes": 31,
       "refund_ratio_30d": 0.04,
       "days_since_txn_median": 9
     },
-    "narrative": "Item-not-received disputes up across four carriers. Median time to ship has risen to about 2.5 days.",
+    "narrative": "Item-not-received disputes up 6.2x in 7 days, across 4 carriers, time to ship is 62h.",
     "evidence_ids": [],
-    "paypal_dispute_ids": []
+    "paypal_dispute_ids": [],
+    "label": "B: many carriers, slow shipping"
   },
   "recommendation": {
     "recommendation_id": "rec_demo_B_wp",
@@ -80,13 +80,12 @@
       {
         "case_id": "case_b01_warehouse_backlog",
         "title": "Warehouse backlog delayed all carriers",
-        "similarity": 0.977,
+        "similarity": 0.903,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
           "fulfilment delay",
           "number of carriers elevated",
-          "item-not-received share",
           "unauthorised share",
           "SKU concentration",
           "trend"
@@ -101,13 +100,12 @@
       {
         "case_id": "case_b03_3pl_migration",
         "title": "Migration to a new fulfilment partner",
-        "similarity": 0.956,
+        "similarity": 0.891,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
           "fulfilment delay",
           "number of carriers elevated",
-          "item-not-received share",
           "unauthorised share",
           "SKU concentration",
           "trend"
@@ -122,12 +120,10 @@
       {
         "case_id": "case_b05_inventory_sync_oversell",
         "title": "Inventory sync bug oversold stock",
-        "similarity": 0.88,
+        "similarity": 0.823,
         "matched_on": [
           "carrier concentration",
-          "share of disputed orders delivered",
           "number of carriers elevated",
-          "item-not-received share",
           "unauthorised share",
           "trend"
         ],
@@ -141,11 +137,10 @@
       {
         "case_id": "case_b06_customs_hold_cross_border",
         "title": "Cross-border parcels held at customs",
-        "similarity": 0.84,
+        "similarity": 0.802,
         "matched_on": [
           "share of disputed orders delivered",
           "fulfilment delay",
-          "item-not-received share",
           "unauthorised share",
           "SKU concentration",
           "trend"
@@ -162,12 +157,12 @@
       {
         "case_id": "case_b04_flash_sale_overflow",
         "title": "Flash sale overwhelmed packing capacity",
-        "similarity": 0.826,
+        "similarity": 0.8,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
-          "item-not-received share",
-          "unauthorised share"
+          "unauthorised share",
+          "SKU concentration"
         ],
         "differs_on": [
           "merchant size (small vs mid)"
@@ -186,7 +181,7 @@
       "version": "0.1.0"
     },
     "diagnosis": "Fulfilment delay before hand-off to carriers",
-    "diagnosis_detail": "Disputes are 4.7x the 30-day baseline and 70% are item-not-received. Disputes are spread across 4 carriers (top carrier 33%) and the median time to ship is 61h. Parcels are leaving late, so the problem is upstream of the carriers.",
+    "diagnosis_detail": "Disputes are 6.2x the 30-day baseline and 88% are item-not-received. Disputes are spread across 4 carriers (top carrier 34%) and the median time to ship is 62h. Parcels are leaving late, so the problem is upstream of the carriers.",
     "actions": [
       {
         "action_id": "act_1",
@@ -224,7 +219,7 @@
       "Inventory sync bug oversold stock (authored, illustrative): Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
       "No measured precedents match this pattern, so no numeric forecast is shown."
     ],
-    "confidence": 0.75,
+    "confidence": 0.71,
     "evidence_quality": "illustrative",
     "abstain": false,
     "abstain_reason": null,
@@ -256,7 +251,7 @@
       "status": "done",
       "at": "2026-11-06T09:00:00Z",
       "simulated": true,
-      "detail": "Binomial test vs 30-day baseline, p=2.42e-11. Run on the synthetic demo order feed."
+      "detail": "Binomial test vs 30-day baseline, p=1.22e-15. Run on the synthetic demo order feed."
     },
     {
       "step": "recommended",

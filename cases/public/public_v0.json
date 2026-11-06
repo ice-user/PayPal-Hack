@@ -1,0 +1,120 @@
+[
+  {
+    "case_id": "case_p01_ftc_nuvei_reimage",
+    "title": "Processor kept a scam merchant with an 8.5% chargeback rate (FTC v. Nuvei)",
+    "provenance": "public", "evidence_quality": "incomplete_report", "causal_claim": false,
+    "confounders_assessed": false, "review_status": "approved",
+    "source": {
+      "ref": "FTC press release and complaint, Nuvei settlement ($4.85M), September 2026",
+      "url": "https://www.ftc.gov/news-events/news/press-releases/2026/09/payment-processor-nuvei-must-implement-robust-merchant-screening-practices-pay-485-million-settle",
+      "licence": "US federal government work (public domain)",
+      "accessed": "2026-11-07"
+    },
+    "field_provenance": {
+      "context": "sourced",
+      "situation_features.dispute_rate_before": "sourced",
+      "situation_features.unauthorised_share": "empty",
+      "narrative": "sourced",
+      "diagnosis": "inferred",
+      "intervention": "inferred",
+      "actions": "authored",
+      "outcome": "sourced"
+    },
+    "context": {"industry": "online tech support software", "merchant_size": "unknown", "region": "offshore merchant, US cardholders", "channel": "card-not-present"},
+    "situation_features": {"dispute_rate_before": 0.0857},
+    "narrative": "The FTC alleges a processor kept an offshore tech-support merchant (Reimage) on for years. An internal risk report showed an annual chargeback rate above 8.5% in 2021 (1,108 chargebacks on 12,934 sales). The merchant shifted volume to other processors so its account would not stay on a card-network monitoring list.",
+    "diagnosis": "Merchant-level fraud with chargebacks managed down by splitting volume, not by fixing the cause",
+    "intervention": "processor_compliance_controls",
+    "actions": ["FLAG_ONLY"],
+    "outcome": {"summary": "Public record: the FTC sued; the processor agreed to pay $4.85M and adopt merchant screening and monitoring. No merchant-level after numbers.", "metric": "chargeback_rate", "before": null, "after": null, "observed_change": null, "measurement_period_days": null},
+    "tags": ["public", "ftc", "processor", "load_balancing", "fraud"]
+  },
+  {
+    "case_id": "case_p02_ftc_bluesnap_acro",
+    "title": "29-40% of a merchant's charges disputed as fraud (FTC v. BlueSnap)",
+    "provenance": "public", "evidence_quality": "incomplete_report", "causal_claim": false,
+    "confounders_assessed": false, "review_status": "approved",
+    "source": {
+      "ref": "FTC press release, BlueSnap settlement ($10M), May 2024",
+      "url": "https://www.ftc.gov/news-events/news/press-releases/2024/05/ftc-takes-action-against-bluesnap-its-former-ceo-senior-vp-credit-card-laundering-processing",
+      "licence": "US federal government work (public domain)",
+      "accessed": "2026-11-07"
+    },
+    "field_provenance": {
+      "context": "sourced",
+      "situation_features.dispute_rate_before": "sourced",
+      "situation_features.unauthorised_share": "inferred",
+      "narrative": "sourced",
+      "diagnosis": "inferred",
+      "intervention": "inferred",
+      "actions": "authored",
+      "outcome": "sourced"
+    },
+    "context": {"industry": "debt relief services", "merchant_size": "unknown", "region": "US", "channel": "card-not-present"},
+    "situation_features": {"dispute_rate_before": 0.29, "unauthorised_share": 0.9},
+    "narrative": "The FTC alleges a processor kept processing for a debt-relief merchant even though Visa reports showed 29% to 40% of its charges disputed as fraudulent, another processor had advised closing the accounts, and a card network asked for them to be shut. Processing continued for more than a year.",
+    "diagnosis": "Fraudulent merchant: disputes are a symptom of deception, not of operations",
+    "intervention": "processor_compliance_controls",
+    "actions": ["FLAG_ONLY"],
+    "outcome": {"summary": "Public record: $10M settlement and a ban on processing for certain high-risk categories. The lower bound 29% is used as the dispute rate; the fraud share is inferred from 'disputed as fraudulent'.", "metric": "dispute_rate", "before": null, "after": null, "observed_change": null, "measurement_period_days": null},
+    "tags": ["public", "ftc", "processor", "fraud"]
+  },
+  {
+    "case_id": "case_p03_ftc_cms_sham_reduction_plans",
+    "title": "Multiple accounts and sham chargeback-reduction plans (FTC v. CMS)",
+    "provenance": "public", "evidence_quality": "incomplete_report", "causal_claim": false,
+    "confounders_assessed": false, "review_status": "approved",
+    "source": {
+      "ref": "FTC press release, Complete Merchant Solutions settlement ($1.5M), December 2020",
+      "url": "https://www.ftc.gov/news-events/news/press-releases/2020/12/payment-processor-its-former-ceo-pay-15-million-settle-ftc-charges-they-facilitated-fraud",
+      "licence": "US federal government work (public domain)",
+      "accessed": "2026-11-07"
+    },
+    "field_provenance": {
+      "context": "sourced",
+      "situation_features": "empty",
+      "narrative": "sourced",
+      "diagnosis": "inferred",
+      "intervention": "inferred",
+      "actions": "authored",
+      "outcome": "sourced"
+    },
+    "context": {"industry": "various (fraudulent schemes)", "merchant_size": "unknown", "region": "US", "channel": "card-not-present"},
+    "situation_features": {},
+    "narrative": "The FTC alleges a processor ignored red flags: high consumer chargeback rates, merchants using multiple merchant accounts to artificially lower chargeback rates and avoid detection by banks and card networks, and sham chargeback-reduction plans.",
+    "diagnosis": "Chargeback rates hidden rather than reduced",
+    "intervention": "processor_compliance_controls",
+    "actions": ["FLAG_ONLY"],
+    "outcome": {"summary": "Public record: $1.5M settlement. Lesson for Precedent: splitting volume across accounts to lower a reported rate is a red flag, never a remedy.", "before": null, "after": null, "observed_change": null, "measurement_period_days": null},
+    "tags": ["public", "ftc", "processor", "load_balancing"]
+  },
+  {
+    "case_id": "case_p04_shopify_reason_code_evidence",
+    "title": "Merchant matched evidence to reason codes; contested win rate about 28% to 60%",
+    "provenance": "public", "evidence_quality": "incomplete_report", "causal_claim": false,
+    "confounders_assessed": false, "review_status": "approved",
+    "source": {
+      "ref": "Shopify Community thread by a merchant, June 2026, with replies",
+      "url": "https://community.shopify.com/t/tracked-our-chargeback-win-rate-for-6-months-the-results-genuinely-surprised-me/630792",
+      "licence": "Third-party forum post; summarised and cited, not reproduced",
+      "accessed": "2026-11-07"
+    },
+    "field_provenance": {
+      "context": "sourced",
+      "situation_features": "empty",
+      "narrative": "sourced",
+      "diagnosis": "sourced",
+      "intervention": "sourced",
+      "actions": "inferred",
+      "outcome": "sourced"
+    },
+    "context": {"industry": "e-commerce (unspecified)", "merchant_size": "small", "region": "unknown", "channel": "Shopify store"},
+    "situation_features": {},
+    "narrative": "A merchant contested about 60% of chargebacks and won about 28% of those, submitting only order confirmations. After learning each reason code's evidence requirements (for example device and purchase-history data for fraud codes), the merchant reported a win rate of about 60% over the next three months.",
+    "diagnosis": "Wrong evidence for the reason code",
+    "intervention": "evidence_collection_response",
+    "actions": ["PROVIDE_EVIDENCE"],
+    "outcome": {"summary": "Self-reported: contested win rate about 28% to about 60% in three months. Replies note a confound: win rate covers only contested disputes, so part of the gain may be case selection. Not a dispute-rate change.", "metric": "contested_win_rate", "before": null, "after": null, "observed_change": null, "measurement_period_days": null},
+    "tags": ["public", "evidence", "reason_codes", "self_reported"]
+  }
+]

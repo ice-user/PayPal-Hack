@@ -2,76 +2,75 @@
   "situation": {
     "situation_id": "sit_demo_A",
     "merchant_id": "m_demo_electronics",
-    "label": "A: one carrier",
     "window": {
-      "start": "2026-10-28",
+      "start": "2026-10-31",
       "end": "2026-11-06"
     },
     "source": "mixed",
     "features": {
-      "transactions_7d": 1840,
-      "disputes_7d": 26,
-      "gmv_7d": 136528.0,
-      "dispute_rate_7d": 0.01413,
+      "transactions_7d": 1789,
+      "disputes_7d": 30,
+      "gmv_7d": 97965.0,
+      "dispute_rate_7d": 0.01677,
       "dispute_rate_7d_ci95": [
-        0.00966,
-        0.02062
+        0.01177,
+        0.02384
       ],
-      "transactions_30d_baseline": 7600,
-      "disputes_30d_baseline": 23,
-      "dispute_rate_30d_baseline": 0.00303,
+      "transactions_30d_baseline": 7595,
+      "disputes_30d_baseline": 29,
+      "dispute_rate_30d_baseline": 0.00382,
       "baseline_ci95": [
-        0.00202,
-        0.00454
+        0.00266,
+        0.00548
       ],
-      "rate_ratio": 4.67,
+      "rate_ratio": 4.39,
       "anomaly": {
         "method": "binomial_vs_baseline",
-        "p_value": 2.61e-10,
+        "p_value": 4.87e-11,
         "is_anomalous": true,
         "min_sample_met": true
       },
-      "trend_slope": 0.71,
+      "trend_slope": 0.47,
       "daily_dispute_rate": [
-        0.003,
-        0.0034,
         0.004,
-        0.0049,
-        0.0061,
-        0.0074,
-        0.0088,
-        0.0105,
-        0.0122,
-        0.0141
+        0.0043,
+        0.008,
+        0.027,
+        0.0145,
+        0.0153,
+        0.0155,
+        0.0035,
+        0.0239,
+        0.0206
       ],
       "reason_mix": {
-        "ITEM_NOT_RECEIVED": 0.74,
+        "ITEM_NOT_RECEIVED": 0.833,
         "UNAUTHORISED": 0.1,
-        "NOT_AS_DESCRIBED": 0.08,
-        "OTHER": 0.08
+        "NOT_AS_DESCRIBED": 0.067
       },
       "concentration": {
-        "sku": 0.62,
-        "carrier": 0.81,
-        "country": 0.93,
-        "top_sku": "HDP-220 wireless headphones",
+        "sku": 0.267,
+        "carrier": 0.867,
+        "country": 0.967,
+        "top_sku": "CSE-9 phone case",
         "top_carrier": "Northline Parcel",
         "top_country": "US"
       },
       "carriers_elevated": 1,
-      "ship_delay_hours_p50": 10,
-      "disputed_orders_delivered_share": 0.12,
-      "avg_amount": 74.2,
+      "ship_delay_hours_p50": 9.9,
+      "disputed_orders_delivered_share": 0.233,
+      "avg_amount": 54.76,
       "median_response_hours": 52,
-      "open_disputes": 23,
+      "open_disputes": 26,
       "refund_ratio_30d": 0.04,
       "days_since_txn_median": 9
     },
-    "narrative": "Item-not-received disputes up sharply in 10 days, mostly on Northline Parcel and one SKU. Orders ship on time.",
+    "narrative": "Item-not-received disputes up 4.4x in 7 days, mostly on Northline Parcel.",
     "evidence_ids": [],
     "paypal_dispute_ids": [
       "PP-R-BTL-10196893"
-    ]
+    ],
+    "label": "A: one carrier"
   },
   "recommendation": {
     "recommendation_id": "rec_demo_A_wp",
@@ -80,24 +79,20 @@
     "grounding": "precedent",
     "precedents": [
       {
-        "case_id": "case_a02_signature_on_high_value",
-        "title": "High-value parcels lost on one carrier's last mile",
-        "similarity": 0.934,
+        "case_id": "case_a04_tracking_number_mismatch",
+        "title": "Wrong tracking numbers uploaded for one carrier",
+        "similarity": 0.902,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
           "fulfilment delay",
           "number of carriers elevated",
-          "item-not-received share",
           "unauthorised share",
-          "SKU concentration",
-          "trend"
+          "SKU concentration"
         ],
-        "differs_on": [
-          "merchant size (small vs mid)"
-        ],
+        "differs_on": [],
         "intervention": "delivery_confirmation_tracking",
-        "outcome_summary": "Illustrative: signature confirmation on orders above a value threshold plus tracking evidence on open disputes. No measured numbers.",
+        "outcome_summary": "Illustrative: corrected tracking was sent to buyers and attached as evidence. No measured numbers.",
         "measurement_period_days": null,
         "evidence_quality": "illustrative",
         "provenance": "authored"
@@ -105,17 +100,17 @@
       {
         "case_id": "case_a01_regional_carrier_scan_gap",
         "title": "Regional carrier stopped posting delivery scans",
-        "similarity": 0.925,
+        "similarity": 0.87,
         "matched_on": [
           "carrier concentration",
-          "share of disputed orders delivered",
           "fulfilment delay",
           "number of carriers elevated",
           "item-not-received share",
-          "unauthorised share",
+          "unauthorised share"
+        ],
+        "differs_on": [
           "trend"
         ],
-        "differs_on": [],
         "intervention": "delivery_confirmation_tracking",
         "outcome_summary": "Illustrative: with tracking submitted as evidence and delivery confirmation required on that carrier, new disputes on it slowed. No measured numbers.",
         "measurement_period_days": null,
@@ -125,18 +120,16 @@
       {
         "case_id": "case_a06_po_box_undeliverable",
         "title": "Carrier could not deliver to PO boxes",
-        "similarity": 0.899,
+        "similarity": 0.856,
         "matched_on": [
           "carrier concentration",
-          "share of disputed orders delivered",
           "fulfilment delay",
           "number of carriers elevated",
           "item-not-received share",
-          "unauthorised share",
-          "SKU concentration",
-          "trend"
+          "unauthorised share"
         ],
         "differs_on": [
+          "SKU concentration",
           "merchant size (small vs mid)"
         ],
         "intervention": "delivery_confirmation_tracking",
@@ -146,31 +139,29 @@
         "provenance": "authored"
       },
       {
-        "case_id": "case_a05_peak_season_carrier_overload",
-        "title": "One carrier overloaded in peak season",
-        "similarity": 0.877,
+        "case_id": "case_a03_carrier_switch_after_hub_outage",
+        "title": "Carrier hub outage stranded one lane",
+        "similarity": 0.854,
         "matched_on": [
-          "share of disputed orders delivered",
+          "carrier concentration",
           "fulfilment delay",
           "number of carriers elevated",
-          "item-not-received share",
           "unauthorised share",
-          "trend"
+          "SKU concentration"
         ],
         "differs_on": [
-          "SKU concentration",
-          "merchant size (large vs mid)"
+          "trend"
         ],
         "intervention": "carrier_switch",
-        "outcome_summary": "Illustrative: volume was shifted to a second carrier and tracking evidence was filed on open disputes. No measured numbers.",
+        "outcome_summary": "Illustrative: new orders were routed to another carrier and affected buyers got a status message. No measured numbers.",
         "measurement_period_days": null,
         "evidence_quality": "illustrative",
         "provenance": "authored"
       },
       {
-        "case_id": "case_a04_tracking_number_mismatch",
-        "title": "Wrong tracking numbers uploaded for one carrier",
-        "similarity": 0.869,
+        "case_id": "case_a02_signature_on_high_value",
+        "title": "High-value parcels lost on one carrier's last mile",
+        "similarity": 0.825,
         "matched_on": [
           "carrier concentration",
           "share of disputed orders delivered",
@@ -180,10 +171,11 @@
           "unauthorised share"
         ],
         "differs_on": [
-          "SKU concentration"
+          "SKU concentration",
+          "merchant size (small vs mid)"
         ],
         "intervention": "delivery_confirmation_tracking",
-        "outcome_summary": "Illustrative: corrected tracking was sent to buyers and attached as evidence. No measured numbers.",
+        "outcome_summary": "Illustrative: signature confirmation on orders above a value threshold plus tracking evidence on open disputes. No measured numbers.",
         "measurement_period_days": null,
         "evidence_quality": "illustrative",
         "provenance": "authored"
@@ -196,7 +188,7 @@
       "version": "0.1.0"
     },
     "diagnosis": "Carrier-specific delivery or tracking failure",
-    "diagnosis_detail": "Disputes are 4.7x the 30-day baseline and 74% are item-not-received. 81% of disputes are on Northline Parcel, only 1 carrier is elevated, orders ship in about 10h, and 12% of disputed orders show a delivery scan. That points at the carrier, not the warehouse.",
+    "diagnosis_detail": "Disputes are 4.4x the 30-day baseline and 83% are item-not-received. 87% of disputes are on Northline Parcel, only 1 carrier is elevated, orders ship in about 10h, and 23% of disputed orders show a delivery scan. That points at the carrier, not the warehouse.",
     "actions": [
       {
         "action_id": "act_1",
@@ -211,14 +203,14 @@
           "dispute_ids": [
             "PP-R-BTL-10196893"
           ],
-          "estimated_disputes": 19
+          "estimated_disputes": 23
         },
         "rationale": "Followed in 4 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
-          "case_a02_signature_on_high_value",
+          "case_a04_tracking_number_mismatch",
           "case_a01_regional_carrier_scan_gap",
           "case_a06_po_box_undeliverable",
-          "case_a04_tracking_number_mismatch"
+          "case_a02_signature_on_high_value"
         ]
       },
       {
@@ -230,20 +222,20 @@
         },
         "rationale": "Followed in 4 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
-          "case_a02_signature_on_high_value",
+          "case_a04_tracking_number_mismatch",
           "case_a01_regional_carrier_scan_gap",
           "case_a06_po_box_undeliverable",
-          "case_a04_tracking_number_mismatch"
+          "case_a02_signature_on_high_value"
         ]
       }
     ],
     "playbook_notes": [
-      "High-value parcels lost on one carrier's last mile (authored, illustrative): Illustrative: signature confirmation on orders above a value threshold plus tracking evidence on open disputes. No measured numbers.",
+      "Wrong tracking numbers uploaded for one carrier (authored, illustrative): Illustrative: corrected tracking was sent to buyers and attached as evidence. No measured numbers.",
       "Regional carrier stopped posting delivery scans (authored, illustrative): Illustrative: with tracking submitted as evidence and delivery confirmation required on that carrier, new disputes on it slowed. No measured numbers.",
       "Carrier could not deliver to PO boxes (authored, illustrative): Illustrative: address validation at checkout and messages to affected buyers. No measured numbers.",
       "No measured precedents match this pattern, so no numeric forecast is shown."
     ],
-    "confidence": 0.77,
+    "confidence": 0.73,
     "evidence_quality": "illustrative",
     "abstain": false,
     "abstain_reason": null,
@@ -275,7 +267,7 @@
       "status": "done",
       "at": "2026-11-06T09:00:00Z",
       "simulated": true,
-      "detail": "Binomial test vs 30-day baseline, p=2.61e-10. Run on the synthetic demo order feed."
+      "detail": "Binomial test vs 30-day baseline, p=4.87e-11. Run on the synthetic demo order feed."
     },
     {
       "step": "recommended",

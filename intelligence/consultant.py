@@ -209,7 +209,22 @@ def recommend(situation: dict, precedents: list[dict], *, mode: str = "with_prec
     x = _facts(situation)
     rec_id = f"rec_{sid.removeprefix('sit_')}_{'wp' if mode == 'with_precedent' else 'np'}"
 
-    if mode == "no_precedent":
+    anomaly = situation["features"]["anomaly"]
+    if not anomaly["is_anomalous"]:
+        # Applies in both modes: deciding whether there is anything to fix is not retrieval.
+        why = ("the sample is too small to tell a real spike from noise"
+               if anomaly.get("min_sample_met") is False else "the dispute rate is within normal variation")
+        rec = {
+            "recommendation_id": rec_id, "situation_id": sid, "mode": mode,
+            "grounding": "precedent" if mode == "with_precedent" else "none",
+            "diagnosis": "No actionable anomaly",
+            "precedents": [_precedent_view(p) for p in precedents[:5]] if mode == "with_precedent" else [],
+            "actions": [], "predicted_effect": None, "counterfactual": None, "playbook_notes": [],
+            "confidence": 0.0, "evidence_quality": "none", "abstain": True,
+            "abstain_reason": f"No action: {why} (binomial p = {anomaly['p_value']}).",
+            "generated_by": {"engine": "rules", "version": "0.1.0"},
+        }
+    elif mode == "no_precedent":
         rec = _baseline(situation, x, rec_id)
     else:
         rec = _with_precedent(situation, precedents, x, rec_id, th)

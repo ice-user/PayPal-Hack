@@ -1,74 +1,73 @@
 {
   "situation_id": "sit_demo_A",
   "merchant_id": "m_demo_electronics",
-  "label": "A: one carrier",
   "window": {
-    "start": "2026-10-28",
+    "start": "2026-10-31",
     "end": "2026-11-06"
   },
   "source": "mixed",
   "features": {
-    "transactions_7d": 1840,
-    "disputes_7d": 26,
-    "gmv_7d": 136528.0,
-    "dispute_rate_7d": 0.01413,
+    "transactions_7d": 1789,
+    "disputes_7d": 30,
+    "gmv_7d": 97965.0,
+    "dispute_rate_7d": 0.01677,
     "dispute_rate_7d_ci95": [
-      0.00966,
-      0.02062
+      0.01177,
+      0.02384
     ],
-    "transactions_30d_baseline": 7600,
-    "disputes_30d_baseline": 23,
-    "dispute_rate_30d_baseline": 0.00303,
+    "transactions_30d_baseline": 7595,
+    "disputes_30d_baseline": 29,
+    "dispute_rate_30d_baseline": 0.00382,
     "baseline_ci95": [
-      0.00202,
-      0.00454
+      0.00266,
+      0.00548
     ],
-    "rate_ratio": 4.67,
+    "rate_ratio": 4.39,
     "anomaly": {
       "method": "binomial_vs_baseline",
-      "p_value": 2.61e-10,
+      "p_value": 4.87e-11,
       "is_anomalous": true,
       "min_sample_met": true
     },
-    "trend_slope": 0.71,
+    "trend_slope": 0.47,
     "daily_dispute_rate": [
-      0.003,
-      0.0034,
       0.004,
-      0.0049,
-      0.0061,
-      0.0074,
-      0.0088,
-      0.0105,
-      0.0122,
-      0.0141
+      0.0043,
+      0.008,
+      0.027,
+      0.0145,
+      0.0153,
+      0.0155,
+      0.0035,
+      0.0239,
+      0.0206
     ],
     "reason_mix": {
-      "ITEM_NOT_RECEIVED": 0.74,
+      "ITEM_NOT_RECEIVED": 0.833,
       "UNAUTHORISED": 0.1,
-      "NOT_AS_DESCRIBED": 0.08,
-      "OTHER": 0.08
+      "NOT_AS_DESCRIBED": 0.067
     },
     "concentration": {
-      "sku": 0.62,
-      "carrier": 0.81,
-      "country": 0.93,
-      "top_sku": "HDP-220 wireless headphones",
+      "sku": 0.267,
+      "carrier": 0.867,
+      "country": 0.967,
+      "top_sku": "CSE-9 phone case",
       "top_carrier": "Northline Parcel",
       "top_country": "US"
     },
     "carriers_elevated": 1,
-    "ship_delay_hours_p50": 10,
-    "disputed_orders_delivered_share": 0.12,
-    "avg_amount": 74.2,
+    "ship_delay_hours_p50": 9.9,
+    "disputed_orders_delivered_share": 0.233,
+    "avg_amount": 54.76,
     "median_response_hours": 52,
-    "open_disputes": 23,
+    "open_disputes": 26,
     "refund_ratio_30d": 0.04,
     "days_since_txn_median": 9
   },
-  "narrative": "Item-not-received disputes up sharply in 10 days, mostly on Northline Parcel and one SKU. Orders ship on time.",
+  "narrative": "Item-not-received disputes up 4.4x in 7 days, mostly on Northline Parcel.",
   "evidence_ids": [],
   "paypal_dispute_ids": [
     "PP-R-BTL-10196893"
-  ]
+  ],
+  "label": "A: one carrier"
 }

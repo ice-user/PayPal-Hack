@@ -1,0 +1,33 @@
+{
+  "_comment": "Platform-wide public figures. Context only: they are not merchant precedents and are never used to compute a merchant's predicted effect.",
+  "accessed": "2026-11-07",
+  "facts": [
+    {
+      "id": "ref_paypal_2025_transaction_losses",
+      "entity": "PayPal Holdings, Inc.",
+      "statement": "Transaction losses were approximately $1.3 billion in 2025 and $1.1 billion in 2024, an increase of $223 million or 20%.",
+      "values": {"transaction_losses_usd_2025": 1.3e9, "transaction_losses_usd_2024": 1.1e9, "tpv_usd_2025": 1.79e12},
+      "derived": {"loss_rate_2025": 0.00073, "_how": "1.3e9 / 1.79e12, computed by us (rounded figures)"},
+      "source": {"ref": "PayPal Form 10-K for fiscal 2025", "url": "https://s205.q4cdn.com/875401827/files/doc_financials/2025/q4/10-K.pdf",
+                 "sec_url": "https://www.sec.gov/Archives/edgar/data/1633917/000163391726000024/pypl-20251231.htm"},
+      "evidence_quality": "aggregate_disclosure"
+    },
+    {
+      "id": "ref_block_2025_losses",
+      "entity": "Block, Inc.",
+      "statement": "Transaction, loan, and consumer receivable losses were $1,337.2 million in 2025, $794.2 million in 2024 and $660.7 million in 2023. Transaction losses include chargebacks for unauthorised card use and disputes over delivery of goods or services.",
+      "values": {"losses_usd_2025": 1337246000, "losses_usd_2024": 794221000, "losses_usd_2023": 660663000},
+      "caveat": "Combines transaction, loan and consumer receivable losses; not a dispute-loss figure on its own.",
+      "source": {"ref": "Block, Inc. 2025 Annual Report (Form 10-K)", "url": "https://s29.q4cdn.com/628966176/files/doc_financials/2026/ar/Block-Inc-2025-ARS.pdf"},
+      "evidence_quality": "aggregate_disclosure"
+    },
+    {
+      "id": "ref_ftc_order_chargeback_monitoring_threshold",
+      "entity": "FTC stipulated order (Humboldt)",
+      "statement": "The order's monitoring provisions use a monthly chargeback rate above 0.75% as a trigger. Exact obligation: read the order; we only saw an excerpt.",
+      "values": {"monthly_chargeback_rate_threshold": 0.0075},
+      "source": {"ref": "FTC, Humboldt stipulated order", "url": "https://www.ftc.gov/system/files/ftc_gov/pdf/Humboldt-StipulatedOrder.pdf"},
+      "evidence_quality": "aggregate_disclosure"
+    }
+  ]
+}
