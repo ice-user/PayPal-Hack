@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://precedent.local/schemas/case.schema.json",
+  "title": "Case",
+  "description": "One precedent in the case library. Owned by Person A. Every case carries provenance and evidence quality; nothing authored or simulated is ever presented as measured.",
+  "type": "object",
+  "required": [
+    "case_id", "title", "provenance", "evidence_quality", "causal_claim",
+    "confounders_assessed", "review_status", "source", "context",
+    "situation_features", "narrative", "diagnosis", "intervention", "actions", "outcome"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {"type": "string", "pattern": "^case_[a-z0-9_]+$"},
+    "title": {"type": "string", "maxLength": 120},
+    "provenance": {"type": "string", "enum": ["public", "authored", "live_simulated"]},
+    "evidence_quality": {"$ref": "#/$defs/evidence_quality"},
+    "causal_claim": {"const": false},
+    "confounders_assessed": {"type": "boolean"},
+    "review_status": {"type": "string", "enum": ["approved", "pending", "rejected"]},
+    "source": {
+      "type": "object",
+      "required": ["ref"],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {"type": "string", "description": "Citation or 'Authored by the Precedent team'."},
+        "url": {"type": "string"},
+        "licence": {"type": "string"},
+        "accessed": {"type": "string", "format": "date"}
+      }
+    },
+    "field_provenance": {
+      "type": "object",
+      "description": "For public cases: how each field was obtained.",
+      "additionalProperties": {"type": "string", "enum": ["sourced", "inferred", "authored", "empty"]}
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "industry": {"type": "string"},
+        "merchant_size": {"type": "string", "enum": ["small", "mid", "large", "platform", "unknown"]},
+        "region": {"type": "string"},
+        "channel": {"type": "string"}
+      }
+    },
+    "situation_features": {
+      "type": "object",
+      "description": "The case's situation, in the same units as SituationRecord.features. Any field may be missing.",
+      "additionalProperties": false,
+      "properties": {
+        "dispute_rate_before": {"$ref": "#/$defs/rate"},
+        "inr_share": {"$ref": "#/$defs/rate", "description": "Share of disputes that were item-not-received."},
+        "concentration_carrier": {"$ref": "#/$defs/rate"},
+        "concentration_sku": {"$ref": "#/$defs/rate"},
+        "carriers_elevated": {"type": "integer", "minimum": 0},
+        "ship_delay_hours_p50": {"type": "number", "minimum": 0},
+        "disputed_orders_delivered_share": {"$ref": "#/$defs/rate"},
+        "trend_slope": {"type": "number", "minimum": 0, "maximum": 1},
+        "unauthorised_share": {"$ref": "#/$defs/rate"}
+      }
+    },
+    "narrative": {"type": "string", "maxLength": 1200},
+    "diagnosis": {"type": "string", "maxLength": 200},
+    "intervention": {"$ref": "#/$defs/intervention"},
+    "actions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/action_type"},
+      "minItems": 1
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["summary"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {"type": "string", "maxLength": 300},
+        "metric": {"type": "string"},
+        "before": {"type": ["number", "null"]},
+        "after": {"type": ["number", "null"]},
+        "observed_change": {"type": ["number", "null"]},
+        "measurement_period_days": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "tags": {"type": "array", "items": {"type": "string"}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"provenance": {"const": "authored"}}},
+      "then": {"properties": {"evidence_quality": {"const": "illustrative"}}}
+    },
+    {
+      "if": {"properties": {"provenance": {"const": "live_simulated"}}},
+      "then": {"properties": {"evidence_quality": {"const": "simulated"}}}
+    },
+    {
+      "if": {"properties": {"evidence_quality": {"not": {"const": "measured_observational"}}}},
+      "then": {"properties": {"outcome": {"properties": {"before": {"type": "null"}, "after": {"type": "null"}, "observed_change": {"type": "null"}}}}}
+    }
+  ],
+  "$defs": {
+    "rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "evidence_quality": {
+      "type": "string",
+      "enum": ["measured_observational", "aggregate_disclosure", "incomplete_report", "illustrative", "simulated"]
+    },
+    "intervention": {
+      "type": "string",
+      "enum": [
+        "delivery_confirmation_tracking",
+        "carrier_switch",
+        "fulfilment_workflow_fix",
+        "proactive_buyer_messaging",
+        "evidence_collection_response",
+        "partial_refund_offer",
+        "accept_and_refund",
+        "fraud_screening",
+        "listing_and_policy_clarity",
+        "processor_compliance_controls"
+      ]
+    },
+    "action_type": {
+      "type": "string",
+      "enum": ["FLAG_ONLY", "PROVIDE_EVIDENCE", "SEND_MESSAGE", "MAKE_OFFER", "ACCEPT_CLAIM"]
+    }
+  }
+}

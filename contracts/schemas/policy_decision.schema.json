@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://precedent.local/schemas/policy_decision.schema.json",
+  "title": "PolicyDecision",
+  "description": "Produced by the Policy Gate (Person B). Deterministic: same input, same decision.",
+  "type": "object",
+  "required": ["action_id", "decision", "tier", "rules_hit", "explanation"],
+  "additionalProperties": false,
+  "properties": {
+    "action_id": {"type": "string"},
+    "decision": {"type": "string", "enum": ["AUTO", "NEEDS_APPROVAL", "BLOCKED"]},
+    "tier": {"type": "string", "enum": ["PREPARE", "EXTERNAL", "MONEY"]},
+    "rules_hit": {"type": "array", "items": {"type": "string"}},
+    "explanation": {"type": "string", "maxLength": 400}
+  }
+}

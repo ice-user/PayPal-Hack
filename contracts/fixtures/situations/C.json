@@ -1,0 +1,72 @@
+{
+  "situation_id": "sit_demo_C",
+  "merchant_id": "m_demo_electronics",
+  "label": "C: delivered orders",
+  "window": {
+    "start": "2026-10-28",
+    "end": "2026-11-06"
+  },
+  "source": "synthetic_order_feed",
+  "features": {
+    "transactions_7d": 1790,
+    "disputes_7d": 24,
+    "gmv_7d": 132818.0,
+    "dispute_rate_7d": 0.01341,
+    "dispute_rate_7d_ci95": [
+      0.00903,
+      0.01987
+    ],
+    "transactions_30d_baseline": 7500,
+    "disputes_30d_baseline": 22,
+    "dispute_rate_30d_baseline": 0.00293,
+    "baseline_ci95": [
+      0.00194,
+      0.00444
+    ],
+    "rate_ratio": 4.57,
+    "anomaly": {
+      "method": "binomial_vs_baseline",
+      "p_value": 1.87e-09,
+      "is_anomalous": true,
+      "min_sample_met": true
+    },
+    "trend_slope": 0.6,
+    "daily_dispute_rate": [
+      0.0029,
+      0.0032,
+      0.0039,
+      0.0047,
+      0.0058,
+      0.007,
+      0.0084,
+      0.0099,
+      0.0116,
+      0.0134
+    ],
+    "reason_mix": {
+      "ITEM_NOT_RECEIVED": 0.68,
+      "UNAUTHORISED": 0.12,
+      "NOT_AS_DESCRIBED": 0.08,
+      "OTHER": 0.12
+    },
+    "concentration": {
+      "sku": 0.3,
+      "carrier": 0.38,
+      "country": 0.94,
+      "top_sku": "HDP-220 wireless headphones",
+      "top_carrier": "Ridgeway Post",
+      "top_country": "US"
+    },
+    "carriers_elevated": 1,
+    "ship_delay_hours_p50": 12,
+    "disputed_orders_delivered_share": 0.82,
+    "avg_amount": 74.2,
+    "median_response_hours": 52,
+    "open_disputes": 21,
+    "refund_ratio_30d": 0.04,
+    "days_since_txn_median": 9
+  },
+  "narrative": "Item-not-received disputes up, but most disputed orders show a confirmed delivery scan.",
+  "evidence_ids": [],
+  "paypal_dispute_ids": []
+}

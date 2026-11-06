@@ -1,0 +1,279 @@
+{
+  "situation": {
+    "situation_id": "sit_demo_C",
+    "merchant_id": "m_demo_electronics",
+    "label": "C: delivered orders",
+    "window": {
+      "start": "2026-10-28",
+      "end": "2026-11-06"
+    },
+    "source": "synthetic_order_feed",
+    "features": {
+      "transactions_7d": 1790,
+      "disputes_7d": 24,
+      "gmv_7d": 132818.0,
+      "dispute_rate_7d": 0.01341,
+      "dispute_rate_7d_ci95": [
+        0.00903,
+        0.01987
+      ],
+      "transactions_30d_baseline": 7500,
+      "disputes_30d_baseline": 22,
+      "dispute_rate_30d_baseline": 0.00293,
+      "baseline_ci95": [
+        0.00194,
+        0.00444
+      ],
+      "rate_ratio": 4.57,
+      "anomaly": {
+        "method": "binomial_vs_baseline",
+        "p_value": 1.87e-09,
+        "is_anomalous": true,
+        "min_sample_met": true
+      },
+      "trend_slope": 0.6,
+      "daily_dispute_rate": [
+        0.0029,
+        0.0032,
+        0.0039,
+        0.0047,
+        0.0058,
+        0.007,
+        0.0084,
+        0.0099,
+        0.0116,
+        0.0134
+      ],
+      "reason_mix": {
+        "ITEM_NOT_RECEIVED": 0.68,
+        "UNAUTHORISED": 0.12,
+        "NOT_AS_DESCRIBED": 0.08,
+        "OTHER": 0.12
+      },
+      "concentration": {
+        "sku": 0.3,
+        "carrier": 0.38,
+        "country": 0.94,
+        "top_sku": "HDP-220 wireless headphones",
+        "top_carrier": "Ridgeway Post",
+        "top_country": "US"
+      },
+      "carriers_elevated": 1,
+      "ship_delay_hours_p50": 12,
+      "disputed_orders_delivered_share": 0.82,
+      "avg_amount": 74.2,
+      "median_response_hours": 52,
+      "open_disputes": 21,
+      "refund_ratio_30d": 0.04,
+      "days_since_txn_median": 9
+    },
+    "narrative": "Item-not-received disputes up, but most disputed orders show a confirmed delivery scan.",
+    "evidence_ids": [],
+    "paypal_dispute_ids": []
+  },
+  "recommendation": {
+    "recommendation_id": "rec_demo_C_wp",
+    "situation_id": "sit_demo_C",
+    "mode": "with_precedent",
+    "grounding": "precedent",
+    "precedents": [
+      {
+        "case_id": "case_c01_porch_theft_cluster",
+        "title": "Disputes on parcels marked delivered",
+        "similarity": 0.978,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "item-not-received share",
+          "unauthorised share",
+          "SKU concentration",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "evidence_collection_response",
+        "outcome_summary": "Illustrative: proof of delivery (scan, location, photo) was filed on each dispute. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c05_low_value_delivered_refund",
+        "title": "Low-value delivered orders disputed",
+        "similarity": 0.931,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "item-not-received share",
+          "unauthorised share",
+          "SKU concentration"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "partial_refund_offer",
+        "outcome_summary": "Illustrative: partial refunds on low-value disputes, evidence on the rest. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c03_wrong_address_autofill",
+        "title": "Checkout autofill sent parcels to old addresses",
+        "similarity": 0.919,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "item-not-received share",
+          "unauthorised share",
+          "SKU concentration",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "evidence_collection_response",
+        "outcome_summary": "Illustrative: delivery proof filed, buyers messaged to resolve address errors, checkout fixed. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c04_apartment_mailroom",
+        "title": "Apartment mailroom misplacement",
+        "similarity": 0.857,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "item-not-received share",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "evidence_collection_response",
+        "outcome_summary": "Illustrative: delivery proof filed and buyers asked to check building mailrooms. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c02_friendly_fraud_repeat_buyers",
+        "title": "Repeat buyers disputing delivered orders",
+        "similarity": 0.824,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "item-not-received share",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "SKU concentration",
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "evidence_collection_response",
+        "outcome_summary": "Illustrative: signature proof filed on disputes and the accounts flagged for review. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      }
+    ],
+    "predicted_effect": null,
+    "counterfactual": null,
+    "generated_by": {
+      "engine": "rules",
+      "version": "0.1.0"
+    },
+    "diagnosis": "Disputes on orders with confirmed delivery",
+    "diagnosis_detail": "Disputes are 4.6x the 30-day baseline and 68% are item-not-received. 82% of disputed orders have a confirmed delivery scan and orders ship in about 12h. The parcels arrived, so the useful response is evidence, not a fulfilment fix.",
+    "actions": [
+      {
+        "action_id": "act_1",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "File proof of delivery on disputes with a confirmed delivery scan",
+        "params": {
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "scope": "open_inr_disputes",
+          "filter": {
+            "delivery_confirmed": true
+          },
+          "dispute_ids": [],
+          "estimated_disputes": 17
+        },
+        "rationale": "Followed in 4 similar case(s) (case_c01_porch_theft_cluster, case_c03_wrong_address_autofill, case_c04_apartment_mailroom, case_c02_friendly_fraud_repeat_buyers). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "supporting_cases": [
+          "case_c01_porch_theft_cluster",
+          "case_c03_wrong_address_autofill",
+          "case_c04_apartment_mailroom",
+          "case_c02_friendly_fraud_repeat_buyers"
+        ]
+      }
+    ],
+    "playbook_notes": [
+      "Disputes on parcels marked delivered (authored, illustrative): Illustrative: proof of delivery (scan, location, photo) was filed on each dispute. No measured numbers.",
+      "Checkout autofill sent parcels to old addresses (authored, illustrative): Illustrative: delivery proof filed, buyers messaged to resolve address errors, checkout fixed. No measured numbers.",
+      "Apartment mailroom misplacement (authored, illustrative): Illustrative: delivery proof filed and buyers asked to check building mailrooms. No measured numbers.",
+      "No measured precedents match this pattern, so no numeric forecast is shown."
+    ],
+    "confidence": 0.64,
+    "evidence_quality": "illustrative",
+    "abstain": false,
+    "abstain_reason": null,
+    "created_at": "2026-11-06T09:00:00Z"
+  },
+  "policy_decisions": [
+    {
+      "action_id": "act_1",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "external_action_requires_approval"
+      ],
+      "explanation": "Visible to buyers or PayPal: one-click approval required."
+    }
+  ],
+  "timeline": [
+    {
+      "step": "detected",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": true,
+      "detail": "Binomial test vs 30-day baseline, p=1.87e-09. Run on the synthetic demo order feed."
+    },
+    {
+      "step": "recommended",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": false,
+      "detail": "1 action(s) proposed, citing 5 precedent(s)."
+    },
+    {
+      "step": "approved",
+      "at": null,
+      "simulated": false,
+      "status": "pending",
+      "detail": "1 action(s) waiting for your approval."
+    },
+    {
+      "step": "executed",
+      "status": "pending",
+      "at": null,
+      "simulated": true,
+      "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."
+    },
+    {
+      "step": "measured",
+      "status": "pending",
+      "at": null,
+      "simulated": true,
+      "detail": "Outcome clock is simulated. Result is recorded as a live_simulated case pending review."
+    }
+  ]
+}

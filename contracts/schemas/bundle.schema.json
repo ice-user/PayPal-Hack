@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://precedent.local/schemas/bundle.schema.json",
+  "title": "ScreenBundle",
+  "description": "Everything the main screen needs for one situation in one mode. The mock API and the fixtures both return this shape.",
+  "type": "object",
+  "required": ["situation", "recommendation", "policy_decisions", "timeline"],
+  "additionalProperties": false,
+  "properties": {
+    "situation": {"$ref": "situation_record.schema.json"},
+    "recommendation": {"$ref": "recommendation.schema.json"},
+    "policy_decisions": {"type": "array", "items": {"$ref": "policy_decision.schema.json"}},
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "status", "simulated", "detail"],
+        "additionalProperties": false,
+        "properties": {
+          "step": {"type": "string", "enum": ["detected", "recommended", "approved", "executed", "measured"]},
+          "status": {"type": "string", "enum": ["done", "pending", "blocked", "skipped"]},
+          "at": {"type": ["string", "null"]},
+          "simulated": {"type": "boolean"},
+          "detail": {"type": "string", "maxLength": 300}
+        }
+      }
+    }
+  }
+}

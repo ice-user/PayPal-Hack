@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://precedent.local/schemas/recommendation.schema.json",
+  "title": "Recommendation",
+  "description": "Produced by the Consultant (Person A). Consumed by the Policy Gate (Person B) and the UI. The Consultant never writes predicted_effect or counterfactual: those come from Person B's code, from measured cases only.",
+  "type": "object",
+  "required": [
+    "recommendation_id", "situation_id", "mode", "grounding", "diagnosis", "precedents",
+    "actions", "predicted_effect", "counterfactual", "playbook_notes", "confidence",
+    "evidence_quality", "abstain", "abstain_reason", "generated_by"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "recommendation_id": {"type": "string", "pattern": "^rec_[A-Za-z0-9_]+$"},
+    "situation_id": {"type": "string"},
+    "mode": {
+      "type": "string",
+      "enum": ["with_precedent", "no_precedent"],
+      "description": "no_precedent is the ablation baseline: the same Consultant without retrieval."
+    },
+    "grounding": {"type": "string", "enum": ["precedent", "none"]},
+    "diagnosis": {"type": "string", "maxLength": 200},
+    "diagnosis_detail": {"type": "string", "maxLength": 1200},
+    "precedents": {"type": "array", "items": {"$ref": "#/$defs/precedent"}},
+    "actions": {"type": "array", "items": {"$ref": "#/$defs/action"}},
+    "predicted_effect": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/effect"}]},
+    "counterfactual": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/effect"}]},
+    "playbook_notes": {"type": "array", "items": {"type": "string", "maxLength": 400}},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "evidence_quality": {
+      "type": "string",
+      "enum": ["measured_observational", "aggregate_disclosure", "incomplete_report", "illustrative", "simulated", "none"],
+      "description": "Strongest evidence quality among the cases that support the chosen actions."
+    },
+    "abstain": {"type": "boolean"},
+    "abstain_reason": {"type": ["string", "null"]},
+    "generated_by": {
+      "type": "object",
+      "required": ["engine"],
+      "additionalProperties": false,
+      "properties": {
+        "engine": {"type": "string", "enum": ["rules", "llm"]},
+        "model": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "created_at": {"type": "string"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"abstain": {"const": true}}},
+      "then": {
+        "properties": {"actions": {"maxItems": 0}, "abstain_reason": {"type": "string", "minLength": 1}}
+      }
+    },
+    {
+      "if": {"properties": {"grounding": {"const": "none"}}},
+      "then": {"properties": {"precedents": {"maxItems": 0}, "predicted_effect": {"type": "null"}, "counterfactual": {"type": "null"}}}
+    }
+  ],
+  "$defs": {
+    "precedent": {
+      "type": "object",
+      "required": [
+        "case_id", "title", "similarity", "matched_on", "differs_on", "intervention",
+        "outcome_summary", "evidence_quality", "provenance"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {"type": "string"},
+        "title": {"type": "string"},
+        "similarity": {"type": "number", "minimum": 0, "maximum": 1},
+        "matched_on": {"type": "array", "items": {"type": "string"}},
+        "differs_on": {"type": "array", "items": {"type": "string"}},
+        "intervention": {"type": "string"},
+        "outcome_summary": {"type": "string"},
+        "measurement_period_days": {"type": ["integer", "null"]},
+        "evidence_quality": {"type": "string"},
+        "provenance": {"type": "string", "enum": ["public", "authored", "live_simulated"]}
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": ["action_id", "type", "params", "rationale", "supporting_cases"],
+      "additionalProperties": false,
+      "properties": {
+        "action_id": {"type": "string"},
+        "type": {"type": "string", "enum": ["FLAG_ONLY", "PROVIDE_EVIDENCE", "SEND_MESSAGE", "MAKE_OFFER", "ACCEPT_CLAIM"]},
+        "title": {"type": "string", "maxLength": 120},
+        "params": {"type": "object"},
+        "rationale": {"type": "string", "maxLength": 600},
+        "supporting_cases": {"type": "array", "items": {"type": "string"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"enum": ["MAKE_OFFER", "ACCEPT_CLAIM"]}}},
+          "then": {
+            "properties": {
+              "params": {
+                "type": "object",
+                "required": ["amount"],
+                "properties": {
+                  "amount": {
+                    "type": "object",
+                    "required": ["currency_code", "value"],
+                    "properties": {"currency_code": {"type": "string"}, "value": {"type": "number", "minimum": 0}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "effect": {
+      "type": "object",
+      "required": ["metric", "range", "horizon_days", "n_measured_cases", "evidence_quality", "causal_claim", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "metric": {"type": "string"},
+        "range": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+        "horizon_days": {"type": "integer", "minimum": 1},
+        "n_measured_cases": {"type": "integer", "minimum": 2},
+        "evidence_quality": {"const": "measured_observational"},
+        "causal_claim": {"const": false},
+        "source": {"const": "computed_from_measured_cases"}
+      }
+    }
+  }
+}

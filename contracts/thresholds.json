@@ -1,0 +1,26 @@
+{
+  "_comment": "Shared by the Consultant (Person A) and the Policy Gate (Person B). Draft v0: Person B to confirm before freezing.",
+  "version": "0.1.0",
+  "k_min": 3,
+  "similarity_min": 0.6,
+  "confidence_min": 0.5,
+  "min_measured_cases_for_effect": 2,
+  "money": {
+    "currency": "USD",
+    "auto_limit": 0,
+    "hard_cap": 500
+  },
+  "rate_limit": {
+    "max_external_actions_per_hour": 20
+  },
+  "tiers": {
+    "PREPARE": ["FLAG_ONLY"],
+    "EXTERNAL": ["PROVIDE_EVIDENCE", "SEND_MESSAGE"],
+    "MONEY": ["MAKE_OFFER", "ACCEPT_CLAIM"]
+  },
+  "tier_default_decision": {
+    "PREPARE": "AUTO",
+    "EXTERNAL": "NEEDS_APPROVAL",
+    "MONEY": "NEEDS_APPROVAL"
+  }
+}
