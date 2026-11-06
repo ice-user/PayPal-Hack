@@ -1,10 +1,28 @@
-# Spike 1 result: PayPal sandbox dispute path (in progress)
+# Spike 1 result: PayPal sandbox dispute path
 
 Run on 2026-11-07 against `api-m.sandbox.paypal.com` with the app `precedent`
 (sandbox, US Business account). Scripts: `backend/spike1/`. Secrets live only in
 `backend/.env` (git-ignored).
 
-## Verdict so far: PARTIAL. Reading works; no seller action has worked yet.
+## Verdict: PASS (dispute created by hand in the buyer UI; seller action executed by API)
+
+**Update, later on 2026-11-07:** the dispute left `UNDER_PAYPAL_REVIEW` by itself and
+moved to `WAITING_FOR_SELLER_RESPONSE` / `REQUIRED_ACTION`. PayPal then offered
+`accept_claim`, `escalate`, `make_offer` (offer type REFUND), `provide_evidence` and
+`send_message`. We sent a real seller message (`POST .../send-message`, HTTP 200,
+debug id `f89425965e54d`). It appears on the dispute as posted by `SELLER`. Right after
+the message, the dispute went back to `UNDER_PAYPAL_REVIEW` with no allowed actions.
+
+**What this means:** the sandbox reviews each step asynchronously for a few minutes,
+then reopens the dispute for the next party. "No allowed actions" is a transient state,
+not a dead end. The adapter re-reads the dispute right before executing and falls back to
+a labelled simulation only if the action is not allowed at that moment.
+
+**Still not done:** API dispute creation (needs buyer consent), webhooks (need a public
+URL and a webhook ID), and make-offer, provide-evidence or accept-claim. Those are kept
+for the demo, because make-offer and accept-claim would close the only dispute.
+
+## First pass (earlier the same day)
 
 | # | Step | Result |
 |---|---|---|

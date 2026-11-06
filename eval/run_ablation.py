@@ -170,19 +170,19 @@ def score_sheet(result: dict) -> None:
                 "rater": "", "notes": "",
             })
             key.append({"item": item, "system": system, "mode": r["systems"][system]["mode"]})
-    with open(OUT / "score_sheet.csv", "w", newline="", encoding="utf-8") as f:
+    with open(OUT / "score_sheet.csv", "w", newline="", encoding="utf-8", newline="\n") as f:
         w = csv.DictWriter(f, fieldnames=list(sheet[0]))
         w.writeheader()
         w.writerows(sheet)
-    (OUT / "score_sheet_KEY_do_not_open_before_rating.json").write_text(json.dumps(key, indent=2), encoding="utf-8")
+    (OUT / "score_sheet_KEY_do_not_open_before_rating.json").write_text(json.dumps(key, indent=2), encoding="utf-8", newline="\n")
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     result = run()
-    (OUT / "ablation_runs.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+    (OUT / "ablation_runs.json").write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     summary = summarise(result)
-    (OUT / "summary.md").write_text(summary, encoding="utf-8")
+    (OUT / "summary.md").write_text(summary, encoding="utf-8", newline="\n")
     score_sheet(result)
     print(summary)
 

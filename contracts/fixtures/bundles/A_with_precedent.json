@@ -285,16 +285,16 @@
     },
     {
       "step": "executed",
-      "status": "pending",
       "at": null,
+      "status": "pending",
       "simulated": true,
       "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."
     },
     {
       "step": "measured",
-      "status": "pending",
       "at": null,
       "simulated": true,
+      "status": "pending",
       "detail": "Outcome clock is simulated. Result is recorded as a live_simulated case pending review."
     }
   ]
