@@ -195,7 +195,7 @@
         "params": {
           "note": "Prioritise the oldest unshipped orders and check pick-and-pack capacity."
         },
-        "rationale": "Followed in 3 similar case(s) (case_b01_warehouse_backlog, case_b03_3pl_migration, case_b05_inventory_sync_oversell). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "rationale": "Followed in 3 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
           "case_b01_warehouse_backlog",
           "case_b03_3pl_migration",
@@ -210,7 +210,7 @@
           "audience": "buyers_with_unshipped_orders_over_48h",
           "template_id": "ship_date_update"
         },
-        "rationale": "Followed in 3 similar case(s) (case_b01_warehouse_backlog, case_b03_3pl_migration, case_b05_inventory_sync_oversell). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "rationale": "Followed in 3 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
           "case_b01_warehouse_backlog",
           "case_b03_3pl_migration",

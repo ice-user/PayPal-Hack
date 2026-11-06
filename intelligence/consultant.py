@@ -254,7 +254,6 @@ def _with_precedent(situation: dict, precedents: list[dict], x: dict, rec_id: st
     actions, seen = [], set()
     for interv in chosen:
         backers = [p for p in supporting if p["case"]["intervention"] == interv]
-        names = ", ".join(p["case"]["case_id"] for p in backers)
         for tmpl in _action_templates(interv, x, situation):
             key = (tmpl["type"], tmpl["title"])
             if key in seen:
@@ -265,7 +264,7 @@ def _with_precedent(situation: dict, precedents: list[dict], x: dict, rec_id: st
                 "type": tmpl["type"],
                 "title": tmpl["title"],
                 "params": tmpl["params"],
-                "rationale": (f"Followed in {len(backers)} similar case(s) ({names}). "
+                "rationale": (f"Followed in {len(backers)} similar case(s). "
                               f"Shared signals: {', '.join(backers[0]['matched_on'][:3]) or 'overall profile'}."),
                 "supporting_cases": [p["case"]["case_id"] for p in backers],
             })

@@ -207,7 +207,7 @@
           "dispute_ids": [],
           "estimated_disputes": 17
         },
-        "rationale": "Followed in 4 similar case(s) (case_c01_porch_theft_cluster, case_c03_wrong_address_autofill, case_c04_apartment_mailroom, case_c02_friendly_fraud_repeat_buyers). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "rationale": "Followed in 4 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
           "case_c01_porch_theft_cluster",
           "case_c03_wrong_address_autofill",

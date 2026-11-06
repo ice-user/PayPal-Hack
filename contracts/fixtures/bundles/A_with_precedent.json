@@ -213,7 +213,7 @@
           ],
           "estimated_disputes": 19
         },
-        "rationale": "Followed in 4 similar case(s) (case_a02_signature_on_high_value, case_a01_regional_carrier_scan_gap, case_a06_po_box_undeliverable, case_a04_tracking_number_mismatch). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "rationale": "Followed in 4 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
           "case_a02_signature_on_high_value",
           "case_a01_regional_carrier_scan_gap",
@@ -228,7 +228,7 @@
         "params": {
           "note": "Turn on signature or photo confirmation for Northline Parcel until its scans recover."
         },
-        "rationale": "Followed in 4 similar case(s) (case_a02_signature_on_high_value, case_a01_regional_carrier_scan_gap, case_a06_po_box_undeliverable, case_a04_tracking_number_mismatch). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "rationale": "Followed in 4 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
         "supporting_cases": [
           "case_a02_signature_on_high_value",
           "case_a01_regional_carrier_scan_gap",
