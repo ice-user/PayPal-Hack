@@ -1,6 +1,6 @@
 import type { Recommendation } from "../types";
 import { INTERVENTION_LABEL, QUALITY_LABEL } from "../format";
-import { Card } from "./Card";
+import { Pane } from "./Card";
 import { Icon } from "./Icon";
 
 interface Props {
@@ -32,13 +32,15 @@ function Ring({ value, below }: { value: number; below: boolean }) {
 export function PrecedentsPanel({ rec, similarityMin, onOpenCase }: Props) {
   const usedIds = new Set(rec.actions.flatMap((a) => a.supporting_cases));
   return (
-    <Card id="precedents" className="span-4"
+    <Pane id="precedents"
       title="Precedents"
-      sub={rec.grounding === "none" ? "Retrieval is switched off." : `Similar past cases, ranked. Threshold ${Math.round(similarityMin * 100)}.`}>
+      sub={rec.grounding === "none" ? "Retrieval is switched off." : `Similar past cases, most similar first. Threshold ${Math.round(similarityMin * 100)}.`}>
       {rec.grounding === "none" ? (
         <div className="callout">
-          <div className="callout-head">No precedents consulted</div>
+          <div>
+          <p className="callout-title">No precedents consulted</p>
           <p>This is the ablation baseline: the same Consultant without case retrieval. Nothing in the plan is cited, so the policy gate will not let it act.</p>
+          </div>
         </div>
       ) : (
         <ul className="people">
@@ -49,7 +51,7 @@ export function PrecedentsPanel({ rec, similarityMin, onOpenCase }: Props) {
               <li key={p.case_id} className={`person ${below ? "below" : ""}`}>
                 <Ring value={p.similarity} below={below} />
                 <div className="person-main">
-                  <button className="person-name linklike" onClick={() => onOpenCase(p.case_id)}
+                  <button className="person-name link" onClick={() => onOpenCase(p.case_id)}
                     aria-label={`Open case details: ${p.title}`}>{p.title}</button>
                   <div className="person-meta">
                     <span className={`dot prov-${p.provenance}`} aria-hidden="true" />
@@ -62,7 +64,7 @@ export function PrecedentsPanel({ rec, similarityMin, onOpenCase }: Props) {
                     {p.matched_on.length > 0 && (
                       <span className="chip match" title={`Matched on: ${p.matched_on.join(", ")}`}>Matched {p.matched_on.length}</span>
                     )}
-                    {p.differs_on.map((m) => <span key={m} className="chip differ" title="Differs on">{m}</span>)}
+                    {p.differs_on.map((m) => <span key={m} className="chip differ" title="Differs on">differs: {m}</span>)}
                   </div>
                 </div>
                 <button className="icon-btn" onClick={() => onOpenCase(p.case_id)} aria-label={`More about ${p.title}`}>
@@ -73,6 +75,6 @@ export function PrecedentsPanel({ rec, similarityMin, onOpenCase }: Props) {
           })}
         </ul>
       )}
-    </Card>
+    </Pane>
   );
 }

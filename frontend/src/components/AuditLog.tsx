@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { AuditEvent } from "../api";
-import { Card } from "./Card";
+import { Pane } from "./Card";
 import { Icon } from "./Icon";
 
 const LABEL: Record<string, string> = {
@@ -43,7 +43,7 @@ export function AuditLog({ events }: { events: AuditEvent[] }) {
   const [all, setAll] = useState(false);
   const shown = all ? events : events.slice(0, 6);
   return (
-    <Card id="audit" className="span-12" title="Audit log" sub="Every step the backend took, newest first."
+    <Pane id="audit" title="Audit log" sub="Every step the backend took, newest first."
       footer={events.length > 6 ? (
         <button className="link-btn" onClick={() => setAll(!all)}>
           {all ? "Show fewer" : `View all ${events.length} events`} <Icon name="arrow" size={14} />
@@ -55,7 +55,7 @@ export function AuditLog({ events }: { events: AuditEvent[] }) {
           <tbody>
             {shown.map((e) => (
               <tr key={e.id}>
-                <td className="num nowrap muted-text">{e.at.replace("T", " ").replace(/(\.\d+)?\+00:00$/, "")}</td>
+                <td className="num nowrap muted">{e.at.replace("T", " ").replace(/(\.\d+)?\+00:00$/, "")}</td>
                 <td className="nowrap">{e.actor}</td>
                 <td className="nowrap"><span className={`status status-${TONE[e.event] ?? "plain"}`}>{LABEL[e.event] ?? e.event}</span></td>
                 <td className="audit-detail">{summary(e)}</td>
@@ -64,6 +64,6 @@ export function AuditLog({ events }: { events: AuditEvent[] }) {
           </tbody>
         </table>
       </div>
-    </Card>
+    </Pane>
   );
 }

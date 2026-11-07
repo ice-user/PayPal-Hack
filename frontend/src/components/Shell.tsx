@@ -2,12 +2,10 @@ import type { LiveDispute, Mode, SituationIndexEntry } from "../types";
 import { Icon, type IconName } from "./Icon";
 
 const SECTIONS: { id: string; label: string; icon: IconName; apiOnly?: boolean }[] = [
-  { id: "rate", label: "Dispute rate", icon: "activity" },
-  { id: "signals", label: "Signals", icon: "signal" },
-  { id: "diagnosis", label: "Diagnosis", icon: "search" },
+  { id: "decision", label: "Decision", icon: "shield" },
+  { id: "evidence", label: "Evidence", icon: "activity" },
   { id: "precedents", label: "Precedents", icon: "book" },
-  { id: "actions", label: "Proposed actions", icon: "shield" },
-  { id: "activity", label: "Activity", icon: "clock" },
+  { id: "history", label: "History", icon: "clock" },
   { id: "audit", label: "Audit log", icon: "file", apiOnly: true },
 ];
 

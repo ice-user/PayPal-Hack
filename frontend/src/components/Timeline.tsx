@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { TimelineEvent } from "../types";
 import { SimulatedTag } from "./Badges";
-import { Card } from "./Card";
+import { Pane } from "./Card";
 import { Icon, type IconName } from "./Icon";
 
 const LABEL: Record<string, string> = {
@@ -25,7 +25,7 @@ const when = (at?: string | null) =>
 /** The loop as an activity feed: detected, recommended, approved, executed, measured. */
 export function Timeline({ events, action }: { events: TimelineEvent[]; action?: ReactNode }) {
   return (
-    <Card id="activity" className="span-3" title="Activity" sub="Where this situation is in the loop." footer={action}>
+    <Pane id="activity" title="Activity" sub="Where this situation is in the loop." footer={action}>
       <ol className="feed">
         {events.map((e) => (
           <li key={e.step} className={`feed-item feed-${e.status}`}>
@@ -41,6 +41,6 @@ export function Timeline({ events, action }: { events: TimelineEvent[]; action?:
           </li>
         ))}
       </ol>
-    </Card>
+    </Pane>
   );
 }
