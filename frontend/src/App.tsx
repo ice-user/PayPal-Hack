@@ -6,11 +6,28 @@ import {
 } from "./api";
 import { AuditLog } from "./components/AuditLog";
 import thresholds from "@contracts/thresholds.json";
-import { SituationPanel } from "./components/SituationPanel";
+import { KpiRow, RateCard, ReasonsCard, SignalsCard } from "./components/Overview";
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
-import { PlanPanel, type ActionView } from "./components/PlanPanel";
+import { ActionsCard, DiagnosisCard, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
 import { CaseDrawer } from "./components/CaseDrawer";
+import { Sidebar, Topbar } from "./components/Shell";
+import { Icon } from "./components/Icon";
+
+type Theme = "dark" | "light";
+const THEME_KEY = "precedent-theme";
+
+function initialTheme(): Theme {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "dark" || saved === "light") return saved;
+  } catch {
+    /* storage blocked: fall through to the default */
+  }
+  return "dark";
+}
+
+const narrow = () => window.matchMedia("(max-width: 960px)").matches;
 
 const situations = listSituations();
 const API = dataMode === "api";
@@ -41,6 +58,20 @@ export default function App() {
   const [live, setLive] = useState<{ dispute?: LiveDispute; error?: string } | null>(null);
   const [openCase, setOpenCase] = useState<string | null>(null);
   const [audit, setAudit] = useState<AuditEvent[]>([]);
+  const [theme, setTheme] = useState<Theme>(initialTheme);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      /* not persisted; fine */
+    }
+  }, [theme]);
+
+  const toggleSidebar = () => (narrow() ? setMobileOpen((o) => !o) : setCollapsed((c) => !c));
 
   useEffect(() => {
     if (!API || !bundle) return;
@@ -133,91 +164,94 @@ export default function App() {
     API && !!bundle && !bundle.outcome &&
     bundle.policy_decisions.some((d) => d.decision === "NEEDS_APPROVAL" && views[d.action_id]?.state === "succeeded");
 
+  const current = situations.find((s) => s.key === key);
+  const anomalous = !!bundle?.situation.features.anomaly.is_anomalous;
+
   return (
-    <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <span className="logo" aria-hidden="true">P</span>
-          <div>
-            <div className="brand-name">Precedent</div>
-            <div className="brand-sub">Demo electronics store · PayPal sandbox</div>
-          </div>
-        </div>
+    <div className={`layout ${collapsed ? "collapsed" : ""}`}>
+      <Sidebar
+        open={mobileOpen}
+        situations={situations}
+        current={key}
+        anomalous={anomalous}
+        onPick={setKey}
+        apiMode={API}
+        disputeIds={bundle?.situation.paypal_dispute_ids ?? []}
+        live={live}
+        onNavigate={() => setMobileOpen(false)}
+      />
+      {mobileOpen && <div className="scrim" onClick={() => setMobileOpen(false)} aria-hidden="true" />}
 
-        <div className="controls">
-          <div className="segmented" role="group" aria-label="Demo situation">
-            {situations.map((s) => (
-              <button key={s.key} aria-pressed={s.key === key} onClick={() => setKey(s.key)}>
-                {s.label}
-              </button>
-            ))}
-          </div>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={mode === "with_precedent"}
-              onChange={(e) => setMode(e.target.checked ? "with_precedent" : "no_precedent")}
-            />
-            <span className="toggle-track" aria-hidden="true"><span className="toggle-thumb" /></span>
-            <span>{mode === "with_precedent" ? "With precedent" : "Without precedent"}</span>
-          </label>
-        </div>
-      </header>
+      <div className="inset">
+        <Topbar
+          label={current?.label ?? key}
+          mode={mode}
+          onMode={setMode}
+          theme={theme}
+          onTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onToggleSidebar={toggleSidebar}
+        />
 
-      <div className="banner">
-        {API ? (
-          <>API mode: plans, approvals and the outcome clock run on the backend. Approved actions are sent to the PayPal sandbox when the dispute allows them; otherwise they are simulated and labelled. The order feed is synthetic.</>
-        ) : (
-          <>Fixture mode: data comes from <code>contracts/fixtures</code>. The order feed is synthetic, cases are labelled, and execution is simulated in the browser.</>
-        )}
+        <main className="content" id="top">
+          {bundle && !error && (
+            <div className="narrative">
+              <span className={`pulse ${anomalous ? "on" : ""}`} aria-hidden="true" />
+              <p>{bundle.situation.narrative}</p>
+            </div>
+          )}
+
+          {loading && <div className="state-msg" role="status">Loading situation…</div>}
+          {error && <div className="state-msg error" role="alert">Could not load this situation: {error}</div>}
+          {notice && <div className="toast" role="alert">{notice}</div>}
+
+          {bundle && !error && (
+            <>
+              <KpiRow situation={bundle.situation} rec={bundle.recommendation} />
+              <div className="grid">
+                <RateCard situation={bundle.situation} />
+                <ReasonsCard situation={bundle.situation} />
+                <DiagnosisCard
+                  rec={bundle.recommendation}
+                  outcome={bundle.outcome ?? null}
+                  busy={busy}
+                  onOpenCase={setOpenCase}
+                  onReview={API ? review : undefined}
+                />
+                <SignalsCard situation={bundle.situation} />
+                <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} onOpenCase={setOpenCase} />
+                <ActionsCard
+                  rec={bundle.recommendation}
+                  decisions={bundle.policy_decisions}
+                  views={views}
+                  busy={busy}
+                  onApprove={approve}
+                  onReject={reject}
+                  onOpenCase={setOpenCase}
+                />
+                <Timeline
+                  events={timeline}
+                  action={
+                    canAdvance ? (
+                      <button className="btn primary block" disabled={busy !== null}
+                        onClick={() => run("advance", () => advanceClock(key, mode, 14))}>
+                        <Icon name="forward" size={14} />
+                        {busy === "advance" ? "Advancing…" : "Advance 14 days (simulated)"}
+                      </button>
+                    ) : null
+                  }
+                />
+                {API && audit.length > 0 && <AuditLog events={audit} />}
+              </div>
+            </>
+          )}
+
+          <footer className="foot">
+            Decision support with cited precedents, not financial advice. Outcomes are observed, never claimed as caused.
+          </footer>
+        </main>
       </div>
 
-      {loading && <div className="loading" role="status">Loading situation…</div>}
-      {error && <div className="error" role="alert">Could not load this situation: {error}</div>}
-      {notice && <div className="notice" role="alert">{notice}</div>}
-
-      {bundle && !error && (
-        <>
-          <div className="narrative">
-            <span className={`pulse ${bundle.situation.features.anomaly.is_anomalous ? "on" : ""}`} aria-hidden="true" />
-            {bundle.situation.narrative}
-          </div>
-          <main className="grid">
-            <SituationPanel situation={bundle.situation} live={live} apiMode={API} />
-            <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} onOpenCase={setOpenCase} />
-            <PlanPanel
-              rec={bundle.recommendation}
-              decisions={bundle.policy_decisions}
-              views={views}
-              busy={busy}
-              outcome={bundle.outcome ?? null}
-              onApprove={approve}
-              onReject={reject}
-              onOpenCase={setOpenCase}
-              onReview={API ? review : undefined}
-            />
-          </main>
-          <Timeline
-            events={timeline}
-            action={
-              canAdvance ? (
-                <button className="btn primary" disabled={busy !== null}
-                  onClick={() => run("advance", () => advanceClock(key, mode, 14))}>
-                  {busy === "advance" ? "Advancing…" : "Advance 14 days (simulated)"}
-                </button>
-              ) : null
-            }
-          />
-        </>
-      )}
-
-      {API && audit.length > 0 && <AuditLog events={audit} />}
-
       <CaseDrawer caseId={openCase} onClose={() => setOpenCase(null)} apiMode={API} />
-
-      <footer className="foot">
-        Decision support with cited precedents, not financial advice. Outcomes are observed, never claimed as caused.
-      </footer>
     </div>
   );
 }
