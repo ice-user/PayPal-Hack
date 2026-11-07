@@ -61,7 +61,7 @@ the policy gate blocks it.
     payment processors and one merchant report. The other 27 are authored playbook cases,
     labelled as such.
 - **Frontend:** React and Vite. JSON-schema contracts are shared with the backend.
-- **Tests:** 61 automated tests cover:
+- **Tests:** 62 automated tests cover:
   - policy tiers;
   - duplicate approvals;
   - webhook signatures and replays;
