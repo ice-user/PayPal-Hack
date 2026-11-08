@@ -1,110 +1,76 @@
-import { PrecedentCase, EvidenceQuality } from "../types/api";
+import type { Recommendation } from "../types";
+import { INTERVENTION_LABEL } from "../format";
+import { ProvenanceBadge, QualityBadge } from "./Badges";
 
-const provenanceColors = {
-  public: "var(--primary, #3b82f6)",
-  authored: "var(--warning, #f59e0b)",
-  live_simulated: "var(--muted-foreground, #9ca3af)",
-};
+interface Props {
+  rec: Recommendation;
+  similarityMin: number;
+  onOpenCase: (caseId: string) => void;
+}
 
-const evidenceColors = {
-  measured_observational: "var(--success, #22c55e)",
-  aggregate_disclosure: "var(--primary, #3b82f6)",
-  incomplete_report: "var(--warning, #f59e0b)",
-  illustrative: "var(--muted-foreground, #9ca3af)",
-  simulated: "var(--destructive, #ef4444)",
-};
-
-export function PrecedentsPanel({
-  precedents,
-  showWithoutPrecedent,
-  onToggleWithoutPrecedent,
-}: {
-  precedents: PrecedentCase[];
-  showWithoutPrecedent: boolean;
-  onToggleWithoutPrecedent: (v: boolean) => void;
-}) {
-  if (precedents.length === 0) {
-    return (
-      <section className="panel precedents-panel">
-        <h2>Precedents</h2>
-        <p className="empty">No precedents found for this situation.</p>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={showWithoutPrecedent}
-            onChange={(e) => onToggleWithoutPrecedent(e.target.checked)}
-          />
-          Show recommendation without precedent
-        </label>
-      </section>
-    );
-  }
-
+export function PrecedentsPanel({ rec, similarityMin, onOpenCase }: Props) {
+  const usedIds = new Set(rec.actions.flatMap((a) => a.supporting_cases));
   return (
-    <section className="panel precedents-panel">
-      <div className="panel-header">
-        <h2>Precedents</h2>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={showWithoutPrecedent}
-            onChange={(e) => onToggleWithoutPrecedent(e.target.checked)}
-          />
-          Without precedent
-        </label>
-      </div>
+    <section className="panel" aria-labelledby="precedents-h">
+      <header className="panel-head">
+        <h2 id="precedents-h">Precedents</h2>
+        <span className="panel-meta">{rec.precedents.length} retrieved</span>
+      </header>
 
-      <div className="precedents-list">
-        {precedents.map((p, i) => (
-          <article key={p.case_id} className="precedent-card">
-            <div className="precedent-header">
-              <span className="precedent-rank">#{i + 1}</span>
-              <span className="precedent-similarity">
-                {(p.similarity_score * 100).toFixed(0)}% match
-              </span>
-            </div>
-
-            <div className="precedent-badges">
-              <span
-                className="badge provenance-badge"
-                style={{ backgroundColor: provenanceColors[p.provenance] + "20", color: provenanceColors[p.provenance] }}
-              >
-                {p.provenance.replace("_", " ")}
-              </span>
-              <span
-                className="badge evidence-badge"
-                style={{ backgroundColor: evidenceColors[p.evidence_quality] + "20", color: evidenceColors[p.evidence_quality] }}
-              >
-                {p.evidence_quality.replace("_", " ")}
-              </span>
-            </div>
-
-            <div className="precedent-matched">
-              <h4>Matched on:</h4>
-              <ul>
-                {p.matched_on.map((m) => <li key={m}>{m}</li>)}
-              </ul>
-            </div>
-
-            <div className="precedent-differs">
-              <h4>Differs on:</h4>
-              <ul>
-                {p.differs_on.map((d) => <li key={d}>{d}</li>)}
-              </ul>
-            </div>
-
-            <div className="precedent-intervention">
-              <h4>Intervention:</h4>
-              <p>{p.intervention}</p>
-            </div>
-
-            <div className="precedent-outcome">
-              <h4>Observed Outcome:</h4>
-              <p>{p.observed_outcome.effect} (over {p.observed_outcome.period}, n={p.observed_outcome.n_measured})</p>
-            </div>
-          </article>
-        ))}
-      </div>
+      {rec.grounding === "none" ? (
+        <div className="empty">
+          <strong>No precedents consulted.</strong>
+          <p>This is the ablation baseline: the same Consultant without case retrieval. Nothing on the right is cited, so the policy gate will not let it act.</p>
+        </div>
+      ) : (
+        <ol className="cases">
+          {rec.precedents.map((p) => {
+            const below = p.similarity < similarityMin;
+            const used = usedIds.has(p.case_id);
+            return (
+              <li key={p.case_id} className={`case ${below ? "below" : ""} ${used ? "used" : ""}`}>
+                <div className="case-top">
+                  <button className="case-title linklike" onClick={() => onOpenCase(p.case_id)}
+                    aria-label={`Open case details: ${p.title}`}>
+                    {p.title}
+                  </button>
+                  <span className="sim num" title="Similarity to the current situation">{Math.round(p.similarity * 100)}</span>
+                </div>
+                <div className="sim-track" aria-hidden="true">
+                  <div className="sim-fill" style={{ width: `${p.similarity * 100}%` }} />
+                  <div className="sim-threshold" style={{ left: `${similarityMin * 100}%` }} />
+                </div>
+                <div className="badges">
+                  <ProvenanceBadge provenance={p.provenance} />
+                  <QualityBadge quality={p.evidence_quality} />
+                  {used && <span className="badge cited">Cited</span>}
+                  {below && <span className="badge muted">Below threshold</span>}
+                </div>
+                <div className="interv">
+                  <span className="label">What they did</span> {INTERVENTION_LABEL[p.intervention] ?? p.intervention}
+                </div>
+                {p.matched_on.length > 0 && (
+                  <div className="chips">
+                    <span className="label">Matched on</span>
+                    {p.matched_on.slice(0, 4).map((m) => <span key={m} className="chip match">{m}</span>)}
+                    {p.matched_on.length > 4 && (
+                      <span className="chip" title={p.matched_on.slice(4).join(", ")}>+{p.matched_on.length - 4} more</span>
+                    )}
+                  </div>
+                )}
+                {p.differs_on.length > 0 && (
+                  <div className="chips">
+                    <span className="label">Differs on</span>
+                    {p.differs_on.map((m) => <span key={m} className="chip differ">{m}</span>)}
+                  </div>
+                )}
+                <p className="outcome">{p.outcome_summary}</p>
+                <div className="case-id"><code>{p.case_id}</code></div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </section>
   );
 }

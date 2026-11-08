@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://precedent.local/schemas/bundle.schema.json",
+  "title": "ScreenBundle",
+  "description": "Everything the main screen needs for one situation in one mode. The mock API and the fixtures both return this shape.",
+  "type": "object",
+  "required": ["situation", "recommendation", "policy_decisions", "timeline"],
+  "additionalProperties": false,
+  "properties": {
+    "situation": {"$ref": "situation_record.schema.json"},
+    "recommendation": {"$ref": "recommendation.schema.json"},
+    "policy_decisions": {"type": "array", "items": {"$ref": "policy_decision.schema.json"}},
+    "action_states": {
+      "type": "object",
+      "description": "API mode only: executor state per action_id.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["state", "server_state"],
+        "additionalProperties": false,
+        "properties": {
+          "state": {"type": "string", "enum": ["proposed", "executing", "succeeded", "failed", "rejected"]},
+          "server_state": {"type": "string", "enum": ["PROPOSED", "GATED", "AWAITING_APPROVAL", "EXECUTING", "SUCCEEDED", "FAILED", "CANCELLED"]},
+          "execution_mode": {"type": ["string", "null"], "enum": ["real", "simulated", null]},
+          "detail": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "outcome": {
+      "type": ["object", "null"],
+      "description": "API mode only: latest simulated outcome for this recommendation.",
+      "additionalProperties": false,
+      "required": ["metric", "before", "after", "horizon_days", "simulated"],
+      "properties": {
+        "metric": {"type": "string"},
+        "before": {"type": "number"},
+        "after": {"type": "number"},
+        "horizon_days": {"type": "integer"},
+        "simulated": {"const": true},
+        "new_case_id": {"type": "string"},
+        "case_review_status": {"type": "string", "enum": ["pending", "approved", "rejected"]}
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "status", "simulated", "detail"],
+        "additionalProperties": false,
+        "properties": {
+          "step": {"type": "string", "enum": ["detected", "recommended", "approved", "executed", "measured"]},
+          "status": {"type": "string", "enum": ["done", "pending", "blocked", "skipped"]},
+          "at": {"type": ["string", "null"]},
+          "simulated": {"type": "boolean"},
+          "detail": {"type": "string", "maxLength": 300}
+        }
+      }
+    }
+  }
+}

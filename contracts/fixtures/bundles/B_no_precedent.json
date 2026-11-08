@@ -1,0 +1,208 @@
+{
+  "situation": {
+    "situation_id": "sit_demo_B",
+    "merchant_id": "m_demo_electronics",
+    "window": {
+      "start": "2026-10-31",
+      "end": "2026-11-06"
+    },
+    "source": "synthetic_order_feed",
+    "features": {
+      "transactions_7d": 1811,
+      "disputes_7d": 32,
+      "gmv_7d": 102700.0,
+      "dispute_rate_7d": 0.01767,
+      "dispute_rate_7d_ci95": [
+        0.01254,
+        0.02484
+      ],
+      "transactions_30d_baseline": 7751,
+      "disputes_30d_baseline": 22,
+      "dispute_rate_30d_baseline": 0.00284,
+      "baseline_ci95": [
+        0.00188,
+        0.00429
+      ],
+      "rate_ratio": 6.23,
+      "anomaly": {
+        "method": "binomial_vs_baseline",
+        "p_value": 1.22e-15,
+        "is_anomalous": true,
+        "min_sample_met": true
+      },
+      "trend_slope": 0.65,
+      "daily_dispute_rate": [
+        0.0,
+        0.004,
+        0.0,
+        0.0268,
+        0.007,
+        0.0192,
+        0.0217,
+        0.022,
+        0.0078,
+        0.0206
+      ],
+      "reason_mix": {
+        "ITEM_NOT_RECEIVED": 0.875,
+        "UNAUTHORISED": 0.062,
+        "OTHER": 0.031,
+        "NOT_AS_DESCRIBED": 0.031
+      },
+      "concentration": {
+        "sku": 0.25,
+        "carrier": 0.344,
+        "country": 0.875,
+        "top_sku": "HDP-220 wireless headphones",
+        "top_carrier": "Ridgeway Post",
+        "top_country": "US"
+      },
+      "carriers_elevated": 4,
+      "ship_delay_hours_p50": 61.9,
+      "disputed_orders_delivered_share": 0.156,
+      "avg_amount": 56.71,
+      "median_response_hours": 52,
+      "open_disputes": 31,
+      "refund_ratio_30d": 0.04,
+      "days_since_txn_median": 9
+    },
+    "narrative": "Item-not-received disputes up 6.2x in 7 days, across 4 carriers, time to ship is 62h.",
+    "evidence_ids": [],
+    "paypal_dispute_ids": [],
+    "label": "B: many carriers, slow shipping"
+  },
+  "recommendation": {
+    "recommendation_id": "rec_demo_B_np",
+    "situation_id": "sit_demo_B",
+    "mode": "no_precedent",
+    "grounding": "none",
+    "diagnosis": "Spike in item-not-received disputes",
+    "diagnosis_detail": "Generic reading of the symptom only. Concentration, fulfilment delay and delivery signals were not compared with any precedent.",
+    "precedents": [],
+    "actions": [
+      {
+        "action_id": "act_1",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "File tracking evidence on all open item-not-received disputes",
+        "params": {
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "scope": "open_inr_disputes",
+          "dispute_ids": [],
+          "estimated_disputes": 31
+        },
+        "rationale": "Generic dispute playbook. No precedent consulted.",
+        "supporting_cases": []
+      },
+      {
+        "action_id": "act_2",
+        "type": "SEND_MESSAGE",
+        "title": "Send an apology message to every buyer with an open dispute",
+        "params": {
+          "audience": "buyers_with_open_disputes",
+          "template_id": "generic_apology"
+        },
+        "rationale": "Generic dispute playbook. No precedent consulted.",
+        "supporting_cases": []
+      },
+      {
+        "action_id": "act_3",
+        "type": "MAKE_OFFER",
+        "title": "Offer a 20% partial refund on every open dispute",
+        "params": {
+          "offer_type": "REFUND",
+          "per_dispute_fraction": 0.2,
+          "dispute_count": 31,
+          "amount": {
+            "currency_code": "USD",
+            "value": 351.6
+          }
+        },
+        "rationale": "Generic dispute playbook. No precedent consulted.",
+        "supporting_cases": []
+      }
+    ],
+    "predicted_effect": null,
+    "counterfactual": null,
+    "playbook_notes": [
+      "Ablation baseline: no precedents were retrieved, so nothing here is cited."
+    ],
+    "confidence": 0.3,
+    "evidence_quality": "none",
+    "abstain": false,
+    "abstain_reason": null,
+    "generated_by": {
+      "engine": "rules",
+      "version": "0.1.0"
+    },
+    "created_at": "2026-11-06T09:00:00Z"
+  },
+  "policy_decisions": [
+    {
+      "action_id": "act_1",
+      "decision": "BLOCKED",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "insufficient_precedent",
+        "confidence_below_floor"
+      ],
+      "explanation": "Needs at least 3 similar precedents and at least one supporting this action. Confidence 0.3 is below 0.5."
+    },
+    {
+      "action_id": "act_2",
+      "decision": "BLOCKED",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "insufficient_precedent",
+        "confidence_below_floor"
+      ],
+      "explanation": "Needs at least 3 similar precedents and at least one supporting this action. Confidence 0.3 is below 0.5."
+    },
+    {
+      "action_id": "act_3",
+      "decision": "BLOCKED",
+      "tier": "MONEY",
+      "rules_hit": [
+        "insufficient_precedent",
+        "confidence_below_floor"
+      ],
+      "explanation": "Needs at least 3 similar precedents and at least one supporting this action. Confidence 0.3 is below 0.5."
+    }
+  ],
+  "timeline": [
+    {
+      "step": "detected",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": true,
+      "detail": "Binomial test vs 30-day baseline, p=1.22e-15. Run on the synthetic demo order feed."
+    },
+    {
+      "step": "recommended",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": false,
+      "detail": "3 action(s) proposed, citing 0 precedent(s)."
+    },
+    {
+      "step": "approved",
+      "at": null,
+      "simulated": false,
+      "status": "blocked",
+      "detail": "The policy gate blocked every external and money action."
+    },
+    {
+      "step": "executed",
+      "at": null,
+      "status": "pending",
+      "simulated": true,
+      "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."
+    },
+    {
+      "step": "measured",
+      "at": null,
+      "simulated": true,
+      "status": "pending",
+      "detail": "Outcome clock is simulated. Result is recorded as a live_simulated case pending review."
+    }
+  ]
+}

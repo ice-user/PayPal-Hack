@@ -1,0 +1,24 @@
+{
+  "situations": [
+    {
+      "key": "A",
+      "situation_id": "sit_demo_A",
+      "label": "A: one carrier"
+    },
+    {
+      "key": "B",
+      "situation_id": "sit_demo_B",
+      "label": "B: many carriers, slow shipping"
+    },
+    {
+      "key": "C",
+      "situation_id": "sit_demo_C",
+      "label": "C: delivered orders"
+    }
+  ],
+  "modes": [
+    "with_precedent",
+    "no_precedent"
+  ],
+  "case_count": 31
+}

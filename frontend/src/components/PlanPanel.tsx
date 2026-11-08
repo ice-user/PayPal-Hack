@@ -1,108 +1,180 @@
-import { Recommendation, ActionType, ApprovalTier } from "../types/api";
+import type { Action, ActionState, Outcome, PolicyDecision, Recommendation } from "../types";
+import { ACTION_LABEL, money, pct, QUALITY_LABEL, rate } from "../format";
+import { DecisionBadge, SimulatedTag, TierBadge } from "./Badges";
 
-const tierColors: Record<ApprovalTier, string> = {
-  AUTO: "var(--success, #22c55e)",
-  NEEDS_APPROVAL: "var(--warning, #f59e0b)",
-  BLOCKED: "var(--destructive, #ef4444)",
-};
-
-const actionLabels: Record<ActionType, string> = {
-  provide_evidence: "Provide Evidence",
-  send_message: "Send Message to Buyer",
-  make_offer: "Make Offer",
-  accept_claim: "Accept Claim",
-  refund: "Refund Buyer",
-  status_update: "Update Status",
-  settle: "Settle Dispute",
-};
-
-export function PlanPanel({
-  recommendation,
-  onApprove,
-  onReject,
-}: {
-  recommendation: Recommendation;
-  onApprove: () => void;
-  onReject: () => void;
-}) {
-  const { typed_action, playbook_notes, confidence, evidence_quality, required_approval, abstain, abstain_reason } = recommendation;
-
-  if (abstain) {
-    return (
-      <section className="panel plan-panel">
-        <h2>Plan</h2>
-        <div className="abstain-state">
-          <h3>System Abstains</h3>
-          <p>{abstain_reason || "Insufficient evidence to make a recommendation."}</p>
-          <p className="abstain-note">No action proposed. Monitor and re-evaluate when more data is available.</p>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="panel plan-panel">
-      <h2>Plan</h2>
-
-      <div className="action-card">
-        <div className="action-header">
-          <span className="action-name">{actionLabels[typed_action]}</span>
-          <span 
-            className="tier-badge"
-            style={{ backgroundColor: tierColors[required_approval] + "20", color: tierColors[required_approval] }}
-          >
-            {required_approval}
-          </span>
-        </div>
-
-        <div className="action-meta">
-          <span className="confidence">Confidence: {(confidence * 100).toFixed(0)}%</span>
-          <span className="evidence-quality">Evidence: {evidence_quality.replace("_", " ")}</span>
-        </div>
-
-        <div className="playbook-notes">
-          <h4>Playbook Notes</h4>
-          <p>{playbook_notes}</p>
-        </div>
-
-        <div className="action-buttons">
-          {required_approval === "AUTO" && (
-            <button className="btn btn-primary" onClick={onApprove} disabled>
-              Auto-Approved
-            </button>
-          )}
-          {required_approval === "NEEDS_APPROVAL" && (
-            <>
-              <button className="btn btn-primary" onClick={onApprove}>
-                Approve
-              </button>
-              <button className="btn btn-secondary" onClick={onReject}>
-                Reject
-              </button>
-            </>
-          )}
-          {required_approval === "BLOCKED" && (
-            <button className="btn btn-danger" disabled>
-              Blocked — Explicit Approval Required
-            </button>
-          )}
-        </div>
-
-        <div className="action-rule">
-          <small>Policy: {getPolicyRule(required_approval, typed_action)}</small>
-        </div>
-      </div>
-
-      <div className="diagnosis">
-        <h4>Diagnosis</h4>
-        <p>{recommendation.diagnosis}</p>
-      </div>
-    </section>
-  );
+export interface ActionView {
+  state: ActionState;
+  mode?: "real" | "simulated";
+  detail?: string;
 }
 
-function getPolicyRule(tier: ApprovalTier, action: ActionType): string {
-  if (tier === "AUTO") return "Analysis/draft action — auto-approved.";
-  if (tier === "NEEDS_APPROVAL") return `${actionLabels[action]} is an external action requiring one-click human approval.`;
-  return `${actionLabels[action]} is a money/claim action blocked above hard cap; explicit approval required.`;
+interface Props {
+  rec: Recommendation;
+  decisions: PolicyDecision[];
+  views: Record<string, ActionView>;
+  busy: string | null;
+  outcome: Outcome | null;
+  onApprove: (a: Action) => void;
+  onReject: (a: Action) => void;
+  onOpenCase: (caseId: string) => void;
+  onReview?: (caseId: string, decision: "approved" | "rejected") => void;
+}
+
+function ParamsLine({ a }: { a: Action }) {
+  const p = a.params as Record<string, unknown>;
+  const bits: string[] = [];
+  const amount = p.amount as { value: number; currency_code: string } | undefined;
+  if (amount) bits.push(`${money(amount.value, amount.currency_code)} total`);
+  if (typeof p.estimated_disputes === "number") bits.push(`~${p.estimated_disputes} disputes`);
+  if (typeof p.dispute_count === "number") bits.push(`${p.dispute_count} disputes`);
+  if (typeof p.audience === "string") bits.push(`to ${p.audience.replaceAll("_", " ")}`);
+  if (typeof p.evidence_type === "string") bits.push(p.evidence_type.replaceAll("_", " ").toLowerCase());
+  if (typeof p.note === "string") bits.push(p.note);
+  return bits.length ? <div className="params">{bits.join(" · ")}</div> : null;
+}
+
+function StateLine({ view, auto }: { view: ActionView; auto: boolean }) {
+  const { state, mode, detail } = view;
+  if (state === "approved" || state === "executing")
+    return <div className="state running">Executing through the PayPal sandbox adapter…</div>;
+  if (state === "succeeded" && auto) return null;
+  if (state === "succeeded")
+    return (
+      <div className="state ok">
+        {mode === "real" ? <span className="badge real">PayPal sandbox</span> : <SimulatedTag />}
+        <span>{detail?.replace(/^Simulated:\s*/, "") ?? "Executed in the browser only (fixture mode)."}</span>
+      </div>
+    );
+  if (state === "failed") return <div className="state failed">Failed: {detail}</div>;
+  if (state === "rejected") return <div className="state rejected">Rejected by you. Nothing was sent.</div>;
+  return null;
+}
+
+export function PlanPanel({ rec, decisions, views, busy, outcome, onApprove, onReject, onOpenCase, onReview }: Props) {
+  const byId = Object.fromEntries(decisions.map((d) => [d.action_id, d]));
+  return (
+    <section className="panel" aria-labelledby="plan-h">
+      <header className="panel-head">
+        <h2 id="plan-h">Plan</h2>
+        <span className="panel-meta">{rec.generated_by.engine === "llm" ? `LLM prose · ${rec.generated_by.model}` : "Rules engine"}</span>
+      </header>
+
+      <div className="diagnosis">
+        <div className="stat-label">Diagnosis</div>
+        <div className="diag-title">{rec.diagnosis}</div>
+        {rec.diagnosis_detail && <p className="diag-detail">{rec.diagnosis_detail}</p>}
+      </div>
+
+      <div className="meta-row">
+        <div>
+          <div className="stat-label">Confidence</div>
+          <div className="conf">
+            <div className="conf-track" aria-hidden="true"><div className="conf-fill" style={{ width: `${rec.confidence * 100}%` }} /></div>
+            <span className="num">{pct(rec.confidence)}</span>
+          </div>
+        </div>
+        <div>
+          <div className="stat-label">Evidence</div>
+          <div>{QUALITY_LABEL[rec.evidence_quality] ?? rec.evidence_quality}</div>
+        </div>
+      </div>
+
+      <div className="effect">
+        <div className="stat-label">Expected effect</div>
+        {rec.predicted_effect ? (
+          <p>
+            Similar merchants were followed by a 7-day dispute rate of{" "}
+            <strong className="num">{rate(rec.predicted_effect.range[0])}–{rate(rec.predicted_effect.range[1])}</strong> within{" "}
+            {rec.predicted_effect.horizon_days} days ({rec.predicted_effect.n_measured_cases} measured cases). Observed, not caused.
+          </p>
+        ) : (
+          <p className="muted-text">No numeric forecast. No measured precedents match this pattern, and we do not invent one.</p>
+        )}
+      </div>
+
+      {outcome && (
+        <div className="outcome-box" role="status">
+          <div className="stat-label">Outcome after {outcome.horizon_days} days <SimulatedTag /></div>
+          <p>
+            7-day dispute rate <strong className="num">{rate(outcome.before)}</strong> before,{" "}
+            <strong className="num">{rate(outcome.after)}</strong> after. Simulated replay, not a real measurement.
+          </p>
+          {outcome.new_case_id && (
+            <div className="review">
+              <span>
+                Recorded as{" "}
+                <button className="linklike" onClick={() => onOpenCase(outcome.new_case_id!)}><code>{outcome.new_case_id}</code></button>
+                {outcome.case_review_status === "approved" && <> · added to the case library as a simulated case (it can inform a diagnosis, never a forecast)</>}
+                {outcome.case_review_status === "rejected" && <> · discarded</>}
+                {(outcome.case_review_status ?? "pending") === "pending" && <> · waiting for your review</>}
+              </span>
+              {(outcome.case_review_status ?? "pending") === "pending" && onReview && (
+                <span className="buttons">
+                  <button className="btn primary" disabled={busy !== null} onClick={() => onReview(outcome.new_case_id!, "approved")}>Add to case library</button>
+                  <button className="btn" disabled={busy !== null} onClick={() => onReview(outcome.new_case_id!, "rejected")}>Discard</button>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {rec.abstain ? (
+        <div className="abstain" role="status">
+          <strong>Abstained.</strong> {rec.abstain_reason}
+        </div>
+      ) : (
+        <ol className="actions">
+          {rec.actions.map((a) => {
+            const d = byId[a.action_id];
+            const view = views[a.action_id] ?? { state: "proposed" as ActionState };
+            const state = view.state;
+            return (
+              <li key={a.action_id} className={`action decision-border-${d?.decision.toLowerCase()}`}>
+                <div className="action-top">
+                  <span className="action-type">{ACTION_LABEL[a.type] ?? a.type}</span>
+                  <span className="badges">
+                    {d && <TierBadge tier={d.tier} />}
+                    {d && <DecisionBadge decision={d.decision} />}
+                  </span>
+                </div>
+                <div className="action-title">{a.title ?? a.type}</div>
+                <ParamsLine a={a} />
+                <p className="rationale">{a.rationale}</p>
+                {d && <p className="gate-why"><span className="label">Policy gate</span> {d.explanation}</p>}
+                {a.supporting_cases.length > 0 && (
+                  <div className="chips">
+                    <span className="label">Cites</span>
+                    {a.supporting_cases.map((c) => (
+                      <button key={c} className="chip cite linklike" onClick={() => onOpenCase(c)}
+                        aria-label={`Open case ${c}`}><code>{c}</code></button>
+                    ))}
+                  </div>
+                )}
+                {d?.decision === "NEEDS_APPROVAL" && state === "proposed" && (
+                  <div className="buttons">
+                    <button className="btn primary" disabled={busy !== null} onClick={() => onApprove(a)}>
+                      {busy === a.action_id ? "Working…" : "Approve"}
+                    </button>
+                    <button className="btn" disabled={busy !== null} onClick={() => onReject(a)}>Reject</button>
+                  </div>
+                )}
+                {d?.decision === "AUTO" && (
+                  <div className="state ok">Prepared automatically. Nothing leaves the system.</div>
+                )}
+                <StateLine view={view} auto={d?.decision === "AUTO"} />
+              </li>
+            );
+          })}
+        </ol>
+      )}
+
+      {rec.playbook_notes.length > 0 && (
+        <div className="notes">
+          <div className="stat-label">Playbook notes (qualitative)</div>
+          <ul>{rec.playbook_notes.map((n, i) => <li key={i}>{n}</li>)}</ul>
+        </div>
+      )}
+    </section>
+  );
 }

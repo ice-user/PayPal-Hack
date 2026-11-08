@@ -1,0 +1,72 @@
+{
+  "situation_id": "sit_demo_B",
+  "merchant_id": "m_demo_electronics",
+  "window": {
+    "start": "2026-10-31",
+    "end": "2026-11-06"
+  },
+  "source": "synthetic_order_feed",
+  "features": {
+    "transactions_7d": 1811,
+    "disputes_7d": 32,
+    "gmv_7d": 102700.0,
+    "dispute_rate_7d": 0.01767,
+    "dispute_rate_7d_ci95": [
+      0.01254,
+      0.02484
+    ],
+    "transactions_30d_baseline": 7751,
+    "disputes_30d_baseline": 22,
+    "dispute_rate_30d_baseline": 0.00284,
+    "baseline_ci95": [
+      0.00188,
+      0.00429
+    ],
+    "rate_ratio": 6.23,
+    "anomaly": {
+      "method": "binomial_vs_baseline",
+      "p_value": 1.22e-15,
+      "is_anomalous": true,
+      "min_sample_met": true
+    },
+    "trend_slope": 0.65,
+    "daily_dispute_rate": [
+      0.0,
+      0.004,
+      0.0,
+      0.0268,
+      0.007,
+      0.0192,
+      0.0217,
+      0.022,
+      0.0078,
+      0.0206
+    ],
+    "reason_mix": {
+      "ITEM_NOT_RECEIVED": 0.875,
+      "UNAUTHORISED": 0.062,
+      "OTHER": 0.031,
+      "NOT_AS_DESCRIBED": 0.031
+    },
+    "concentration": {
+      "sku": 0.25,
+      "carrier": 0.344,
+      "country": 0.875,
+      "top_sku": "HDP-220 wireless headphones",
+      "top_carrier": "Ridgeway Post",
+      "top_country": "US"
+    },
+    "carriers_elevated": 4,
+    "ship_delay_hours_p50": 61.9,
+    "disputed_orders_delivered_share": 0.156,
+    "avg_amount": 56.71,
+    "median_response_hours": 52,
+    "open_disputes": 31,
+    "refund_ratio_30d": 0.04,
+    "days_since_txn_median": 9
+  },
+  "narrative": "Item-not-received disputes up 6.2x in 7 days, across 4 carriers, time to ship is 62h.",
+  "evidence_ids": [],
+  "paypal_dispute_ids": [],
+  "label": "B: many carriers, slow shipping"
+}

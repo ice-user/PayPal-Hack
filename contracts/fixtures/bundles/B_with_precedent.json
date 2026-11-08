@@ -1,0 +1,285 @@
+{
+  "situation": {
+    "situation_id": "sit_demo_B",
+    "merchant_id": "m_demo_electronics",
+    "window": {
+      "start": "2026-10-31",
+      "end": "2026-11-06"
+    },
+    "source": "synthetic_order_feed",
+    "features": {
+      "transactions_7d": 1811,
+      "disputes_7d": 32,
+      "gmv_7d": 102700.0,
+      "dispute_rate_7d": 0.01767,
+      "dispute_rate_7d_ci95": [
+        0.01254,
+        0.02484
+      ],
+      "transactions_30d_baseline": 7751,
+      "disputes_30d_baseline": 22,
+      "dispute_rate_30d_baseline": 0.00284,
+      "baseline_ci95": [
+        0.00188,
+        0.00429
+      ],
+      "rate_ratio": 6.23,
+      "anomaly": {
+        "method": "binomial_vs_baseline",
+        "p_value": 1.22e-15,
+        "is_anomalous": true,
+        "min_sample_met": true
+      },
+      "trend_slope": 0.65,
+      "daily_dispute_rate": [
+        0.0,
+        0.004,
+        0.0,
+        0.0268,
+        0.007,
+        0.0192,
+        0.0217,
+        0.022,
+        0.0078,
+        0.0206
+      ],
+      "reason_mix": {
+        "ITEM_NOT_RECEIVED": 0.875,
+        "UNAUTHORISED": 0.062,
+        "OTHER": 0.031,
+        "NOT_AS_DESCRIBED": 0.031
+      },
+      "concentration": {
+        "sku": 0.25,
+        "carrier": 0.344,
+        "country": 0.875,
+        "top_sku": "HDP-220 wireless headphones",
+        "top_carrier": "Ridgeway Post",
+        "top_country": "US"
+      },
+      "carriers_elevated": 4,
+      "ship_delay_hours_p50": 61.9,
+      "disputed_orders_delivered_share": 0.156,
+      "avg_amount": 56.71,
+      "median_response_hours": 52,
+      "open_disputes": 31,
+      "refund_ratio_30d": 0.04,
+      "days_since_txn_median": 9
+    },
+    "narrative": "Item-not-received disputes up 6.2x in 7 days, across 4 carriers, time to ship is 62h.",
+    "evidence_ids": [],
+    "paypal_dispute_ids": [],
+    "label": "B: many carriers, slow shipping"
+  },
+  "recommendation": {
+    "recommendation_id": "rec_demo_B_wp",
+    "situation_id": "sit_demo_B",
+    "mode": "with_precedent",
+    "grounding": "precedent",
+    "precedents": [
+      {
+        "case_id": "case_b01_warehouse_backlog",
+        "title": "Warehouse backlog delayed all carriers",
+        "similarity": 0.863,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "SKU concentration",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "fulfilment_workflow_fix",
+        "outcome_summary": "Illustrative: backlog cleared, pick-and-pack priority changed, and buyers with late orders got proactive updates. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b03_3pl_migration",
+        "title": "Migration to a new fulfilment partner",
+        "similarity": 0.852,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "SKU concentration",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "fulfilment_workflow_fix",
+        "outcome_summary": "Illustrative: a daily unshipped-order report and restored status emails. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b05_inventory_sync_oversell",
+        "title": "Inventory sync bug oversold stock",
+        "similarity": 0.787,
+        "matched_on": [
+          "carrier concentration",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "fulfilment_workflow_fix",
+        "outcome_summary": "Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b06_customs_hold_cross_border",
+        "title": "Cross-border parcels held at customs",
+        "similarity": 0.767,
+        "matched_on": [
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "unauthorised share",
+          "SKU concentration",
+          "trend"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "proactive_buyer_messaging",
+        "outcome_summary": "Illustrative: messages explaining the hold, with customs status attached as evidence. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b04_flash_sale_overflow",
+        "title": "Flash sale overwhelmed packing capacity",
+        "similarity": 0.765,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "unauthorised share",
+          "SKU concentration"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "proactive_buyer_messaging",
+        "outcome_summary": "Illustrative: proactive delay notices with a new ship date, and temporary order caps. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      }
+    ],
+    "predicted_effect": null,
+    "counterfactual": null,
+    "generated_by": {
+      "engine": "rules",
+      "version": "0.1.0"
+    },
+    "diagnosis": "Fulfilment delay before hand-off to carriers",
+    "diagnosis_detail": "Disputes are 6.2x the 30-day baseline and 88% are item-not-received. Disputes are spread across 4 carriers (top carrier 34%) and the median time to ship is 62h. Parcels are leaving late, so the problem is upstream of the carriers.",
+    "actions": [
+      {
+        "action_id": "act_1",
+        "type": "FLAG_ONLY",
+        "title": "Clear the unshipped backlog (orders waiting over 48h)",
+        "params": {
+          "note": "Prioritise the oldest unshipped orders and check pick-and-pack capacity."
+        },
+        "rationale": "Followed in 3 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "supporting_cases": [
+          "case_b01_warehouse_backlog",
+          "case_b03_3pl_migration",
+          "case_b05_inventory_sync_oversell"
+        ]
+      },
+      {
+        "action_id": "act_2",
+        "type": "SEND_MESSAGE",
+        "title": "Send a ship-date update to buyers with late orders",
+        "params": {
+          "audience": "buyers_with_unshipped_orders_over_48h",
+          "template_id": "ship_date_update"
+        },
+        "rationale": "Followed in 3 similar case(s). Shared signals: carrier concentration, share of disputed orders delivered, fulfilment delay.",
+        "supporting_cases": [
+          "case_b01_warehouse_backlog",
+          "case_b03_3pl_migration",
+          "case_b05_inventory_sync_oversell"
+        ]
+      }
+    ],
+    "playbook_notes": [
+      "Warehouse backlog delayed all carriers (authored, illustrative): Illustrative: backlog cleared, pick-and-pack priority changed, and buyers with late orders got proactive updates. No measured numbers.",
+      "Migration to a new fulfilment partner (authored, illustrative): Illustrative: a daily unshipped-order report and restored status emails. No measured numbers.",
+      "Inventory sync bug oversold stock (authored, illustrative): Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
+      "No measured precedents match this pattern, so no numeric forecast is shown."
+    ],
+    "confidence": 0.68,
+    "evidence_quality": "illustrative",
+    "abstain": false,
+    "abstain_reason": null,
+    "created_at": "2026-11-06T09:00:00Z"
+  },
+  "policy_decisions": [
+    {
+      "action_id": "act_1",
+      "decision": "AUTO",
+      "tier": "PREPARE",
+      "rules_hit": [
+        "prepare_only"
+      ],
+      "explanation": "Preparation only: nothing leaves the system."
+    },
+    {
+      "action_id": "act_2",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "external_action_requires_approval"
+      ],
+      "explanation": "Visible to buyers or PayPal: one-click approval required."
+    }
+  ],
+  "timeline": [
+    {
+      "step": "detected",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": true,
+      "detail": "Binomial test vs 30-day baseline, p=1.22e-15. Run on the synthetic demo order feed."
+    },
+    {
+      "step": "recommended",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": false,
+      "detail": "2 action(s) proposed, citing 5 precedent(s)."
+    },
+    {
+      "step": "approved",
+      "at": null,
+      "simulated": false,
+      "status": "pending",
+      "detail": "1 action(s) waiting for your approval."
+    },
+    {
+      "step": "executed",
+      "at": null,
+      "status": "pending",
+      "simulated": true,
+      "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."
+    },
+    {
+      "step": "measured",
+      "at": null,
+      "simulated": true,
+      "status": "pending",
+      "detail": "Outcome clock is simulated. Result is recorded as a live_simulated case pending review."
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://precedent.local/schemas/situation_record.schema.json",
+  "title": "SituationRecord",
+  "description": "Produced by the Situation Builder (Person B). Consumed by the Retriever, the Consultant and the UI.",
+  "type": "object",
+  "required": ["situation_id", "merchant_id", "window", "features", "narrative", "source"],
+  "additionalProperties": false,
+  "properties": {
+    "situation_id": {"type": "string", "pattern": "^sit_[A-Za-z0-9_]+$"},
+    "merchant_id": {"type": "string"},
+    "label": {"type": "string", "description": "Short human label for the demo switcher."},
+    "window": {
+      "type": "object",
+      "required": ["start", "end"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {"type": "string", "format": "date"},
+        "end": {"type": "string", "format": "date"}
+      }
+    },
+    "source": {
+      "type": "string",
+      "enum": ["synthetic_order_feed", "paypal_sandbox", "mixed"],
+      "description": "Where the numbers came from. The demo merchant's orders are synthetic."
+    },
+    "features": {
+      "type": "object",
+      "required": [
+        "transactions_7d", "disputes_7d", "dispute_rate_7d", "dispute_rate_7d_ci95",
+        "dispute_rate_30d_baseline", "baseline_ci95", "anomaly", "reason_mix",
+        "concentration", "carriers_elevated", "ship_delay_hours_p50",
+        "disputed_orders_delivered_share", "open_disputes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "transactions_7d": {"type": "integer", "minimum": 0},
+        "disputes_7d": {"type": "integer", "minimum": 0},
+        "gmv_7d": {"type": "number", "minimum": 0},
+        "dispute_rate_7d": {"$ref": "#/$defs/rate"},
+        "dispute_rate_7d_ci95": {"$ref": "#/$defs/interval"},
+        "transactions_30d_baseline": {"type": "integer", "minimum": 0},
+        "disputes_30d_baseline": {"type": "integer", "minimum": 0},
+        "dispute_rate_30d_baseline": {"$ref": "#/$defs/rate"},
+        "baseline_ci95": {"$ref": "#/$defs/interval"},
+        "rate_ratio": {"type": "number", "minimum": 0},
+        "anomaly": {
+          "type": "object",
+          "required": ["method", "p_value", "is_anomalous"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"type": "string", "enum": ["binomial_vs_baseline"]},
+            "p_value": {"type": "number", "minimum": 0, "maximum": 1},
+            "is_anomalous": {"type": "boolean"},
+            "min_sample_met": {"type": "boolean"}
+          }
+        },
+        "trend_slope": {"type": "number", "description": "Normalised 0..1 steepness of the daily dispute rate over the window."},
+        "daily_dispute_rate": {"type": "array", "items": {"$ref": "#/$defs/rate"}, "description": "Optional series for the sparkline, oldest first."},
+        "reason_mix": {
+          "type": "object",
+          "description": "Share of disputes by reason. Values sum to about 1.",
+          "additionalProperties": {"$ref": "#/$defs/rate"}
+        },
+        "concentration": {
+          "type": "object",
+          "description": "Share of disputes on the single top SKU / carrier / country.",
+          "additionalProperties": false,
+          "properties": {
+            "sku": {"$ref": "#/$defs/rate"},
+            "carrier": {"$ref": "#/$defs/rate"},
+            "country": {"$ref": "#/$defs/rate"},
+            "top_sku": {"type": "string"},
+            "top_carrier": {"type": "string"},
+            "top_country": {"type": "string"}
+          }
+        },
+        "carriers_elevated": {"type": "integer", "minimum": 0},
+        "ship_delay_hours_p50": {"type": "number", "minimum": 0},
+        "disputed_orders_delivered_share": {"$ref": "#/$defs/rate"},
+        "avg_amount": {"type": "number", "minimum": 0},
+        "median_response_hours": {"type": "number", "minimum": 0},
+        "open_disputes": {"type": "integer", "minimum": 0},
+        "refund_ratio_30d": {"$ref": "#/$defs/rate"},
+        "days_since_txn_median": {"type": "number", "minimum": 0}
+      }
+    },
+    "narrative": {"type": "string", "maxLength": 400},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "paypal_dispute_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Real sandbox dispute IDs linked to this situation, if any."
+    }
+  },
+  "$defs": {
+    "rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "interval": {
+      "type": "array",
+      "items": {"type": "number", "minimum": 0, "maximum": 1},
+      "minItems": 2,
+      "maxItems": 2
+    }
+  }
+}
