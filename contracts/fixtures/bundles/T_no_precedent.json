@@ -1,0 +1,647 @@
+{
+  "situation": {
+    "situation_id": "sit_demo_T",
+    "merchant_id": "m_demo_techkart",
+    "window": {
+      "start": "2026-11-02",
+      "end": "2026-11-08"
+    },
+    "source": "synthetic_order_feed",
+    "features": {
+      "transactions_7d": 1123,
+      "disputes_7d": 27,
+      "gmv_7d": 101017.0,
+      "dispute_rate_7d": 0.02404,
+      "dispute_rate_7d_ci95": [
+        0.01658,
+        0.03476
+      ],
+      "transactions_30d_baseline": 4752,
+      "disputes_30d_baseline": 27,
+      "dispute_rate_30d_baseline": 0.00568,
+      "baseline_ci95": [
+        0.00391,
+        0.00825
+      ],
+      "rate_ratio": 4.23,
+      "anomaly": {
+        "method": "binomial_vs_baseline",
+        "p_value": 9e-10,
+        "is_anomalous": true,
+        "min_sample_met": true
+      },
+      "trend_slope": 0.54,
+      "daily_dispute_rate": [
+        0.0123,
+        0.0,
+        0.0,
+        0.0299,
+        0.0176,
+        0.0301,
+        0.0241,
+        0.0123,
+        0.0377,
+        0.0182
+      ],
+      "reason_mix": {
+        "ITEM_NOT_RECEIVED": 0.926,
+        "UNAUTHORISED": 0.037,
+        "OTHER": 0.037
+      },
+      "concentration": {
+        "sku": 0.481,
+        "carrier": 0.63,
+        "country": 1.0,
+        "top_sku": "VX-200 wireless earbuds",
+        "top_carrier": "Carrier X",
+        "top_country": "US"
+      },
+      "carriers_elevated": 1,
+      "ship_delay_hours_p50": 10.0,
+      "disputed_orders_delivered_share": 0.593,
+      "avg_amount": 89.95,
+      "median_response_hours": 52,
+      "open_disputes": 27,
+      "refund_ratio_30d": 0.04,
+      "days_since_txn_median": 9
+    },
+    "narrative": "Item-not-received disputes up 4.2x in 7 days, mostly on Carrier X.",
+    "evidence_ids": [],
+    "paypal_dispute_ids": [],
+    "label": "T: TechKart, delivery failure crisis"
+  },
+  "recommendation": {
+    "recommendation_id": "rec_demo_T_np",
+    "situation_id": "sit_demo_T",
+    "mode": "no_precedent",
+    "grounding": "none",
+    "diagnosis": "Spike in item-not-received disputes",
+    "diagnosis_detail": "Generic reading of the symptom only. Concentration, fulfilment delay and delivery signals were not compared with any precedent.",
+    "precedents": [],
+    "actions": [
+      {
+        "action_id": "act_1",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "File tracking evidence on all open item-not-received disputes",
+        "params": {
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "scope": "open_inr_disputes",
+          "dispute_ids": [],
+          "estimated_disputes": 27
+        },
+        "rationale": "Generic dispute playbook. No precedent consulted.",
+        "supporting_cases": []
+      },
+      {
+        "action_id": "act_2",
+        "type": "SEND_MESSAGE",
+        "title": "Send an apology message to every buyer with an open dispute",
+        "params": {
+          "audience": "buyers_with_open_disputes",
+          "template_id": "generic_apology"
+        },
+        "rationale": "Generic dispute playbook. No precedent consulted.",
+        "supporting_cases": []
+      },
+      {
+        "action_id": "act_3",
+        "type": "MAKE_OFFER",
+        "title": "Offer a 20% partial refund on every open dispute",
+        "params": {
+          "offer_type": "REFUND",
+          "per_dispute_fraction": 0.2,
+          "dispute_count": 27,
+          "amount": {
+            "currency_code": "USD",
+            "value": 485.73
+          }
+        },
+        "rationale": "Generic dispute playbook. No precedent consulted.",
+        "supporting_cases": []
+      },
+      {
+        "action_id": "act_4",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "Submit tracking numbers as proof of fulfilment: 24 disputes",
+        "params": {
+          "triage_group": "generic_tracking",
+          "response": "generic_tracking",
+          "dispute_count": 24,
+          "synthetic_dispute_ids": [
+            "TKD-004182",
+            "TKD-004756",
+            "TKD-004840",
+            "TKD-004882",
+            "TKD-004885",
+            "TKD-004984",
+            "TKD-004985",
+            "TKD-004992",
+            "TKD-005058",
+            "TKD-005078",
+            "TKD-005099",
+            "TKD-005100",
+            "TKD-005126",
+            "TKD-005236",
+            "TKD-005251",
+            "TKD-005369",
+            "TKD-005535",
+            "TKD-005553",
+            "TKD-005555",
+            "TKD-005606",
+            "TKD-005631",
+            "TKD-005707",
+            "TKD-005806",
+            "TKD-005829"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-09",
+          "asserts_delivery": true,
+          "total_value": 2346.0,
+          "evidence_type": "PROOF_OF_FULFILLMENT"
+        },
+        "supporting_cases": [],
+        "rationale": "Generic advice applied to every dispute alike. Shipment state and deadlines are not checked."
+      },
+      {
+        "action_id": "act_5",
+        "type": "MAKE_OFFER",
+        "title": "Offer refunds where there is no tracking: 2 disputes",
+        "params": {
+          "triage_group": "generic_refund",
+          "response": "generic_refund",
+          "dispute_count": 2,
+          "synthetic_dispute_ids": [
+            "TKD-005452",
+            "TKD-005871"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-18",
+          "asserts_delivery": false,
+          "total_value": 138.0,
+          "amount": {
+            "currency_code": "USD",
+            "value": 138.0
+          },
+          "offer_type": "REFUND"
+        },
+        "supporting_cases": [],
+        "rationale": "Generic advice applied to every dispute alike. Shipment state and deadlines are not checked."
+      }
+    ],
+    "predicted_effect": null,
+    "counterfactual": null,
+    "playbook_notes": [
+      "Ablation baseline: no precedents were retrieved, so nothing here is cited."
+    ],
+    "confidence": 0.3,
+    "evidence_quality": "none",
+    "abstain": false,
+    "abstain_reason": null,
+    "generated_by": {
+      "engine": "rules",
+      "version": "0.1.0"
+    },
+    "created_at": "2026-11-08T09:00:00Z",
+    "triage": {
+      "groups": [
+        {
+          "response": "generic_tracking",
+          "label": "Submit tracking numbers as proof of fulfilment",
+          "states": [
+            "Delivered",
+            "In transit",
+            "Lost (carrier confirmed)"
+          ],
+          "count": 24,
+          "total_value": 2346.0,
+          "earliest_due": "2026-11-09",
+          "action_ids": [
+            "act_4"
+          ],
+          "cites": [],
+          "warnings": [],
+          "confidence": 0.0
+        },
+        {
+          "response": "generic_refund",
+          "label": "Offer refunds where there is no tracking",
+          "states": [
+            "No tracking"
+          ],
+          "count": 2,
+          "total_value": 138.0,
+          "earliest_due": "2026-11-18",
+          "action_ids": [
+            "act_5"
+          ],
+          "cites": [],
+          "warnings": [],
+          "confidence": 0.0
+        }
+      ],
+      "rows": [
+        {
+          "dispute_id": "TKD-004182",
+          "order_id": "TK-004182",
+          "carrier": "Swift Freight",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-09",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004840",
+          "order_id": "TK-004840",
+          "carrier": "Parcelway",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-15",
+          "response_due": "2026-11-12",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004885",
+          "order_id": "TK-004885",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "signature",
+          "expected_delivery": null,
+          "response_due": "2026-11-12",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004984",
+          "order_id": "TK-004984",
+          "carrier": "Carrier X",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-16",
+          "response_due": "2026-11-13",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004882",
+          "order_id": "TK-004882",
+          "carrier": "Carrier X",
+          "sku": "Hub-7 USB-C dock",
+          "amount": 99.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-14",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004992",
+          "order_id": "TK-004992",
+          "carrier": "Swift Freight",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "lost",
+          "proof": "tracking",
+          "expected_delivery": null,
+          "response_due": "2026-11-14",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005058",
+          "order_id": "TK-005058",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-16",
+          "response_due": "2026-11-14",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005078",
+          "order_id": "TK-005078",
+          "carrier": "Carrier X",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-09",
+          "response_due": "2026-11-14",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005100",
+          "order_id": "TK-005100",
+          "carrier": "Metro Courier",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "lost",
+          "proof": "tracking",
+          "expected_delivery": null,
+          "response_due": "2026-11-14",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004985",
+          "order_id": "TK-004985",
+          "carrier": "Parcelway",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "delivered",
+          "proof": "gps",
+          "expected_delivery": null,
+          "response_due": "2026-11-15",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005099",
+          "order_id": "TK-005099",
+          "carrier": "Metro Courier",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-15",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005126",
+          "order_id": "TK-005126",
+          "carrier": "Carrier X",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-11",
+          "response_due": "2026-11-15",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005251",
+          "order_id": "TK-005251",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-09",
+          "response_due": "2026-11-15",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005369",
+          "order_id": "TK-005369",
+          "carrier": "Carrier X",
+          "sku": "Lumo desk lamp",
+          "amount": 59.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-15",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005553",
+          "order_id": "TK-005553",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "signature",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005555",
+          "order_id": "TK-005555",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005631",
+          "order_id": "TK-005631",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005707",
+          "order_id": "TK-005707",
+          "carrier": "Parcelway",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "gps",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-004756",
+          "order_id": "TK-004756",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005236",
+          "order_id": "TK-005236",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "gps",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005452",
+          "order_id": "TK-005452",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "unknown",
+          "proof": "none",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_refund"
+        },
+        {
+          "dispute_id": "TKD-005535",
+          "order_id": "TK-005535",
+          "carrier": "Carrier X",
+          "sku": "Hub-7 USB-C dock",
+          "amount": 99.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005606",
+          "order_id": "TK-005606",
+          "carrier": "Swift Freight",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005806",
+          "order_id": "TK-005806",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "signature",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005829",
+          "order_id": "TK-005829",
+          "carrier": "Swift Freight",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "lost",
+          "proof": "tracking",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_tracking"
+        },
+        {
+          "dispute_id": "TKD-005871",
+          "order_id": "TK-005871",
+          "carrier": "Parcelway",
+          "sku": "Lumo desk lamp",
+          "amount": 59.0,
+          "status": "unknown",
+          "proof": "none",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "generic_refund"
+        }
+      ],
+      "precedents": [],
+      "untriaged": 0
+    }
+  },
+  "policy_decisions": [
+    {
+      "action_id": "act_1",
+      "decision": "BLOCKED",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "insufficient_precedent",
+        "confidence_below_floor"
+      ],
+      "explanation": "Needs at least 3 similar precedents and at least one supporting this action. Confidence 0.3 is below 0.5."
+    },
+    {
+      "action_id": "act_2",
+      "decision": "BLOCKED",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "insufficient_precedent",
+        "confidence_below_floor"
+      ],
+      "explanation": "Needs at least 3 similar precedents and at least one supporting this action. Confidence 0.3 is below 0.5."
+    },
+    {
+      "action_id": "act_3",
+      "decision": "BLOCKED",
+      "tier": "MONEY",
+      "rules_hit": [
+        "insufficient_precedent",
+        "confidence_below_floor"
+      ],
+      "explanation": "Needs at least 3 similar precedents and at least one supporting this action. Confidence 0.3 is below 0.5."
+    },
+    {
+      "action_id": "act_4",
+      "decision": "BLOCKED",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "insufficient_precedent"
+      ],
+      "explanation": "Needs at least 2 agreeing dispute cases; has 0."
+    },
+    {
+      "action_id": "act_5",
+      "decision": "BLOCKED",
+      "tier": "MONEY",
+      "rules_hit": [
+        "insufficient_precedent"
+      ],
+      "explanation": "Needs at least 2 agreeing dispute cases; has 0."
+    }
+  ],
+  "timeline": [
+    {
+      "step": "detected",
+      "status": "done",
+      "at": "2026-11-08T09:00:00Z",
+      "simulated": true,
+      "detail": "Binomial test vs 30-day baseline, p=9e-10. Run on the synthetic demo order feed."
+    },
+    {
+      "step": "recommended",
+      "status": "done",
+      "at": "2026-11-08T09:00:00Z",
+      "simulated": false,
+      "detail": "5 action(s) proposed, citing 0 precedent(s)."
+    },
+    {
+      "step": "approved",
+      "at": null,
+      "simulated": false,
+      "status": "blocked",
+      "detail": "The policy gate blocked every external and money action."
+    },
+    {
+      "step": "executed",
+      "at": null,
+      "status": "pending",
+      "simulated": true,
+      "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."
+    },
+    {
+      "step": "measured",
+      "at": null,
+      "simulated": true,
+      "status": "pending",
+      "detail": "Outcome clock is simulated. Result is recorded as a live_simulated case pending review."
+    }
+  ]
+}

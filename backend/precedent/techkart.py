@@ -199,3 +199,18 @@ TK_TEST = [
     TechKartScenario("tk19_quiet_month_no_spike", seed=519, spike_rate=0.0, expected=_QUIET),
     TechKartScenario("tk20_quiet_high_volume", seed=520, spike_rate=0.0, orders_per_day=300, expected=_QUIET),
 ]
+
+
+def simulate_after(s: TechKartScenario, fit: str, *, horizon_days: int = 14) -> float:
+    """Simulated 7-day dispute rate after the clock advances (illustrative, see outcomes.py).
+    Dispute-level responses do not fix the carrier, so without a merchant-wide fix (fit
+    'none') the spike continues."""
+    from dataclasses import replace
+
+    from .outcomes import RESIDUAL
+    from .situation_builder import build
+
+    after = replace(s, seed=s.seed + 1000, end=s.end + timedelta(days=horizon_days),
+                    spike_rate=s.spike_rate * RESIDUAL[fit])
+    orders, _ = generate(after)
+    return build(orders, situation_id="sit_sim_after")["features"]["dispute_rate_7d"]

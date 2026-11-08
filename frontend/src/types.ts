@@ -99,6 +99,39 @@ export interface Recommendation {
   abstain: boolean;
   abstain_reason: string | null;
   generated_by: { engine: "rules" | "llm"; model?: string; version?: string };
+  triage?: Triage;
+}
+
+/** Dispute-level triage (TechKart test environment). Its actions are also in `actions`. */
+export interface TriageGroup {
+  response: string;
+  label: string;
+  states: string[];
+  count: number;
+  total_value: number;
+  earliest_due: string;
+  action_ids: string[];
+  cites: string[];
+  warnings: string[];
+  confidence: number;
+}
+export interface TriageRow {
+  dispute_id: string;
+  order_id: string;
+  carrier: string;
+  sku: string;
+  amount: number;
+  status: "delivered" | "in_transit" | "lost" | "unknown";
+  proof: string;
+  expected_delivery: string | null;
+  response_due: string;
+  response: string;
+}
+export interface Triage {
+  groups: TriageGroup[];
+  rows: TriageRow[];
+  precedents: { case_id: string; title: string; response: string; appropriate: boolean; outcome: string }[];
+  untriaged: number;
 }
 
 export interface PolicyDecision {

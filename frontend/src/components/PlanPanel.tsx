@@ -14,6 +14,11 @@ export interface ActionView {
 function paramsLine(a: Action): string {
   const p = a.params as Record<string, unknown>;
   const bits: string[] = [];
+  if (typeof p.triage_group === "string") {
+    if (typeof p.total_value === "number") bits.push(`${money(p.total_value)} in orders`);
+    if (typeof p.earliest_due === "string") bits.push(`respond by ${shortDay(p.earliest_due)}`);
+    return bits.join(" · ");
+  }
   const amount = p.amount as { value: number; currency_code: string } | undefined;
   if (amount) bits.push(`${money(amount.value, amount.currency_code)} total`);
   if (typeof p.estimated_disputes === "number") bits.push(`about ${p.estimated_disputes} disputes`);
@@ -22,6 +27,9 @@ function paramsLine(a: Action): string {
   if (typeof p.evidence_type === "string") bits.push(p.evidence_type.replaceAll("_", " ").toLowerCase());
   return bits.join(" · ");
 }
+
+export const shortDay = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
 const REACH: Record<Tier, { icon: IconName; text: string }> = {
   PREPARE: { icon: "file", text: "Internal only. Nothing leaves the system." },
@@ -125,17 +133,18 @@ export function ActionsPane({ rec, decisions, views, busy, disputeIds, onApprove
 
   return (
     <Pane id="actions" className="pane-actions" title="Proposed actions"
-      pill={rec.abstain ? null : waiting ? <Pill tone="warn">{waiting} waiting for you</Pill> : <Pill tone="good">All handled</Pill>}
+      pill={!rec.actions.length ? null : waiting ? <Pill tone="warn">{waiting} waiting for you</Pill> : <Pill tone="good">All handled</Pill>}
       sub="Prepare-only steps run on their own. Anything a buyer or PayPal sees waits for your click.">
-      {rec.abstain ? (
+      {rec.abstain && (
         <div className="callout warn" role="status">
           <Icon name="alert" />
           <div>
-            <p className="callout-title">The consultant abstained</p>
-            <p>{rec.abstain_reason}</p>
+            <p className="callout-title">{rec.actions.length ? "No merchant-wide fix: the spike-level plan abstained" : "The consultant abstained"}</p>
+            <p>{rec.abstain_reason}{rec.actions.length ? " Open disputes still need answers, so the dispute-level actions below remain." : ""}</p>
           </div>
         </div>
-      ) : (
+      )}
+      {rec.actions.length > 0 && (
         <ol className="actions">
           {rec.actions.map((a, i) => {
             const d = byId[a.action_id];
@@ -162,7 +171,11 @@ export function ActionsPane({ rec, decisions, views, busy, disputeIds, onApprove
                     {a.supporting_cases.length > 0 && (
                       <span className="chips">
                         <span className="chip-label">Cites</span>
-                        {a.supporting_cases.map((c) => (
+                        {a.supporting_cases.map((c) => c.startsWith("dc_") ? (
+                          <span key={c} className="chip" title="Dispute-level case (see the shipment-state table)">
+                            {c.replace(/^dc_/, "").split("_")[0]}
+                          </span>
+                        ) : (
                           <button key={c} className="chip chip-btn" onClick={() => onOpenCase(c)} aria-label={`Open case ${c}`}>
                             {c.replace(/^case_/, "").split("_")[0]}
                           </button>
@@ -257,6 +270,12 @@ export function NextStep({ canAdvance, outcome, busy, onAdvance, onOpenCase, onR
           <strong className="num">{rate(outcome.before)}</strong> → <strong className="num">{rate(outcome.after)}</strong>.{" "}
           <SimulatedTag />
         </p>
+        {!outcome.new_case_id && (
+          <p className="muted">
+            Only dispute-level responses ran. They answer open disputes but do not fix the cause, so with no
+            merchant-wide fix the spike continued. No case is recorded: there is no situation-level remedy to learn from.
+          </p>
+        )}
         {outcome.new_case_id && (
           <p className="muted">
             Recorded as{" "}

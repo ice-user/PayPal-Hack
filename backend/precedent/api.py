@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 from .executor import ActionError
 from .paypal_adapter import PayPalError
 from .scenarios import DEMO
+from .techkart import TECHKART  # noqa: E402
 from .service import MODES, Service
 from .webhooks import MAX_BODY_BYTES, metadata
 
@@ -68,7 +69,8 @@ def health() -> dict:
 
 @app.get("/api/situations")
 def situations() -> dict:
-    return {"situations": [{"key": k, "situation_id": f"sit_demo_{k}", "label": v.name} for k, v in DEMO.items()],
+    labels = {k: v.name for k, v in DEMO.items()} | {"T": TECHKART.name}
+    return {"situations": [{"key": k, "situation_id": f"sit_demo_{k}", "label": v} for k, v in labels.items()],
             "modes": list(MODES)}
 
 

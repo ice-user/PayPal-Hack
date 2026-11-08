@@ -117,6 +117,15 @@ explains the uncertainty, offers no action, and skips approval, execution and th
 outcome clock in both precedent modes. A/B/C still demonstrate the three original
 remedies. D reuses the known mixed development case; it is not a new evaluation set.
 
+**TechKart test environment (dispute-level triage):** situation **T** is the spec's
+delivery-failure merchant. Each open not-received dispute is matched to dispute-level
+cases by its parcel's real state (delivered, in transit, lost, no tracking) and its
+response deadline, then grouped into gated actions. "Without precedent" shows the spec's
+generic consultant. Details: [docs/TECHKART_TEST_ENV.md](docs/TECHKART_TEST_ENV.md).
+Evaluation: `python eval/run_techkart.py` (results in `eval/results/techkart/`). To run
+real sandbox calls per state, set
+`TECHKART_SANDBOX_DISPUTES=delivered:PP-...,in_transit:PP-...,lost:PP-...` in `backend/.env`.
+
 **Ablation:** `python eval/run_ablation.py` (see `eval/README.md`).
 
 **Retrieval integration:** API mode now defaults to structured similarity plus local

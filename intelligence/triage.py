@@ -176,7 +176,7 @@ def triage(disputes: list[dict], today: date, *, cases: list[dict] | None = None
             }[response]
             rationale = f"{why} Followed in {len(backers)} similar dispute case(s)."
             if warnings:
-                rationale += f" Avoid what backfired in {len(warnings)} case(s): {by_id[warnings[0]]['outcome'].split(':')[0].lower()}."
+                rationale += f" Avoid what backfired in {len(warnings)} case(s), e.g. \"{by_id[warnings[0]]['title']}\"."
             actions.append({"action_id": f"act_{idx}", "type": atype, "title": title[:120], "params": params,
                             "rationale": rationale[:600], "supporting_cases": backers})
             group_action_ids.append(f"act_{idx}")
@@ -208,3 +208,39 @@ def generic_plan(disputes: list[dict]) -> dict[str, str]:
     where there is none. Ignores shipment state, proof level and deadlines (spec section 4)."""
     return {d["dispute_id"]: ("generic_tracking" if d["proof"] != "none" else "generic_refund")
             for d in disputes if d["reason"] == "ITEM_NOT_RECEIVED"}
+
+
+def generic_triage(disputes: list[dict], *, start_index: int = 1) -> dict:
+    """System A as actions, for the dashboard's 'Without precedent' view. It cites no cases,
+    so the policy gate blocks its external actions, exactly as for the situation level."""
+    plan = generic_plan(disputes)
+    inr = [d for d in disputes if d["reason"] == "ITEM_NOT_RECEIVED"]
+    tracked = [d for d in inr if plan[d["dispute_id"]] == "generic_tracking"]
+    untracked = [d for d in inr if plan[d["dispute_id"]] == "generic_refund"]
+    actions, groups, idx = [], [], start_index
+    for response, members, atype, label in (
+            ("generic_tracking", tracked, "PROVIDE_EVIDENCE", "Submit tracking numbers as proof of fulfilment"),
+            ("generic_refund", untracked, "MAKE_OFFER", "Offer refunds where there is no tracking")):
+        if not members:
+            continue
+        total = round(sum(d["amount"] for d in members), 2)
+        params = {"triage_group": response, "response": response, "dispute_count": len(members),
+                  "synthetic_dispute_ids": [d["dispute_id"] for d in members], "dispute_ids": [],
+                  "earliest_due": min(d["response_due"] for d in members), "asserts_delivery": response == "generic_tracking",
+                  "total_value": total}
+        if atype == "MAKE_OFFER":
+            params.update(amount={"currency_code": "USD", "value": total}, offer_type="REFUND")
+        else:
+            params["evidence_type"] = "PROOF_OF_FULFILLMENT"
+        actions.append({"action_id": f"act_{idx}", "type": atype, "title": f"{label}: {len(members)} disputes",
+                        "params": params, "supporting_cases": [],
+                        "rationale": "Generic advice applied to every dispute alike. Shipment state and deadlines are not checked."})
+        groups.append({"response": response, "label": label, "states": sorted({STATE_LABEL[d["shipment_status"]] for d in members}),
+                       "count": len(members), "total_value": total, "earliest_due": params["earliest_due"],
+                       "action_ids": [f"act_{idx}"], "cites": [], "warnings": [], "confidence": 0.0})
+        idx += 1
+    rows = [{"dispute_id": d["dispute_id"], "order_id": d["order_id"], "carrier": d["carrier"], "sku": d["sku"],
+             "amount": d["amount"], "status": d["shipment_status"], "proof": d["proof"],
+             "expected_delivery": d.get("expected_delivery"), "response_due": d["response_due"],
+             "response": plan[d["dispute_id"]]} for d in sorted(inr, key=lambda x: x["response_due"])]
+    return {"actions": actions, "groups": groups, "rows": rows, "precedents": [], "untriaged": len(disputes) - len(inr)}

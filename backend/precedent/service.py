@@ -15,6 +15,7 @@ from intelligence.consultant import DIAGNOSIS, recommend  # noqa: E402
 from intelligence.llm_writer import make_writer  # noqa: E402
 from intelligence.retrieve_hybrid import make_retriever, retrieve  # noqa: E402
 from intelligence.schema import thresholds, validate  # noqa: E402
+from intelligence.triage import generic_triage, load_dispute_cases, triage  # noqa: E402
 
 from .executor import CLIENT_STATE, ActionError, Executor  # noqa: E402
 from .orders import generate  # noqa: E402
@@ -23,6 +24,7 @@ from .paypal_adapter import PayPalAdapter, load_env  # noqa: E402
 from .scenarios import DEMO  # noqa: E402
 from .situation_builder import build  # noqa: E402
 from .store import Store  # noqa: E402
+from . import techkart  # noqa: E402
 
 # The real sandbox dispute linked to demo situation A (created by hand, see docs/SPIKE1_RESULT.md).
 # Override with DEMO_DISPUTE_ID in backend/.env when you make a fresh one for recording.
@@ -31,7 +33,27 @@ MODES = ("with_precedent", "no_precedent")
 DIAG_TO_FAMILY = {v: k for k, v in DIAGNOSIS.items()}
 
 
+SITUATION_KEYS = list(DEMO) + ["T"]
+
+
+def techkart_sandbox() -> dict[str, str]:
+    """Optional real sandbox disputes for TechKart, one per shipment state:
+    TECHKART_SANDBOX_DISPUTES=delivered:PP-...,in_transit:PP-...,lost:PP-..."""
+    raw = load_env().get("TECHKART_SANDBOX_DISPUTES", "")
+    pairs = (p.split(":", 1) for p in raw.split(",") if ":" in p)
+    return {k.strip(): v.strip() for k, v in pairs if k.strip() and v.strip()}
+
+
+def demo_disputes(key: str) -> list[dict]:
+    return techkart.generate(techkart.TECHKART)[1] if key == "T" else []
+
+
 def demo_situation(key: str) -> dict:
+    if key == "T":
+        orders, _ = techkart.generate(techkart.TECHKART)
+        ids = sorted(set(techkart_sandbox().values())) or None
+        return build(orders, situation_id="sit_demo_T", merchant_id="m_demo_techkart",
+                     label=techkart.TECHKART.name, paypal_dispute_ids=ids)
     s = DEMO[key]
     return build(generate(s), situation_id=f"sit_demo_{key}", label=s.name,
                  paypal_dispute_ids=[REAL_SANDBOX_DISPUTE] if key == "A" else None)
@@ -41,6 +63,7 @@ def timeline(situation: dict, rec: dict, decisions: list[dict], states: dict | N
              outcome: dict | None = None) -> list[dict]:
     at = situation["window"]["end"] + "T09:00:00Z"
     states = states or {}
+    idle = rec["abstain"] and not rec["actions"]  # abstained with nothing left to do (triage can remain)
     gated = [d for d in decisions if d["tier"] != "PREPARE"]
     all_blocked = bool(gated) and all(d["decision"] == "BLOCKED" for d in gated)
     pending = [d for d in decisions if d["decision"] == "NEEDS_APPROVAL"
@@ -52,7 +75,7 @@ def timeline(situation: dict, rec: dict, decisions: list[dict], states: dict | N
     done = [v for v in acted.values() if v["state"] == "succeeded"]
     real = sum(v.get("execution_mode") == "real" for v in done)
 
-    if rec["abstain"]:
+    if idle:
         approved = {"status": "skipped", "detail": "Nothing to approve: the Consultant abstained."}
     elif all_blocked:
         approved = {"status": "blocked", "detail": "The policy gate blocked every external and money action."}
@@ -63,7 +86,7 @@ def timeline(situation: dict, rec: dict, decisions: list[dict], states: dict | N
     else:
         approved = {"status": "pending", "detail": f"{len(pending)} action(s) waiting for your approval."}
 
-    if rec["abstain"]:
+    if idle:
         executed = {"status": "skipped", "simulated": True,
                     "detail": "No execution: the Consultant abstained."}
     elif done:
@@ -72,7 +95,7 @@ def timeline(situation: dict, rec: dict, decisions: list[dict], states: dict | N
     else:
         executed = {"status": "pending", "simulated": True,
                     "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."}
-    if rec["abstain"] and not outcome:
+    if idle and not outcome:
         measured = {"status": "skipped", "detail": "No outcome replay: no action was recommended or executed."}
     elif outcome:
         measured = {"status": "done", "detail": (f"Simulated {outcome['horizon_days']} days: dispute rate "
@@ -85,27 +108,49 @@ def timeline(situation: dict, rec: dict, decisions: list[dict], states: dict | N
         {"step": "detected", "status": "done", "at": at, "simulated": True,
          "detail": f"Binomial test vs 30-day baseline, p={anomaly['p_value']}. Run on the synthetic demo order feed."},
         {"step": "recommended", "status": "done", "at": at, "simulated": False,
-         "detail": "Abstained." if rec["abstain"] else f"{len(rec['actions'])} action(s) proposed, citing {len(rec['precedents'])} precedent(s)."},
+         "detail": ("Abstained." if idle else
+                    f"Spike-level plan abstained; {len(rec['actions'])} dispute-level action(s) proposed." if rec["abstain"] else
+                    f"{len(rec['actions'])} action(s) proposed, citing {len(rec['precedents'])} precedent(s).")},
         dict({"step": "approved", "at": None, "simulated": False}, **approved),
         dict({"step": "executed", "at": None}, **executed),
         dict({"step": "measured", "at": None, "simulated": True}, **measured),
     ]
 
 
-def static_bundle(situation: dict, cases: list[dict], mode: str) -> dict:
+def static_bundle(situation: dict, cases: list[dict], mode: str, disputes: list[dict] | None = None) -> dict:
     """Fixture bundle: no server state."""
-    rec, decisions = plan(situation, cases, mode)
+    rec, decisions = plan(situation, cases, mode, disputes=disputes)
     bundle = {"situation": situation, "recommendation": rec, "policy_decisions": decisions,
               "timeline": timeline(situation, rec, decisions)}
     validate("bundle", bundle)
     return bundle
 
 
-def plan(situation: dict, cases: list[dict], mode: str, writer=None, retriever=retrieve) -> tuple[dict, list[dict]]:
+def plan(situation: dict, cases: list[dict], mode: str, writer=None, retriever=retrieve,
+         disputes: list[dict] | None = None) -> tuple[dict, list[dict]]:
     precedents = retriever(situation, cases, k=6) if mode == "with_precedent" else []
     rec = recommend(situation, precedents, mode=mode, writer=writer,
                     created_at=situation["window"]["end"] + "T09:00:00Z")
+    if disputes:
+        rec = with_triage(rec, situation, disputes, mode)
     return rec, gate_reference.decide(rec)
+
+
+def with_triage(rec: dict, situation: dict, disputes: list[dict], mode: str) -> dict:
+    """Add dispute-level triage (TechKart). With precedent: case-based triage per dispute.
+    Without: the spec's generic consultant. See docs/TECHKART_TEST_ENV.md."""
+    from datetime import date
+    start = len(rec["actions"]) + 1
+    if mode == "with_precedent":
+        t = triage(disputes, date.fromisoformat(situation["window"]["end"]), cases=load_dispute_cases(),
+                   carrier=situation["features"]["concentration"].get("top_carrier") or "the carrier",
+                   sandbox=techkart_sandbox(), start_index=start)
+    else:
+        t = generic_triage(disputes, start_index=start)
+    actions = t.pop("actions")
+    rec = dict(rec, actions=rec["actions"] + actions, triage=t)
+    validate("recommendation", rec)
+    return rec
 
 
 class Service:
@@ -116,7 +161,8 @@ class Service:
         self.executor = Executor(self.store, self.adapter,
                                  max_external_per_hour=thresholds()["rate_limit"]["max_external_actions_per_hour"])
         self.cases = usable(load_cases())
-        self.situations = {k: demo_situation(k) for k in DEMO}
+        self.situations = {k: demo_situation(k) for k in SITUATION_KEYS}
+        self.disputes = {k: demo_disputes(k) for k in SITUATION_KEYS}
         self._plans: dict[tuple[str, str], tuple[dict, list[dict]]] = {}
 
     def _plan(self, key: str, mode: str) -> tuple[dict, dict, list[dict]]:
@@ -126,7 +172,7 @@ class Service:
         cache_key = (key, mode)
         if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
             self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation),
-                                         retriever=self.retriever)
+                                         retriever=self.retriever, disputes=self.disputes.get(key))
         rec, decisions = self._plans[cache_key]
         self.executor.register(rec, decisions)
         return situation, rec, decisions
@@ -159,8 +205,9 @@ class Service:
             case_id = f"case_ls_{rec['recommendation_id'].removeprefix('rec_').lower()}_{len(outs)}"
             case = next((c for c in self.store.pending_cases() if c["case_id"] == case_id), None)
             outcome = {"metric": o["metric"], "before": o["before"], "after": o["after"],
-                       "horizon_days": o["horizon_days"], "simulated": True, "new_case_id": case_id,
-                       "case_review_status": case["review_status"] if case else "pending"}
+                       "horizon_days": o["horizon_days"], "simulated": True}
+            if case or not rec["abstain"]:
+                outcome.update(new_case_id=case_id, case_review_status=case["review_status"] if case else "pending")
         bundle = {"situation": situation, "recommendation": rec, "policy_decisions": decisions,
                   "action_states": states, "outcome": outcome,
                   "timeline": timeline(situation, rec, decisions, states, outcome)}
@@ -184,13 +231,20 @@ class Service:
         if not approved:
             raise ActionError(409, "Approve and execute at least one action before advancing the simulated clock.")
         family = DIAG_TO_FAMILY.get(rec["diagnosis"]) if not rec["abstain"] else None
-        sim = simulate(DEMO[key], family, horizon_days=days)
+        if key == "T":
+            fit = "match" if family == "carrier" else ("none" if not family else "partial")
+            sim = {"fit": fit, "after_rate": techkart.simulate_after(techkart.TECHKART, fit, horizon_days=days)}
+        else:
+            sim = simulate(DEMO[key], family, horizon_days=days)
         before = situation["features"]["dispute_rate_7d"]
         self.store.add_outcome(rec["recommendation_id"], "dispute_rate_7d", before, sim["after_rate"], days, simulated=True)
         n = len(self.store.outcomes_for(rec["recommendation_id"]))
-        case = live_simulated_case(rec, situation, before, sim["after_rate"], days, n)
-        validate("case", case)
-        self.store.add_pending_case(case)
+        case_id = None
+        if not rec["abstain"]:  # a dispute-level-only plan has no situation-level remedy to learn from
+            case = live_simulated_case(rec, situation, before, sim["after_rate"], days, n)
+            validate("case", case)
+            self.store.add_pending_case(case)
+            case_id = case["case_id"]
         self.store.audit("simulated_clock", "outcome_recorded", {"recommendation_id": rec["recommendation_id"],
-                         "before": before, "after": sim["after_rate"], "fit": sim["fit"], "case_id": case["case_id"]})
+                         "before": before, "after": sim["after_rate"], "fit": sim["fit"], "case_id": case_id})
         return self.bundle(key, mode)

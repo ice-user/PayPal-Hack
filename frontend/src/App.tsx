@@ -10,6 +10,7 @@ import { ConflictNotice, KpiStrip, PageHeader, RatePane, ReasonsPane, SignalsPan
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
 import { ActionsPane, DiagnosisPane, NextStep, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
+import { TriagePane } from "./components/TriagePane";
 import { CaseDrawer } from "./components/CaseDrawer";
 import { Section } from "./components/Card";
 import { Sidebar, Topbar } from "./components/Shell";
@@ -278,6 +279,11 @@ export default function App() {
                 sub={mode === "with_precedent" ? "What the consultant proposes, and what is waiting for you." : "Ablation view: the same consultant with case retrieval switched off."}>
                 <ConflictNotice situation={bundle.situation} />
                 <div className="panel panel-hero">
+                  {bundle.recommendation.triage && (
+                    <div className="split split-1">
+                      <TriagePane triage={bundle.recommendation.triage} generic={mode === "no_precedent"} />
+                    </div>
+                  )}
                   <div className="split split-actions">
                     <ActionsPane
                       rec={bundle.recommendation}
