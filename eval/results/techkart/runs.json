@@ -1,0 +1,1207 @@
+{
+  "runs": [
+    {
+      "scenario": "tk01_default_mix",
+      "disputes": 24,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 24,
+          "valid": 0,
+          "state_ok": 9,
+          "unsupported": 12,
+          "deadline_n": 3,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "doc_n": 5,
+          "doc_ok": 0,
+          "unknown_n": 3,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 21,
+          "generic_refund": 3
+        }
+      },
+      "B": {
+        "abstain": false,
+        "family": "carrier",
+        "confidence": 0.55,
+        "scores": {
+          "n": 24,
+          "valid": 24,
+          "state_ok": 24,
+          "deadline_n": 3,
+          "deadline_ok": 3,
+          "deadline_missed": 0,
+          "doc_n": 5,
+          "doc_ok": 5,
+          "unknown_n": 3,
+          "abstain_ok": 3
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 4,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_in_transit": 3,
+          "evidence_delivery": 4,
+          "evidence_delivery_documented": 5,
+          "message_eta": 9,
+          "gather_info": 3
+        }
+      }
+    },
+    {
+      "scenario": "tk02_mostly_delivered",
+      "disputes": 14,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 14,
+          "valid": 0,
+          "state_ok": 8,
+          "unsupported": 3,
+          "deadline_n": 3,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "doc_n": 4,
+          "doc_ok": 0,
+          "unknown_n": 3,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 11,
+          "generic_refund": 3
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.41,
+        "scores": {
+          "n": 14,
+          "valid": 14,
+          "state_ok": 14,
+          "deadline_n": 3,
+          "deadline_ok": 3,
+          "deadline_missed": 0,
+          "doc_n": 4,
+          "doc_ok": 4,
+          "unknown_n": 3,
+          "abstain_ok": 3
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 3,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery_documented": 4,
+          "evidence_in_transit": 3,
+          "gather_info": 3,
+          "evidence_delivery": 4
+        }
+      }
+    },
+    {
+      "scenario": "tk03_mostly_in_transit_short",
+      "disputes": 30,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 30,
+          "valid": 0,
+          "state_ok": 10,
+          "unknown_n": 3,
+          "abstain_ok": 0,
+          "unsupported": 17,
+          "doc_n": 3,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 27,
+          "generic_refund": 3
+        }
+      },
+      "B": {
+        "abstain": false,
+        "family": "carrier",
+        "confidence": 0.5,
+        "scores": {
+          "n": 30,
+          "valid": 30,
+          "state_ok": 30,
+          "unknown_n": 3,
+          "abstain_ok": 3,
+          "doc_n": 3,
+          "doc_ok": 3
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 4,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 7,
+          "message_eta": 13,
+          "evidence_delivery_documented": 3,
+          "gather_info": 3,
+          "refund_lost": 4
+        }
+      }
+    },
+    {
+      "scenario": "tk04_mostly_in_transit_long",
+      "disputes": 16,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 16,
+          "valid": 0,
+          "state_ok": 5,
+          "unsupported": 10,
+          "deadline_n": 9,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "unknown_n": 1,
+          "abstain_ok": 0,
+          "doc_n": 2,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 15,
+          "generic_refund": 1
+        }
+      },
+      "B": {
+        "abstain": false,
+        "family": "carrier",
+        "confidence": 0.59,
+        "scores": {
+          "n": 16,
+          "valid": 16,
+          "state_ok": 16,
+          "deadline_n": 9,
+          "deadline_ok": 9,
+          "deadline_missed": 0,
+          "unknown_n": 1,
+          "abstain_ok": 1,
+          "doc_n": 2,
+          "doc_ok": 2
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 4,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_in_transit": 9,
+          "evidence_delivery": 3,
+          "gather_info": 1,
+          "evidence_delivery_documented": 2,
+          "refund_lost": 1
+        }
+      }
+    },
+    {
+      "scenario": "tk05_lost_heavy",
+      "disputes": 19,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 19,
+          "valid": 0,
+          "state_ok": 5,
+          "unsupported": 13,
+          "unknown_n": 1,
+          "abstain_ok": 0,
+          "doc_n": 2,
+          "doc_ok": 0,
+          "deadline_n": 1,
+          "deadline_ok": 0,
+          "deadline_missed": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 18,
+          "generic_refund": 1
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.18,
+        "scores": {
+          "n": 19,
+          "valid": 19,
+          "state_ok": 19,
+          "unknown_n": 1,
+          "abstain_ok": 1,
+          "doc_n": 2,
+          "doc_ok": 2,
+          "deadline_n": 1,
+          "deadline_ok": 1,
+          "deadline_missed": 0
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 6,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "refund_lost": 10,
+          "gather_info": 1,
+          "evidence_delivery_documented": 2,
+          "evidence_delivery": 3,
+          "evidence_in_transit": 1,
+          "message_eta": 2
+        }
+      }
+    },
+    {
+      "scenario": "tk06_no_tracking_heavy",
+      "disputes": 30,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 30,
+          "valid": 0,
+          "state_ok": 7,
+          "unknown_n": 14,
+          "abstain_ok": 0,
+          "doc_n": 2,
+          "doc_ok": 0,
+          "unsupported": 9
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_refund": 14,
+          "generic_tracking": 16
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.35,
+        "scores": {
+          "n": 30,
+          "valid": 30,
+          "state_ok": 30,
+          "unknown_n": 14,
+          "abstain_ok": 14,
+          "doc_n": 2,
+          "doc_ok": 2
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "gather_info": 14,
+          "evidence_delivery": 5,
+          "refund_lost": 5,
+          "evidence_delivery_documented": 2,
+          "message_eta": 4
+        }
+      }
+    },
+    {
+      "scenario": "tk07_old_disputes_tight_deadlines",
+      "disputes": 19,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 19,
+          "valid": 0,
+          "state_ok": 6,
+          "unsupported": 11,
+          "deadline_n": 3,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "doc_n": 4,
+          "doc_ok": 0,
+          "unknown_n": 2,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 17,
+          "generic_refund": 2
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.39,
+        "scores": {
+          "n": 19,
+          "valid": 19,
+          "state_ok": 19,
+          "deadline_n": 3,
+          "deadline_ok": 3,
+          "deadline_missed": 0,
+          "doc_n": 4,
+          "doc_ok": 4,
+          "unknown_n": 2,
+          "abstain_ok": 2
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_in_transit": 3,
+          "message_eta": 6,
+          "evidence_delivery_documented": 4,
+          "evidence_delivery": 2,
+          "refund_lost": 2,
+          "gather_info": 2
+        }
+      }
+    },
+    {
+      "scenario": "tk08_new_disputes_loose_deadlines",
+      "disputes": 24,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 24,
+          "valid": 0,
+          "state_ok": 10,
+          "unsupported": 14,
+          "doc_n": 6,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 24
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.43,
+        "scores": {
+          "n": 24,
+          "valid": 24,
+          "state_ok": 24,
+          "doc_n": 6,
+          "doc_ok": 6
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 4
+        },
+        "over_cap": 0,
+        "responses": {
+          "message_eta": 10,
+          "evidence_delivery": 4,
+          "refund_lost": 4,
+          "evidence_delivery_documented": 6
+        }
+      }
+    },
+    {
+      "scenario": "tk09_other_carrier_and_product",
+      "disputes": 29,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 29,
+          "valid": 0,
+          "state_ok": 13,
+          "unsupported": 14,
+          "doc_n": 8,
+          "doc_ok": 0,
+          "deadline_n": 2,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "unknown_n": 2,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 27,
+          "generic_refund": 2
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.42,
+        "scores": {
+          "n": 29,
+          "valid": 29,
+          "state_ok": 29,
+          "doc_n": 8,
+          "doc_ok": 8,
+          "deadline_n": 2,
+          "deadline_ok": 2,
+          "deadline_missed": 0,
+          "unknown_n": 2,
+          "abstain_ok": 2
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "message_eta": 9,
+          "evidence_delivery_documented": 8,
+          "gather_info": 2,
+          "refund_lost": 3,
+          "evidence_delivery": 5,
+          "evidence_in_transit": 2
+        }
+      }
+    },
+    {
+      "scenario": "tk10_high_volume",
+      "disputes": 33,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 33,
+          "valid": 0,
+          "state_ok": 13,
+          "unsupported": 16,
+          "doc_n": 4,
+          "doc_ok": 0,
+          "unknown_n": 4,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 29,
+          "generic_refund": 4
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.29,
+        "scores": {
+          "n": 33,
+          "valid": 33,
+          "state_ok": 33,
+          "doc_n": 4,
+          "doc_ok": 4,
+          "unknown_n": 4,
+          "abstain_ok": 4
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 9,
+          "message_eta": 11,
+          "refund_lost": 5,
+          "evidence_delivery_documented": 4,
+          "gather_info": 4
+        }
+      }
+    },
+    {
+      "scenario": "tk11_low_volume_strong_spike",
+      "disputes": 22,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 22,
+          "valid": 0,
+          "state_ok": 9,
+          "unsupported": 10,
+          "deadline_n": 1,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "doc_n": 3,
+          "doc_ok": 0,
+          "unknown_n": 3,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 19,
+          "generic_refund": 3
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.28,
+        "scores": {
+          "n": 22,
+          "valid": 22,
+          "state_ok": 22,
+          "deadline_n": 1,
+          "deadline_ok": 1,
+          "deadline_missed": 0,
+          "doc_n": 3,
+          "doc_ok": 3,
+          "unknown_n": 3,
+          "abstain_ok": 3
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 6,
+          "evidence_in_transit": 1,
+          "gather_info": 3,
+          "message_eta": 8,
+          "evidence_delivery_documented": 3,
+          "refund_lost": 1
+        }
+      }
+    },
+    {
+      "scenario": "tk12_documented_deliveries",
+      "disputes": 29,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 29,
+          "valid": 0,
+          "state_ok": 18,
+          "doc_n": 13,
+          "doc_ok": 0,
+          "unknown_n": 5,
+          "abstain_ok": 0,
+          "unsupported": 6
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 24,
+          "generic_refund": 5
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.31,
+        "scores": {
+          "n": 29,
+          "valid": 29,
+          "state_ok": 29,
+          "doc_n": 13,
+          "doc_ok": 13,
+          "unknown_n": 5,
+          "abstain_ok": 5
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 4,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 5,
+          "evidence_delivery_documented": 13,
+          "gather_info": 5,
+          "message_eta": 5,
+          "refund_lost": 1
+        }
+      }
+    },
+    {
+      "scenario": "tk13_even_mix",
+      "disputes": 32,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 32,
+          "valid": 0,
+          "state_ok": 17,
+          "unknown_n": 6,
+          "abstain_ok": 0,
+          "unsupported": 9,
+          "deadline_n": 1,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "doc_n": 7,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_refund": 6,
+          "generic_tracking": 26
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.15,
+        "scores": {
+          "n": 32,
+          "valid": 32,
+          "state_ok": 32,
+          "unknown_n": 6,
+          "abstain_ok": 6,
+          "deadline_n": 1,
+          "deadline_ok": 1,
+          "deadline_missed": 0,
+          "doc_n": 7,
+          "doc_ok": 7
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "gather_info": 6,
+          "message_eta": 3,
+          "evidence_delivery_documented": 7,
+          "evidence_delivery": 10,
+          "evidence_in_transit": 1,
+          "refund_lost": 5
+        }
+      }
+    },
+    {
+      "scenario": "tk14_transit_mixed_windows",
+      "disputes": 20,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 20,
+          "valid": 0,
+          "state_ok": 6,
+          "unsupported": 12,
+          "deadline_n": 7,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "doc_n": 3,
+          "doc_ok": 0,
+          "unknown_n": 2,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 18,
+          "generic_refund": 2
+        }
+      },
+      "B": {
+        "abstain": false,
+        "family": "carrier",
+        "confidence": 0.52,
+        "scores": {
+          "n": 20,
+          "valid": 20,
+          "state_ok": 20,
+          "deadline_n": 7,
+          "deadline_ok": 7,
+          "deadline_missed": 0,
+          "doc_n": 3,
+          "doc_ok": 3,
+          "unknown_n": 2,
+          "abstain_ok": 2
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_in_transit": 7,
+          "message_eta": 4,
+          "evidence_delivery_documented": 3,
+          "gather_info": 2,
+          "refund_lost": 1,
+          "evidence_delivery": 3
+        }
+      }
+    },
+    {
+      "scenario": "tk15_dock_product_focus",
+      "disputes": 24,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 24,
+          "valid": 0,
+          "state_ok": 10,
+          "doc_n": 4,
+          "doc_ok": 0,
+          "unsupported": 10,
+          "unknown_n": 4,
+          "abstain_ok": 0,
+          "deadline_n": 1,
+          "deadline_ok": 0,
+          "deadline_missed": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 20,
+          "generic_refund": 4
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.2,
+        "scores": {
+          "n": 24,
+          "valid": 24,
+          "state_ok": 24,
+          "doc_n": 4,
+          "doc_ok": 4,
+          "unknown_n": 4,
+          "abstain_ok": 4,
+          "deadline_n": 1,
+          "deadline_ok": 1,
+          "deadline_missed": 0
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 6,
+          "refund_lost": 3,
+          "message_eta": 6,
+          "gather_info": 4,
+          "evidence_delivery_documented": 4,
+          "evidence_in_transit": 1
+        }
+      }
+    },
+    {
+      "scenario": "tk16_carrier_focus_weaker",
+      "disputes": 24,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 24,
+          "valid": 0,
+          "state_ok": 7,
+          "unsupported": 10,
+          "deadline_n": 2,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "unknown_n": 7,
+          "abstain_ok": 0,
+          "doc_n": 3,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 17,
+          "generic_refund": 7
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.0,
+        "scores": {
+          "n": 24,
+          "valid": 24,
+          "state_ok": 24,
+          "deadline_n": 2,
+          "deadline_ok": 2,
+          "deadline_missed": 0,
+          "unknown_n": 7,
+          "abstain_ok": 7,
+          "doc_n": 3,
+          "doc_ok": 3
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 5,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "refund_lost": 2,
+          "evidence_delivery": 4,
+          "gather_info": 7,
+          "message_eta": 6,
+          "evidence_delivery_documented": 3,
+          "evidence_in_transit": 2
+        }
+      }
+    },
+    {
+      "scenario": "tk17_parcelway_lost_wave",
+      "disputes": 23,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 23,
+          "valid": 0,
+          "state_ok": 6,
+          "unsupported": 15,
+          "deadline_n": 1,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "unknown_n": 2,
+          "abstain_ok": 0,
+          "doc_n": 2,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 21,
+          "generic_refund": 2
+        }
+      },
+      "B": {
+        "abstain": false,
+        "family": "carrier",
+        "confidence": 0.66,
+        "scores": {
+          "n": 23,
+          "valid": 23,
+          "state_ok": 23,
+          "deadline_n": 1,
+          "deadline_ok": 1,
+          "deadline_missed": 0,
+          "unknown_n": 2,
+          "abstain_ok": 2,
+          "doc_n": 2,
+          "doc_ok": 2
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 6,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 4,
+          "refund_lost": 10,
+          "gather_info": 2,
+          "evidence_in_transit": 1,
+          "message_eta": 4,
+          "evidence_delivery_documented": 2
+        }
+      }
+    },
+    {
+      "scenario": "tk18_late_window_transit",
+      "disputes": 27,
+      "truth": {
+        "family": "carrier",
+        "anomalous": true,
+        "should_abstain": false
+      },
+      "A": {
+        "abstain": false,
+        "family": null,
+        "confidence": 0.3,
+        "scores": {
+          "n": 27,
+          "valid": 0,
+          "state_ok": 7,
+          "unsupported": 16,
+          "deadline_n": 7,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "unknown_n": 4,
+          "abstain_ok": 0,
+          "doc_n": 1,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 23,
+          "generic_refund": 4
+        }
+      },
+      "B": {
+        "abstain": false,
+        "family": "carrier",
+        "confidence": 0.65,
+        "scores": {
+          "n": 27,
+          "valid": 27,
+          "state_ok": 27,
+          "deadline_n": 7,
+          "deadline_ok": 7,
+          "deadline_missed": 0,
+          "unknown_n": 4,
+          "abstain_ok": 4,
+          "doc_n": 1,
+          "doc_ok": 1
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 6,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery": 6,
+          "refund_lost": 7,
+          "evidence_in_transit": 7,
+          "message_eta": 2,
+          "gather_info": 4,
+          "evidence_delivery_documented": 1
+        }
+      }
+    },
+    {
+      "scenario": "tk19_quiet_month_no_spike",
+      "disputes": 3,
+      "truth": {
+        "family": null,
+        "anomalous": false,
+        "should_abstain": true
+      },
+      "A": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.0,
+        "scores": {
+          "n": 3,
+          "valid": 0,
+          "state_ok": 2,
+          "unknown_n": 1,
+          "abstain_ok": 0,
+          "doc_n": 1,
+          "doc_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_refund": 1,
+          "generic_tracking": 2
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.0,
+        "scores": {
+          "n": 3,
+          "valid": 3,
+          "state_ok": 3,
+          "unknown_n": 1,
+          "abstain_ok": 1,
+          "doc_n": 1,
+          "doc_ok": 1
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 2,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery_documented": 1,
+          "evidence_delivery": 1,
+          "gather_info": 1
+        }
+      }
+    },
+    {
+      "scenario": "tk20_quiet_high_volume",
+      "disputes": 10,
+      "truth": {
+        "family": null,
+        "anomalous": false,
+        "should_abstain": true
+      },
+      "A": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.0,
+        "scores": {
+          "n": 10,
+          "valid": 0,
+          "state_ok": 5,
+          "doc_n": 1,
+          "doc_ok": 0,
+          "unsupported": 4,
+          "deadline_n": 3,
+          "deadline_ok": 0,
+          "deadline_missed": 0,
+          "unknown_n": 1,
+          "abstain_ok": 0
+        },
+        "gate": {},
+        "over_cap": 0,
+        "responses": {
+          "generic_tracking": 9,
+          "generic_refund": 1
+        }
+      },
+      "B": {
+        "abstain": true,
+        "family": null,
+        "confidence": 0.0,
+        "scores": {
+          "n": 10,
+          "valid": 10,
+          "state_ok": 10,
+          "doc_n": 1,
+          "doc_ok": 1,
+          "deadline_n": 3,
+          "deadline_ok": 3,
+          "deadline_missed": 0,
+          "unknown_n": 1,
+          "abstain_ok": 1
+        },
+        "gate": {
+          "NEEDS_APPROVAL": 4,
+          "AUTO": 1
+        },
+        "over_cap": 0,
+        "responses": {
+          "evidence_delivery_documented": 1,
+          "evidence_in_transit": 3,
+          "evidence_delivery": 4,
+          "refund_lost": 1,
+          "gather_info": 1
+        }
+      }
+    }
+  ]
+}

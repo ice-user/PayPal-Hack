@@ -59,3 +59,38 @@ result.**
 - S14 (carrier and fulfilment causes at once): read as fulfilment only, at confidence 0.68.
   This is the one unsafe act. The detector has no notion of two simultaneous causes. Fixing
   it needs a mixed-cause signal, not more tuning on this set.
+
+## TechKart test environment (dispute-level triage)
+
+Spec: `docs/TECHKART_TEST_ENV.md`. Scorer: `python eval/run_techkart.py`. Results: `results/techkart/`.
+
+**Run 1, TK_TEST (20 scenarios, 452 open item-not-received disputes), 2026-11-09.**
+The scenarios were committed in `40ee3b8` and the scorer in the next commit, before either
+system was run on them. Run once.
+
+| Metric | System A, generic (scripted) | System B, Precedent |
+|---|---|---|
+| Exact spec path | 0/452 | 452/452 |
+| Fits the parcel's true state | 173/452 (38%) | 452/452 |
+| GPS or signature included when available | 0/78 | 78/78 |
+| Deadline first: responds in time without claiming delivery | 0/44 | 44/44 |
+| No tracking: no external action | 0/68 | 68/68 |
+| Unsupported claims (lower is better) | 211/452 (47%) | 0/452 |
+| Spike scenarios: right cause at the situation level | 0/18 | 6/18, abstained 12 |
+| Quiet scenarios: plan abstains | 2/2 | 2/2 |
+
+How to read it:
+- **B's 100% is mostly by construction.** The same team wrote the dispute cases, the
+  decision paths and the generator, and each dispute case maps one shipment state to one
+  response. It shows the triage implements the spec's paths and the gate accepts them.
+  It is not evidence of real-world performance.
+- **A is a weak baseline.** It is the spec's generic consultant, scripted, so it scores 0 on
+  exact paths by design. The informative number is its unsupported claims: it asserts
+  delivery on 47% of disputes where the parcel was in transit or known lost. A Claude
+  baseline with the same inputs and action list would be the fair test, and needs an API key.
+- **New finding at the situation level.** When a spike mixes delivered and undelivered
+  parcels (the spec's own scenario), the situation-level Consultant's precedents split
+  between "carrier failure" and "delivered but disputed". It abstained in 12 of 18 spike
+  scenarios. That is safe, but it means no merchant-wide fix (such as requiring delivery
+  confirmation on the carrier) is proposed. The dispute-level triage still answers every
+  dispute.
