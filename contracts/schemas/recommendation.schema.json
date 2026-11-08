@@ -44,13 +44,30 @@
         "version": {"type": "string"}
       }
     },
-    "created_at": {"type": "string"}
+    "created_at": {"type": "string"},
+    "triage": {
+      "description": "Optional dispute-level triage (TechKart test environment, docs/TECHKART_TEST_ENV.md). Its actions also appear in `actions`, with params.triage_group set.",
+      "type": "object",
+      "required": ["groups", "rows", "precedents", "untriaged"],
+      "properties": {
+        "groups": {"type": "array", "items": {"type": "object", "required": ["response", "label", "count", "action_ids"]}},
+        "rows": {"type": "array", "items": {"type": "object", "required": ["dispute_id", "status", "response_due", "response"]}},
+        "precedents": {"type": "array", "items": {"type": "object", "required": ["case_id", "title", "appropriate"]}},
+        "untriaged": {"type": "integer", "minimum": 0}
+      }
+    }
   },
   "allOf": [
     {
       "if": {"properties": {"abstain": {"const": true}}},
       "then": {
-        "properties": {"actions": {"maxItems": 0}, "abstain_reason": {"type": "string", "minLength": 1}}
+        "properties": {
+          "actions": {
+            "description": "When the situation-level plan abstains, only dispute-level triage actions may remain: open disputes still need a response.",
+            "items": {"properties": {"params": {"required": ["triage_group"]}}, "required": ["params"]}
+          },
+          "abstain_reason": {"type": "string", "minLength": 1}
+        }
       }
     },
     {

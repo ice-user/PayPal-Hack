@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from .schema import thresholds, validate
 
+TRIAGE_MIN_BACKERS = 2  # mirrors intelligence.triage.MIN_BACKERS
+
 
 def _tier(action_type: str, th: dict) -> str:
     for tier, types in th["tiers"].items():
@@ -27,14 +29,22 @@ def decide(recommendation: dict, *, allowlist: list[str] | None = None) -> list[
         decision = th["tier_default_decision"].get(tier, "BLOCKED")
         why: list[str] = []
 
+        triage = bool(a.get("params", {}).get("triage_group"))
         if tier == "UNKNOWN" or (allowlist is not None and a["type"] not in allowlist):
             rules.append("type_not_allowed")
             decision, why = "BLOCKED", [f"{a['type']} is not an allowed action type."]
-        elif recommendation["abstain"]:
+        elif recommendation["abstain"] and not triage:
             rules.append("consultant_abstained")
             decision, why = "BLOCKED", ["The Consultant abstained."]
         else:
-            if tier != "PREPARE":
+            if tier != "PREPARE" and triage:
+                # Dispute-level triage: backed by dispute-level cases, independent of the spike-level plan.
+                backers = len(a.get("supporting_cases", []))
+                if backers < TRIAGE_MIN_BACKERS:
+                    rules.append("insufficient_precedent")
+                    decision = "BLOCKED"
+                    why.append(f"Needs at least {TRIAGE_MIN_BACKERS} agreeing dispute cases; has {backers}.")
+            elif tier != "PREPARE":
                 backing = [p for p in supported if p["case_id"] in a.get("supporting_cases", [])]
                 if len(supported) < th["k_min"] or not backing:
                     rules.append("insufficient_precedent")
