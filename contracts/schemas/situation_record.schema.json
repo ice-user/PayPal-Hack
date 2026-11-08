@@ -77,6 +77,22 @@
         },
         "carriers_elevated": {"type": "integer", "minimum": 0},
         "ship_delay_hours_p50": {"type": "number", "minimum": 0},
+        "diagnostic_conflict": {
+          "type": "object",
+          "description": "Optional exploratory uncertainty signal from order cohorts, not proof of multiple causes. Requires abstention in both recommendation modes.",
+          "additionalProperties": false,
+          "required": ["kind", "prompt_ship_hours", "window_orders", "window_lost_inr", "baseline_orders", "baseline_lost_inr", "method", "p_value"],
+          "properties": {
+            "kind": {"const": "fulfilment_and_prompt_shipment_losses"},
+            "prompt_ship_hours": {"type": "number", "minimum": 0},
+            "window_orders": {"type": "integer", "minimum": 1},
+            "window_lost_inr": {"type": "integer", "minimum": 0},
+            "baseline_orders": {"type": "integer", "minimum": 1},
+            "baseline_lost_inr": {"type": "integer", "minimum": 0},
+            "method": {"const": "fisher_exact_one_sided"},
+            "p_value": {"$ref": "#/$defs/rate"}
+          }
+        },
         "disputed_orders_delivered_share": {"$ref": "#/$defs/rate"},
         "avg_amount": {"type": "number", "minimum": 0},
         "median_response_hours": {"type": "number", "minimum": 0},

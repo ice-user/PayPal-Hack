@@ -17,7 +17,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from intelligence.schema import validate  # noqa: E402
-from intelligence.stats import binomial_upper_p, wilson_ci  # noqa: E402
+from intelligence.stats import binomial_upper_p, fisher_upper_p, wilson_ci  # noqa: E402
 
 from .orders import WINDOW_DAYS  # noqa: E402
 
@@ -26,6 +26,45 @@ MIN_TX = 500
 MIN_DISPUTES = 10
 ELEVATED_RATIO = 2.0
 ELEVATED_MIN_DISPUTES = 3
+
+# Exploratory uncertainty check, not a causal diagnosis or anomaly test.
+# 48h matches the existing overdue-order playbook; flag at 90% evidence because
+# the consequence is human review, never permission to perform an action.
+PROMPT_SHIP_HOURS = 48
+CONFLICT_DELAY_HOURS = 36
+CONFLICT_MIN_WINDOW = 100
+CONFLICT_MIN_BASELINE = 500
+CONFLICT_MIN_LOSSES = 3
+CONFLICT_P_THRESHOLD = 0.10
+
+
+def _lost_inr(order: dict) -> bool:
+    return order["disputed"] and order["dispute_reason"] == "ITEM_NOT_RECEIVED" and not order["delivered"]
+
+
+def diagnostic_conflict(window: list[dict], baseline: list[dict], delay_p50: float) -> dict | None:
+    """Look for loss signals unexplained by late dispatch alone.
+
+    Prompt means dispatched within 48h, not delivered on time. A positive check
+    indicates ambiguity requiring review; it cannot identify a carrier or prove
+    that two causes exist. No scenario names, seeds or planted labels are read.
+    """
+    if delay_p50 < CONFLICT_DELAY_HOURS:
+        return None
+    prompt = [o for o in window if o["ship_delay_hours"] <= PROMPT_SHIP_HOURS]
+    base_prompt = [o for o in baseline if o["ship_delay_hours"] <= PROMPT_SHIP_HOURS]
+    k, kb = sum(map(_lost_inr, prompt)), sum(map(_lost_inr, base_prompt))
+    if len(prompt) < CONFLICT_MIN_WINDOW or len(base_prompt) < CONFLICT_MIN_BASELINE or k < CONFLICT_MIN_LOSSES:
+        return None
+    p = fisher_upper_p(k, len(prompt), kb, len(base_prompt))
+    if p >= CONFLICT_P_THRESHOLD:
+        return None
+    return {
+        "kind": "fulfilment_and_prompt_shipment_losses", "prompt_ship_hours": PROMPT_SHIP_HOURS,
+        "window_orders": len(prompt), "window_lost_inr": k,
+        "baseline_orders": len(base_prompt), "baseline_lost_inr": kb,
+        "method": "fisher_exact_one_sided", "p_value": float(f"{p:.6g}"),
+    }
 
 
 def _top_share(counter: Counter, total: int) -> tuple[str | None, float]:
@@ -77,15 +116,12 @@ def build(orders: list[dict], *, situation_id: str, merchant_id: str = "m_demo_e
 
     # A carrier is "elevated" when its not-received disputes on parcels WITHOUT a delivery
     # scan are well above its own baseline: that is the part a carrier can be blamed for.
-    def lost(o: dict) -> bool:
-        return o["disputed"] and o["dispute_reason"] == "ITEM_NOT_RECEIVED" and not o["delivered"]
-
-    base_lost_rate = sum(lost(o) for o in base) / tx30 if tx30 else 0.0
+    base_lost_rate = sum(_lost_inr(o) for o in base) / tx30 if tx30 else 0.0
     elevated = 0
     for c in {o["carrier"] for o in orders}:
         w = [o for o in window if o["carrier"] == c]
         b = [o for o in base if o["carrier"] == c]
-        kw, kb = sum(lost(o) for o in w), sum(lost(o) for o in b)
+        kw, kb = sum(_lost_inr(o) for o in w), sum(_lost_inr(o) for o in b)
         rb = max(kb / len(b) if b else 0.0, base_lost_rate * 0.5, 1e-4)
         if w and kw >= ELEVATED_MIN_DISPUTES and (kw / len(w)) > ELEVATED_RATIO * rb:
             elevated += 1
@@ -120,6 +156,9 @@ def build(orders: list[dict], *, situation_id: str, merchant_id: str = "m_demo_e
         "refund_ratio_30d": 0.04,
         "days_since_txn_median": 9,
     }
+    conflict = diagnostic_conflict(window, base, delay_p50) if features["anomaly"]["is_anomalous"] else None
+    if conflict:
+        features["diagnostic_conflict"] = conflict
     situation = {
         "situation_id": situation_id,
         "merchant_id": merchant_id,
@@ -146,6 +185,8 @@ def narrative(f: dict) -> str:
                   "NOT_AS_DESCRIBED": "Not-as-described"}.get(top_reason, "Dispute")
     c = f["concentration"]
     parts = [f"{reason_txt} disputes up {f['rate_ratio']:.1f}x in 7 days"]
+    if f.get("diagnostic_conflict"):
+        parts.append("slow dispatch and elevated not-received disputes on promptly shipped orders; review needed")
     if c.get("carrier", 0) >= 0.6 and f["carriers_elevated"] <= 1:
         parts.append(f"mostly on {c.get('top_carrier')}")
     elif f["carriers_elevated"] >= 3:

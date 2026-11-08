@@ -1,0 +1,2 @@
+# Optional semantic retrieval; install alongside requirements.txt on Python 3.12.
+sentence-transformers>=3.3,<4

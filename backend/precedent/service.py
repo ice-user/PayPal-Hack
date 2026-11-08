@@ -13,7 +13,7 @@ from intelligence import gate_reference  # noqa: E402
 from intelligence.cases import load_cases, usable  # noqa: E402
 from intelligence.consultant import DIAGNOSIS, recommend  # noqa: E402
 from intelligence.llm_writer import make_writer  # noqa: E402
-from intelligence.retrieve_baseline import retrieve  # noqa: E402
+from intelligence.retrieve_hybrid import make_retriever, retrieve  # noqa: E402
 from intelligence.schema import thresholds, validate  # noqa: E402
 
 from .executor import CLIENT_STATE, ActionError, Executor  # noqa: E402
@@ -63,13 +63,18 @@ def timeline(situation: dict, rec: dict, decisions: list[dict], states: dict | N
     else:
         approved = {"status": "pending", "detail": f"{len(pending)} action(s) waiting for your approval."}
 
-    if done:
+    if rec["abstain"]:
+        executed = {"status": "skipped", "simulated": True,
+                    "detail": "No execution: the Consultant abstained."}
+    elif done:
         executed = {"status": "done", "simulated": real < len(done),
                     "detail": f"{len(done)} executed: {real} as real PayPal sandbox calls, {len(done) - real} simulated."}
     else:
         executed = {"status": "pending", "simulated": True,
                     "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."}
-    if outcome:
+    if rec["abstain"] and not outcome:
+        measured = {"status": "skipped", "detail": "No outcome replay: no action was recommended or executed."}
+    elif outcome:
         measured = {"status": "done", "detail": (f"Simulated {outcome['horizon_days']} days: dispute rate "
                                                  f"{outcome['before'] * 100:.2f}% to {outcome['after'] * 100:.2f}%. "
                                                  "Recorded as a live_simulated case pending review.")}
@@ -96,17 +101,18 @@ def static_bundle(situation: dict, cases: list[dict], mode: str) -> dict:
     return bundle
 
 
-def plan(situation: dict, cases: list[dict], mode: str, writer=None) -> tuple[dict, list[dict]]:
-    precedents = retrieve(situation, cases, k=6)
+def plan(situation: dict, cases: list[dict], mode: str, writer=None, retriever=retrieve) -> tuple[dict, list[dict]]:
+    precedents = retriever(situation, cases, k=6) if mode == "with_precedent" else []
     rec = recommend(situation, precedents, mode=mode, writer=writer,
                     created_at=situation["window"]["end"] + "T09:00:00Z")
     return rec, gate_reference.decide(rec)
 
 
 class Service:
-    def __init__(self, store: Store | None = None, adapter: PayPalAdapter | None = None):
+    def __init__(self, store: Store | None = None, adapter: PayPalAdapter | None = None, retriever=None):
         self.store = store or Store()
         self.adapter = adapter or PayPalAdapter()
+        self.retriever = retriever if retriever is not None else make_retriever(load_env())
         self.executor = Executor(self.store, self.adapter,
                                  max_external_per_hour=thresholds()["rate_limit"]["max_external_actions_per_hour"])
         self.cases = usable(load_cases())
@@ -119,7 +125,8 @@ class Service:
         situation = self.situations[key]
         cache_key = (key, mode)
         if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
-            self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation))
+            self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation),
+                                         retriever=self.retriever)
         rec, decisions = self._plans[cache_key]
         self.executor.register(rec, decisions)
         return situation, rec, decisions

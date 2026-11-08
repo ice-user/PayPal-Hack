@@ -137,7 +137,8 @@ def test_webhook_bad_signature_rejected_and_replay_ignored():
     client, _ = make_client(bad)
     hdrs = {"paypal-auth-algo": "SHA256withRSA", "paypal-cert-url": "https://api.sandbox.paypal.com/cert",
             "paypal-transmission-id": "T-1", "paypal-transmission-sig": "sig", "paypal-transmission-time": "2026-11-07T00:00:00Z"}
-    event = {"event_type": "CUSTOMER.DISPUTE.UPDATED", "resource": {"dispute_id": "PP-R-1"}}
+    event = {"id": "WH-1", "create_time": "2026-11-07T00:00:00Z",
+             "event_type": "CUSTOMER.DISPUTE.UPDATED", "resource": {"dispute_id": "PP-R-1"}}
     assert client.post("/api/paypal/webhook", json=event, headers=hdrs).status_code == 400
     good = FakePayPal(verify="SUCCESS")
     client, _ = make_client(good)

@@ -66,6 +66,13 @@ export function SituationPanel({ situation, live, apiMode }: Props) {
         {f.anomaly.min_sample_met === false && " · sample too small"}
       </div>
 
+      {f.diagnostic_conflict && (
+        <div className="anomaly on" role="status">
+          Review needed: dispatch is slow, and orders shipped within {f.diagnostic_conflict.prompt_ship_hours}h
+          {" "}also show elevated not-received disputes without delivery scans. A single remedy may miss part of the problem.
+        </div>
+      )}
+
       <dl className="facts">
         <div><dt>Transactions (7d)</dt><dd className="num">{f.transactions_7d.toLocaleString()}</dd></div>
         <div><dt>Disputes (7d)</dt><dd className="num">{f.disputes_7d}</dd></div>

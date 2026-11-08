@@ -31,6 +31,16 @@ export interface SituationRecord {
     };
     carriers_elevated: number;
     ship_delay_hours_p50: number;
+    diagnostic_conflict?: {
+      kind: "fulfilment_and_prompt_shipment_losses";
+      prompt_ship_hours: number;
+      window_orders: number;
+      window_lost_inr: number;
+      baseline_orders: number;
+      baseline_lost_inr: number;
+      method: "fisher_exact_one_sided";
+      p_value: number;
+    };
     disputed_orders_delivered_share: number;
     avg_amount?: number;
     median_response_hours?: number;

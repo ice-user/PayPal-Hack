@@ -185,7 +185,10 @@ class PayPalAdapter:
 
     # ---- webhooks ----
     def verify_webhook(self, headers: dict, event: dict) -> bool:
-        """Ask PayPal to verify the signature. False on any doubt."""
+        """Ask PayPal to verify. False means invalid; unavailable verification raises.
+
+        Callers must retry on errors without recording the event as processed.
+        """
         if not (self.configured and self.webhook_id):
             return False
         h = {k.lower(): v for k, v in headers.items()}
@@ -198,6 +201,8 @@ class PayPalAdapter:
             return False
         try:
             resp = self._call("POST", "/v1/notifications/verify-webhook-signature", body=body)
-        except PayPalError:
-            return False
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            raise PayPalError(503, {"name": "WEBHOOK_VERIFICATION_UNAVAILABLE"}) from exc
+        if not isinstance(resp, dict) or resp.get("verification_status") not in ("SUCCESS", "FAILURE"):
+            raise PayPalError(503, {"name": "WEBHOOK_VERIFICATION_UNAVAILABLE"})
         return resp.get("verification_status") == "SUCCESS"

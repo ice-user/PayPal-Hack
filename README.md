@@ -56,7 +56,7 @@ the development set is in [eval/results/summary.md](eval/results/summary.md); th
 |---|---|
 | `contracts/` | JSON schemas, shared thresholds, fixtures (the contract between frontend and backend) |
 | `cases/` | Case library (authored now; public cases next) |
-| `intelligence/` | Consultant, baseline retriever, effects rule, reference policy gate, stats |
+| `intelligence/` | Consultant, hybrid and baseline retrievers, effects rule, reference policy gate, stats |
 | `scripts/build_fixtures.py` | Builds and validates the demo fixtures from the pipeline |
 | `frontend/` | React + Vite dashboard (runs on fixtures, or a real API via `VITE_API_BASE`) |
 | `backend/precedent/` | API (FastAPI), executor, PayPal adapter, order-feed generator, Situation Builder, outcome tracker, SQLite store |
@@ -70,7 +70,7 @@ the development set is in [eval/results/summary.md](eval/results/summary.md); th
 **Tests and fixtures**
 
 ```bash
-pip install jsonschema pytest fastapi uvicorn httpx
+pip install -r requirements.txt
 python scripts/build_fixtures.py
 python -m pytest -q
 ```
@@ -97,7 +97,68 @@ Then open http://localhost:5173.
 5. To run the demo again: `POST /api/demo/reset`. This clears approvals and outcomes, not
    PayPal.
 
+**Isolated local demo (PowerShell, no credentials):**
+
+```powershell
+cd frontend
+$env:VITE_API_BASE="/"
+npm.cmd run build
+cd ..
+.\.venv\Scripts\python.exe scripts/run_local_demo.py
+```
+
+Open http://127.0.0.1:8765. This runner uses an in-memory database, the default
+hybrid retriever, and no PayPal or LLM credentials. All external actions simulate;
+its case reviews and outcomes disappear when the process stops. It doesn't change
+the normal app's database. Use `--port 8766` if the default port is occupied.
+
+Choose **D: overlapping signals (review needed)** to check abstention: the plan
+explains the uncertainty, offers no action, and skips approval, execution and the
+outcome clock in both precedent modes. A/B/C still demonstrate the three original
+remedies. D reuses the known mixed development case; it is not a new evaluation set.
+
 **Ablation:** `python eval/run_ablation.py` (see `eval/README.md`).
+
+**Retrieval integration:** API mode now defaults to structured similarity plus local
+TF-IDF narrative ranking, fused with reciprocal ranks (90% structured, 10% text).
+TF-IDF is lexical matching, not semantic embeddings. `similarity`, `matched_on`,
+and `differs_on` retain their structured meaning; the 0.6 policy threshold is
+unchanged. Eligible structured matches rank ahead of weak matches. A 2% ranking
+boost applies only to public measured cases with before/after outcomes. Pending
+and rejected cases are excluded. Numeric effects still use the existing measured-only rule.
+
+Set `PRECEDENT_RETRIEVER=structured` in `backend/.env` to use the old retriever.
+For semantic embeddings, install `requirements-embeddings.txt` alongside the base
+requirements in a Python 3.12 environment, provision a SentenceTransformer model
+locally (for example `sentence-transformers/all-MiniLM-L6-v2`), then set
+`PRECEDENT_RETRIEVER=semantic` and `PRECEDENT_EMBEDDING_MODEL` to its local directory.
+The model loads offline with remote code disabled; missing dependencies or weights
+raise an error instead of silently changing retrieval modes. Restart the API after
+changing retrieval settings. Semantic model quality has not yet been evaluated here.
+
+`python eval/compare_retrieval.py` compares the baseline and default hybrid on known
+development scenarios without changing previous evaluation artifacts. Add
+`--semantic-model PATH` to evaluate a provisioned embedding model. The new text
+weight was adjusted against the three demo scenarios; these are regression checks,
+not new held-out results. Existing headline results describe the old structured
+retriever. Fixture generation uses the default TF-IDF hybrid for reproducibility.
+
+**Overlapping signals:** an optional `features.diagnostic_conflict` records an
+exploratory comparison of not-received disputes without delivery scans among
+orders dispatched within 48h, against the same cohort in the baseline. When the
+overall spike is anomalous and median dispatch is at least 36h, the check requires
+at least 100 current / 500 baseline promptly shipped orders, at least 3 current
+losses, and one-sided Fisher exact p < 0.10. This is a conservative review trigger,
+not proof of a carrier failure or multiple causes. It abstains in both modes and
+never authorizes an action. Small or weak signals can remain undetected. See
+[integration notes](docs/INTEGRATION_2026-11-08.md) for the development-only results.
+
+**Webhooks:** the receiver now persists verified dispute history, deduplicates by
+PayPal event ID across restarts, and keeps older updates from replacing newer
+snapshots. View history at `/api/paypal/disputes/{dispute_id}/events` and receipt
+records at `/api/audit`. Related actions are contextual links, not confirmation
+of execution or resolution. See [webhook setup and tests](docs/WEBHOOKS.md).
+Live sandbox delivery still needs a registered public HTTPS callback.
 
 **Deploy (one container, API and dashboard on one URL):**
 

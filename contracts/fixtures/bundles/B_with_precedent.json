@@ -118,23 +118,6 @@
         "provenance": "authored"
       },
       {
-        "case_id": "case_b05_inventory_sync_oversell",
-        "title": "Inventory sync bug oversold stock",
-        "similarity": 0.787,
-        "matched_on": [
-          "carrier concentration",
-          "number of carriers elevated",
-          "unauthorised share",
-          "trend"
-        ],
-        "differs_on": [],
-        "intervention": "fulfilment_workflow_fix",
-        "outcome_summary": "Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
-        "measurement_period_days": null,
-        "evidence_quality": "illustrative",
-        "provenance": "authored"
-      },
-      {
         "case_id": "case_b06_customs_hold_cross_border",
         "title": "Cross-border parcels held at customs",
         "similarity": 0.767,
@@ -150,6 +133,23 @@
         ],
         "intervention": "proactive_buyer_messaging",
         "outcome_summary": "Illustrative: messages explaining the hold, with customs status attached as evidence. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b05_inventory_sync_oversell",
+        "title": "Inventory sync bug oversold stock",
+        "similarity": 0.787,
+        "matched_on": [
+          "carrier concentration",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "fulfilment_workflow_fix",
+        "outcome_summary": "Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
         "measurement_period_days": null,
         "evidence_quality": "illustrative",
         "provenance": "authored"
@@ -216,7 +216,7 @@
     "playbook_notes": [
       "Warehouse backlog delayed all carriers (authored, illustrative): Illustrative: backlog cleared, pick-and-pack priority changed, and buyers with late orders got proactive updates. No measured numbers.",
       "Migration to a new fulfilment partner (authored, illustrative): Illustrative: a daily unshipped-order report and restored status emails. No measured numbers.",
-      "Inventory sync bug oversold stock (authored, illustrative): Illustrative: sync fixed, unfulfillable orders offered a refund or a wait. No measured numbers.",
+      "Cross-border parcels held at customs (authored, illustrative): Illustrative: messages explaining the hold, with customs status attached as evidence. No measured numbers.",
       "No measured precedents match this pattern, so no numeric forecast is shown."
     ],
     "confidence": 0.68,
