@@ -6,16 +6,19 @@ Then start the frontend with VITE_API_BASE=http://localhost:8000.
 """
 from __future__ import annotations
 
+import json
 import os
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
 
 from .executor import ActionError
 from .paypal_adapter import PayPalError
 from .scenarios import DEMO
 from .service import MODES, Service
+from .webhooks import MAX_BODY_BYTES, metadata
 
 app = FastAPI(title="Precedent API", version="0.1.0",
               description="Dispute consultant for PayPal merchants. Synthetic order feed; PayPal sandbox only.")
@@ -156,17 +159,38 @@ def _mount_dashboard() -> None:
 
 @app.post("/api/paypal/webhook")
 async def paypal_webhook(request: Request) -> dict:
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+        if len(body) > MAX_BODY_BYTES:
+            raise HTTPException(413, "Webhook body exceeds 1 MiB.")
+    try:
+        event = json.loads(body)
+        projected = metadata(event)
+    except (ValueError, UnicodeError, RecursionError) as exc:
+        raise HTTPException(400, "Malformed webhook envelope.") from exc
+    return await run_in_threadpool(_ingest_webhook, dict(request.headers), event, projected)
+
+
+def _ingest_webhook(headers: dict, event: dict, projected: dict) -> dict:
     s = service()
-    event = await request.json()
-    if not s.adapter.verify_webhook(dict(request.headers), event):
-        s.store.audit("paypal", "webhook_rejected", {"event_type": event.get("event_type")})
+    if not (s.adapter.configured and s.adapter.webhook_id):
+        raise HTTPException(503, "Webhook verification is not configured.")
+    try:
+        verified = s.adapter.verify_webhook(headers, event)
+    except PayPalError as exc:
+        raise HTTPException(503, "Webhook verification unavailable; retry delivery.") from exc
+    if not verified:
+        s.store.audit("paypal", "webhook_rejected", {"event_type": projected["event_type"]})
         raise HTTPException(400, "Webhook signature could not be verified.")
-    tid = request.headers.get("paypal-transmission-id", "")
-    if s.store.seen_webhook(tid, event.get("event_type", "")):
-        return {"ok": True, "replay": True}
-    s.store.audit("paypal", "webhook_received", {"event_type": event.get("event_type"),
-                                                 "resource_id": (event.get("resource") or {}).get("dispute_id")})
-    return {"ok": True, "replay": False}
+    replay = s.store.record_webhook(projected, headers["paypal-transmission-id"])
+    return {"ok": True, "replay": replay}
+
+
+@app.get("/api/paypal/disputes/{dispute_id}/events")
+def paypal_dispute_events(dispute_id: str, limit: int = Query(default=50, ge=1, le=500)) -> dict:
+    """Local verified history; no PayPal read or seller action is triggered."""
+    return service().store.webhook_history(dispute_id, limit)
 
 
 _mount_dashboard()  # last, so /api routes take precedence

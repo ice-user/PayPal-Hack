@@ -1,0 +1,240 @@
+{
+  "situation": {
+    "situation_id": "sit_demo_D",
+    "merchant_id": "m_demo_electronics",
+    "window": {
+      "start": "2026-10-31",
+      "end": "2026-11-06"
+    },
+    "source": "synthetic_order_feed",
+    "features": {
+      "transactions_7d": 1777,
+      "disputes_7d": 42,
+      "gmv_7d": 94786.0,
+      "dispute_rate_7d": 0.02364,
+      "dispute_rate_7d_ci95": [
+        0.01753,
+        0.03179
+      ],
+      "transactions_30d_baseline": 7790,
+      "disputes_30d_baseline": 24,
+      "dispute_rate_30d_baseline": 0.00308,
+      "baseline_ci95": [
+        0.00207,
+        0.00458
+      ],
+      "rate_ratio": 7.67,
+      "anomaly": {
+        "method": "binomial_vs_baseline",
+        "p_value": 2.42e-23,
+        "is_anomalous": true,
+        "min_sample_met": true
+      },
+      "trend_slope": 0.61,
+      "daily_dispute_rate": [
+        0.0,
+        0.0077,
+        0.0039,
+        0.0077,
+        0.0212,
+        0.0464,
+        0.0112,
+        0.0346,
+        0.0233,
+        0.0242
+      ],
+      "reason_mix": {
+        "ITEM_NOT_RECEIVED": 0.905,
+        "UNAUTHORISED": 0.048,
+        "NOT_AS_DESCRIBED": 0.024,
+        "OTHER": 0.024
+      },
+      "concentration": {
+        "sku": 0.333,
+        "carrier": 0.405,
+        "country": 0.905,
+        "top_sku": "CSE-9 phone case",
+        "top_carrier": "Northline Parcel",
+        "top_country": "US"
+      },
+      "carriers_elevated": 3,
+      "ship_delay_hours_p50": 58.1,
+      "disputed_orders_delivered_share": 0.095,
+      "avg_amount": 53.34,
+      "median_response_hours": 52,
+      "open_disputes": 41,
+      "refund_ratio_30d": 0.04,
+      "days_since_txn_median": 9,
+      "diagnostic_conflict": {
+        "kind": "fulfilment_and_prompt_shipment_losses",
+        "prompt_ship_hours": 48,
+        "window_orders": 529,
+        "window_lost_inr": 3,
+        "baseline_orders": 7790,
+        "baseline_lost_inr": 12,
+        "method": "fisher_exact_one_sided",
+        "p_value": 0.0656672
+      }
+    },
+    "narrative": "Item-not-received disputes up 7.7x in 7 days, slow dispatch and elevated not-received disputes on promptly shipped orders; review needed, across 3 carriers, time to ship is 58h.",
+    "evidence_ids": [],
+    "paypal_dispute_ids": [],
+    "label": "D: overlapping signals (review needed)"
+  },
+  "recommendation": {
+    "recommendation_id": "rec_demo_D_wp",
+    "situation_id": "sit_demo_D",
+    "mode": "with_precedent",
+    "grounding": "precedent",
+    "diagnosis": "Overlapping signals need review",
+    "precedents": [
+      {
+        "case_id": "case_b06_customs_hold_cross_border",
+        "title": "Cross-border parcels held at customs",
+        "similarity": 0.861,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "proactive_buyer_messaging",
+        "outcome_summary": "Illustrative: messages explaining the hold, with customs status attached as evidence. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b04_flash_sale_overflow",
+        "title": "Flash sale overwhelmed packing capacity",
+        "similarity": 0.849,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "number of carriers elevated",
+          "unauthorised share",
+          "SKU concentration"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "proactive_buyer_messaging",
+        "outcome_summary": "Illustrative: proactive delay notices with a new ship date, and temporary order caps. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b03_3pl_migration",
+        "title": "Migration to a new fulfilment partner",
+        "similarity": 0.802,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "fulfilment_workflow_fix",
+        "outcome_summary": "Illustrative: a daily unshipped-order report and restored status emails. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b02_preorder_without_notice",
+        "title": "Pre-order items shipped weeks later without notice",
+        "similarity": 0.796,
+        "matched_on": [
+          "share of disputed orders delivered",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "proactive_buyer_messaging",
+        "outcome_summary": "Illustrative: buyers with delayed orders were messaged with a ship date and an option to cancel; listings were marked as pre-order. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_b01_warehouse_backlog",
+        "title": "Warehouse backlog delayed all carriers",
+        "similarity": 0.767,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "fulfilment_workflow_fix",
+        "outcome_summary": "Illustrative: backlog cleared, pick-and-pack priority changed, and buyers with late orders got proactive updates. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      }
+    ],
+    "actions": [],
+    "predicted_effect": null,
+    "counterfactual": null,
+    "playbook_notes": [],
+    "confidence": 0.0,
+    "evidence_quality": "none",
+    "abstain": true,
+    "abstain_reason": "No action: median dispatch time is 58h, but orders dispatched within 48h also show elevated item-not-received disputes without delivery scans (3/529 vs 12/7790 in the baseline). Late dispatch alone may not explain the spike. Review dispatch and tracking records before choosing a remedy.",
+    "generated_by": {
+      "engine": "rules",
+      "version": "0.2.0"
+    },
+    "created_at": "2026-11-06T09:00:00Z"
+  },
+  "policy_decisions": [],
+  "timeline": [
+    {
+      "step": "detected",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": true,
+      "detail": "Binomial test vs 30-day baseline, p=2.42e-23. Run on the synthetic demo order feed."
+    },
+    {
+      "step": "recommended",
+      "status": "done",
+      "at": "2026-11-06T09:00:00Z",
+      "simulated": false,
+      "detail": "Abstained."
+    },
+    {
+      "step": "approved",
+      "at": null,
+      "simulated": false,
+      "status": "skipped",
+      "detail": "Nothing to approve: the Consultant abstained."
+    },
+    {
+      "step": "executed",
+      "at": null,
+      "status": "skipped",
+      "simulated": true,
+      "detail": "No execution: the Consultant abstained."
+    },
+    {
+      "step": "measured",
+      "at": null,
+      "simulated": true,
+      "status": "skipped",
+      "detail": "No outcome replay: no action was recommended or executed."
+    }
+  ]
+}

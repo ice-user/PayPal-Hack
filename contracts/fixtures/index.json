@@ -14,6 +14,11 @@
       "key": "C",
       "situation_id": "sit_demo_C",
       "label": "C: delivered orders"
+    },
+    {
+      "key": "D",
+      "situation_id": "sit_demo_D",
+      "label": "D: overlapping signals (review needed)"
     }
   ],
   "modes": [

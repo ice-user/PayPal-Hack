@@ -1,5 +1,24 @@
 # Handoff: Person B (backend and retrieval ML)
 
+> **Integration update (8 Nov):** the API now uses `intelligence/retrieve_hybrid.py`.
+> It fuses structured ranks and local lexical TF-IDF narrative ranks, with an
+> optional offline SentenceTransformer scorer. Existing similarity thresholds and
+> response shapes are unchanged. See README for configuration and
+> `eval/compare_retrieval.py` for development checks. Real semantic-model evaluation,
+> hosted webhooks, deployment and buyer-consent dispute creation remain open.
+> The status table below describes the earlier foundation snapshot.
+
+> **Later on 8 Nov:** added an exploratory cohort check for overlapping dispatch
+> and delivery signals, with abstention in both modes and demo scenario D. See
+> `docs/INTEGRATION_2026-11-08.md` for the additive contract field, development
+> results, limitations and review handoff. This is not a new held-out result.
+
+> **Webhook integration (8 Nov):** verified events now have durable event-ID
+> deduplication, atomic receipt/audit storage, ordered dispute snapshots, and
+> read-only history with links to real actions on the same dispute. Webhooks do
+> not confirm action success. See `docs/WEBHOOKS.md` for behavior and the live
+> sandbox checklist; public delivery remains unverified.
+
 > **Status update (overnight 7 to 8 Nov):** with Person A's go-ahead, a first working
 > version of most of this list was built in `backend/precedent/`. Please review and extend it
 > rather than rebuild. `docs/STATUS_2026-11-07.md` has the details.

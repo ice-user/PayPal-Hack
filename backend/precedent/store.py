@@ -38,6 +38,16 @@ CREATE TABLE IF NOT EXISTS outcomes (
 CREATE TABLE IF NOT EXISTS webhook_events (
   transmission_id TEXT PRIMARY KEY, event_type TEXT, received_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS verified_webhook_events (
+  event_id TEXT PRIMARY KEY, transmission_id TEXT NOT NULL,
+  event_type TEXT NOT NULL, created_at TEXT NOT NULL, received_at TEXT NOT NULL,
+  dispute_id TEXT, dispute TEXT, disposition TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS webhook_dispute_history ON verified_webhook_events(dispute_id, created_at);
+CREATE TABLE IF NOT EXISTS paypal_dispute_snapshots (
+  dispute_id TEXT PRIMARY KEY, event_id TEXT NOT NULL,
+  update_time TEXT NOT NULL, dispute TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS pending_cases (
   case_id TEXT PRIMARY KEY, body TEXT NOT NULL, created_at TEXT NOT NULL
 );
@@ -113,14 +123,67 @@ class Store:
         return [dict(r, simulated=bool(r["simulated"])) for r in rows]
 
     # ---- webhooks ----
-    def seen_webhook(self, transmission_id: str, event_type: str) -> bool:
-        """Record a webhook; return True if it was already processed (replay)."""
-        try:
-            with self._lock, self.db:
-                self.db.execute("INSERT INTO webhook_events VALUES (?,?,?)", (transmission_id, event_type, now()))
-            return False
-        except sqlite3.IntegrityError:
-            return True
+    def _related_actions(self, dispute_id: str | None) -> list[dict]:
+        # paypal_ref contains only the successfully executed members of a batch.
+        # Matching params would incorrectly include its simulated members.
+        if not dispute_id:
+            return []
+        rows = self.db.execute("SELECT recommendation_id, action_id, paypal_ref FROM actions "
+                               "WHERE execution_mode='real' AND paypal_ref IS NOT NULL").fetchall()
+        return [{"recommendation_id": r["recommendation_id"], "action_id": r["action_id"]}
+                for r in rows if dispute_id in r["paypal_ref"].split(",")]
+
+    def record_webhook(self, event: dict, transmission_id: str) -> bool:
+        """Atomically persist verified metadata, snapshot and audit. True means replay.
+
+        Legacy transmission-only receipts are retained in webhook_events. They cannot
+        establish event identity and are deliberately not used for new deduplication.
+        """
+        with self._lock, self.db:
+            received_at = now()
+            dispute = event["dispute"]
+            did = dispute["dispute_id"] if dispute else None
+            body = json.dumps(dispute) if dispute else None
+            cur = self.db.execute(
+                "INSERT INTO verified_webhook_events VALUES (?,?,?,?,?,?,?,?) ON CONFLICT(event_id) DO NOTHING",
+                (event["event_id"], transmission_id, event["event_type"], event["created_at"],
+                 received_at, did, body, "pending"))
+            if cur.rowcount == 0:
+                return True
+            disposition = "ignored_event_type"
+            if dispute:
+                disposition = "history_only_missing_state_or_time"
+                if dispute["update_time"] and dispute["status"]:
+                    cur = self.db.execute(
+                        "INSERT INTO paypal_dispute_snapshots VALUES (?,?,?,?) "
+                        "ON CONFLICT(dispute_id) DO UPDATE SET event_id=excluded.event_id, "
+                        "update_time=excluded.update_time, dispute=excluded.dispute "
+                        "WHERE excluded.update_time > paypal_dispute_snapshots.update_time",
+                        (did, event["event_id"], dispute["update_time"], body))
+                    disposition = "snapshot_updated" if cur.rowcount else "history_only_stale_or_equal"
+            self.db.execute("UPDATE verified_webhook_events SET disposition=? WHERE event_id=?",
+                            (disposition, event["event_id"]))
+            payload = {"event_id": event["event_id"], "event_type": event["event_type"],
+                       "resource_id": did, "disposition": disposition,
+                       "related_actions": self._related_actions(did),
+                       "relationship": "same_dispute_only_not_action_confirmation"}
+            self.db.execute("INSERT INTO audit_log (at, actor, event, payload) VALUES (?,?,?,?)",
+                            (received_at, "paypal", "webhook_received", json.dumps(payload)))
+        return False
+
+    def webhook_history(self, dispute_id: str, limit: int = 50) -> dict:
+        with self._lock:
+            rows = self.db.execute(
+                "SELECT * FROM verified_webhook_events WHERE dispute_id=? "
+                "ORDER BY created_at DESC, event_id DESC LIMIT ?", (dispute_id, limit)).fetchall()
+            snapshot = self.db.execute("SELECT * FROM paypal_dispute_snapshots WHERE dispute_id=?",
+                                       (dispute_id,)).fetchone()
+            # Resolve again on reads: an event can arrive before execution returns.
+            related = self._related_actions(dispute_id)
+        return {"source": "verified_paypal_sandbox_webhooks", "dispute_id": dispute_id,
+                "snapshot": None if snapshot is None else dict(snapshot, dispute=json.loads(snapshot["dispute"])),
+                "events": [dict(r, dispute=json.loads(r["dispute"])) for r in rows],
+                "related_actions": related, "relationship": "same_dispute_only_not_action_confirmation"}
 
     # ---- demo reset ----
     def reset_demo(self) -> None:

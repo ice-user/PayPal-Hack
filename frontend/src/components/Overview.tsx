@@ -4,6 +4,7 @@ import { pct, pValue, QUALITY_LABEL, rate, REASON_LABEL } from "../format";
 import { Pane, Pill } from "./Card";
 import { Donut, Meters, RateChart, RateLegend } from "./Charts";
 import { SimulatedTag } from "./Badges";
+import { Icon } from "./Icon";
 
 const day = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -22,6 +23,26 @@ export function PageHeader({ situation, label, anomalous }: { situation: Situati
       </div>
       <h1 className="page-title">{situation.narrative}</h1>
     </header>
+  );
+}
+
+/** Shown when the order feed sees overlapping causes (scenario D): the plan abstains and asks for review. */
+export function ConflictNotice({ situation }: { situation: SituationRecord }) {
+  const c = situation.features.diagnostic_conflict;
+  if (!c) return null;
+  return (
+    <div className="callout warn" role="status">
+      <Icon name="alert" />
+      <div>
+        <p className="callout-title">Review needed: more than one cause may be at work</p>
+        <p>
+          Dispatch is slow, and orders shipped within {c.prompt_ship_hours}h also show elevated not-received disputes
+          without delivery scans ({c.window_lost_inr} of {c.window_orders.toLocaleString()} this window vs {c.baseline_lost_inr} of{" "}
+          {c.baseline_orders.toLocaleString()} before; one-sided Fisher exact p = {pValue(c.p_value)}). A single remedy may miss
+          part of the problem, so no action is proposed.
+        </p>
+      </div>
+    </div>
   );
 }
 

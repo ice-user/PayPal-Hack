@@ -6,7 +6,7 @@ import {
 } from "./api";
 import thresholds from "@contracts/thresholds.json";
 import { AuditLog } from "./components/AuditLog";
-import { KpiStrip, PageHeader, RatePane, ReasonsPane, SignalsPane } from "./components/Overview";
+import { ConflictNotice, KpiStrip, PageHeader, RatePane, ReasonsPane, SignalsPane } from "./components/Overview";
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
 import { ActionsPane, DiagnosisPane, NextStep, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
@@ -276,6 +276,7 @@ export default function App() {
 
               <Section id="decision" title="Decision"
                 sub={mode === "with_precedent" ? "What the consultant proposes, and what is waiting for you." : "Ablation view: the same consultant with case retrieval switched off."}>
+                <ConflictNotice situation={bundle.situation} />
                 <div className="panel panel-hero">
                   <div className="split split-actions">
                     <ActionsPane

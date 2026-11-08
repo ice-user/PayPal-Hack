@@ -3,7 +3,7 @@
 Pipeline (the same one the product runs):
   synthetic order feed (backend/precedent/orders.py, seeded)
   -> Situation Builder (Wilson CIs, binomial test, order-feed features)
-  -> baseline retriever -> Consultant (with and without precedent)
+  -> default hybrid TF-IDF retriever -> Consultant (with and without precedent)
   -> reference Policy Gate -> timeline -> ScreenBundle
 
 Every output is schema-validated. Run:  python scripts/build_fixtures.py

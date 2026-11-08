@@ -1,0 +1,82 @@
+{
+  "situation_id": "sit_demo_D",
+  "merchant_id": "m_demo_electronics",
+  "window": {
+    "start": "2026-10-31",
+    "end": "2026-11-06"
+  },
+  "source": "synthetic_order_feed",
+  "features": {
+    "transactions_7d": 1777,
+    "disputes_7d": 42,
+    "gmv_7d": 94786.0,
+    "dispute_rate_7d": 0.02364,
+    "dispute_rate_7d_ci95": [
+      0.01753,
+      0.03179
+    ],
+    "transactions_30d_baseline": 7790,
+    "disputes_30d_baseline": 24,
+    "dispute_rate_30d_baseline": 0.00308,
+    "baseline_ci95": [
+      0.00207,
+      0.00458
+    ],
+    "rate_ratio": 7.67,
+    "anomaly": {
+      "method": "binomial_vs_baseline",
+      "p_value": 2.42e-23,
+      "is_anomalous": true,
+      "min_sample_met": true
+    },
+    "trend_slope": 0.61,
+    "daily_dispute_rate": [
+      0.0,
+      0.0077,
+      0.0039,
+      0.0077,
+      0.0212,
+      0.0464,
+      0.0112,
+      0.0346,
+      0.0233,
+      0.0242
+    ],
+    "reason_mix": {
+      "ITEM_NOT_RECEIVED": 0.905,
+      "UNAUTHORISED": 0.048,
+      "NOT_AS_DESCRIBED": 0.024,
+      "OTHER": 0.024
+    },
+    "concentration": {
+      "sku": 0.333,
+      "carrier": 0.405,
+      "country": 0.905,
+      "top_sku": "CSE-9 phone case",
+      "top_carrier": "Northline Parcel",
+      "top_country": "US"
+    },
+    "carriers_elevated": 3,
+    "ship_delay_hours_p50": 58.1,
+    "disputed_orders_delivered_share": 0.095,
+    "avg_amount": 53.34,
+    "median_response_hours": 52,
+    "open_disputes": 41,
+    "refund_ratio_30d": 0.04,
+    "days_since_txn_median": 9,
+    "diagnostic_conflict": {
+      "kind": "fulfilment_and_prompt_shipment_losses",
+      "prompt_ship_hours": 48,
+      "window_orders": 529,
+      "window_lost_inr": 3,
+      "baseline_orders": 7790,
+      "baseline_lost_inr": 12,
+      "method": "fisher_exact_one_sided",
+      "p_value": 0.0656672
+    }
+  },
+  "narrative": "Item-not-received disputes up 7.7x in 7 days, slow dispatch and elevated not-received disputes on promptly shipped orders; review needed, across 3 carriers, time to ship is 58h.",
+  "evidence_ids": [],
+  "paypal_dispute_ids": [],
+  "label": "D: overlapping signals (review needed)"
+}

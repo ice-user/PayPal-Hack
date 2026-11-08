@@ -224,6 +224,24 @@ def recommend(situation: dict, precedents: list[dict], *, mode: str = "with_prec
             "abstain_reason": f"No action: {why} (binomial p = {anomaly['p_value']}).",
             "generated_by": {"engine": "rules", "version": "0.1.0"},
         }
+    elif situation["features"].get("diagnostic_conflict"):
+        conflict = situation["features"]["diagnostic_conflict"]
+        rec = {
+            "recommendation_id": rec_id, "situation_id": sid, "mode": mode,
+            "grounding": "precedent" if mode == "with_precedent" else "none",
+            "diagnosis": "Overlapping signals need review",
+            "precedents": [_precedent_view(p) for p in precedents[:5]] if mode == "with_precedent" else [],
+            "actions": [], "predicted_effect": None, "counterfactual": None, "playbook_notes": [],
+            "confidence": 0.0, "evidence_quality": "none", "abstain": True,
+            "abstain_reason": (
+                f"No action: median dispatch time is {x['delay_h']:.0f}h, but orders dispatched within "
+                f"{conflict['prompt_ship_hours']}h also show elevated item-not-received disputes without delivery scans "
+                f"({conflict['window_lost_inr']}/{conflict['window_orders']} vs "
+                f"{conflict['baseline_lost_inr']}/{conflict['baseline_orders']} in the baseline). "
+                "Late dispatch alone may not explain the spike. Review dispatch and tracking records before choosing a remedy."
+            ),
+            "generated_by": {"engine": "rules", "version": "0.2.0"},
+        }
     elif mode == "no_precedent":
         rec = _baseline(situation, x, rec_id)
     else:

@@ -17,6 +17,9 @@ DEMO = {
                   expected={"family": "fulfilment", "anomalous": True, "should_abstain": False}),
     "C": Scenario("C: delivered orders", "delivered", seed=13, extra_rate=0.011,
                   expected={"family": "delivered", "anomalous": True, "should_abstain": False}),
+    "D": Scenario("D: overlapping signals (review needed)", "mixed", seed=151, extra_rate=0.04,
+                  target_carrier="Northline Parcel", delay_hours=58,
+                  expected={"family": None, "anomalous": True, "should_abstain": True}),
 }
 
 # Held-out TEST set. Written on 2026-11-08 after the case library was frozen at v1, and run
