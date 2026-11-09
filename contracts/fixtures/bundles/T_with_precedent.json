@@ -393,7 +393,8 @@
           "warnings": [
             "dc_d05_tracking_number_only"
           ],
-          "confidence": 0.54
+          "confidence": 0.54,
+          "paypal": false
         },
         {
           "response": "evidence_delivery_documented",
@@ -414,7 +415,8 @@
           "warnings": [
             "dc_d05_tracking_number_only"
           ],
-          "confidence": 0.55
+          "confidence": 0.55,
+          "paypal": false
         },
         {
           "response": "message_eta",
@@ -433,7 +435,8 @@
             "dc_t02_eta_message_low_value"
           ],
           "warnings": [],
-          "confidence": 1.0
+          "confidence": 1.0,
+          "paypal": false
         },
         {
           "response": "evidence_in_transit",
@@ -455,7 +458,8 @@
             "dc_t05_claimed_delivered_early",
             "dc_t06_waited_past_deadline"
           ],
-          "confidence": 1.0
+          "confidence": 1.0,
+          "paypal": false
         },
         {
           "response": "refund_lost",
@@ -476,7 +480,8 @@
           "warnings": [
             "dc_l03_lost_but_contested"
           ],
-          "confidence": 1.0
+          "confidence": 1.0,
+          "paypal": false
         },
         {
           "response": "gather_info",
@@ -496,7 +501,8 @@
           "warnings": [
             "dc_u02_guessed_response"
           ],
-          "confidence": 1.0
+          "confidence": 1.0,
+          "paypal": false
         }
       ],
       "rows": [
@@ -510,7 +516,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-09",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004840",
@@ -522,7 +529,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-15",
           "response_due": "2026-11-12",
-          "response": "evidence_in_transit"
+          "response": "evidence_in_transit",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004885",
@@ -534,7 +542,8 @@
           "proof": "signature",
           "expected_delivery": null,
           "response_due": "2026-11-12",
-          "response": "evidence_delivery_documented"
+          "response": "evidence_delivery_documented",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004984",
@@ -546,7 +555,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-16",
           "response_due": "2026-11-13",
-          "response": "evidence_in_transit"
+          "response": "evidence_in_transit",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004882",
@@ -558,7 +568,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-14",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004992",
@@ -570,7 +581,8 @@
           "proof": "tracking",
           "expected_delivery": null,
           "response_due": "2026-11-14",
-          "response": "refund_lost"
+          "response": "refund_lost",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005058",
@@ -582,7 +594,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-16",
           "response_due": "2026-11-14",
-          "response": "evidence_in_transit"
+          "response": "evidence_in_transit",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005078",
@@ -594,7 +607,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-09",
           "response_due": "2026-11-14",
-          "response": "message_eta"
+          "response": "message_eta",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005100",
@@ -606,7 +620,8 @@
           "proof": "tracking",
           "expected_delivery": null,
           "response_due": "2026-11-14",
-          "response": "refund_lost"
+          "response": "refund_lost",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004985",
@@ -618,7 +633,8 @@
           "proof": "gps",
           "expected_delivery": null,
           "response_due": "2026-11-15",
-          "response": "evidence_delivery_documented"
+          "response": "evidence_delivery_documented",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005099",
@@ -630,7 +646,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-15",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005126",
@@ -642,7 +659,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-11",
           "response_due": "2026-11-15",
-          "response": "message_eta"
+          "response": "message_eta",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005251",
@@ -654,7 +672,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-09",
           "response_due": "2026-11-15",
-          "response": "message_eta"
+          "response": "message_eta",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005369",
@@ -666,7 +685,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-15",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005553",
@@ -678,7 +698,8 @@
           "proof": "signature",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "evidence_delivery_documented"
+          "response": "evidence_delivery_documented",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005555",
@@ -690,7 +711,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005631",
@@ -702,7 +724,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005707",
@@ -714,7 +737,8 @@
           "proof": "gps",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "evidence_delivery_documented"
+          "response": "evidence_delivery_documented",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004756",
@@ -726,7 +750,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005236",
@@ -738,7 +763,8 @@
           "proof": "gps",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "evidence_delivery_documented"
+          "response": "evidence_delivery_documented",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005452",
@@ -750,7 +776,8 @@
           "proof": "none",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "gather_info"
+          "response": "gather_info",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005535",
@@ -762,7 +789,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005606",
@@ -774,7 +802,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "evidence_delivery"
+          "response": "evidence_delivery",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005806",
@@ -786,7 +815,8 @@
           "proof": "signature",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "evidence_delivery_documented"
+          "response": "evidence_delivery_documented",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005829",
@@ -798,7 +828,8 @@
           "proof": "tracking",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "refund_lost"
+          "response": "refund_lost",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005871",
@@ -810,7 +841,8 @@
           "proof": "none",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "gather_info"
+          "response": "gather_info",
+          "paypal": false
         }
       ],
       "precedents": [

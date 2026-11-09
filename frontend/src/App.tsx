@@ -79,7 +79,8 @@ function Skeleton() {
 }
 
 export default function App() {
-  const [key, setKey] = useState(situations[0]?.key ?? "A");
+  // The demo opens on TechKart (the story the landing page tells), when the fixtures include it.
+  const [key, setKey] = useState(situations.find((s) => s.key === "T")?.key ?? situations[0]?.key ?? "A");
   const [mode, setMode] = useState<Mode>("with_precedent");
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -330,7 +331,7 @@ export default function App() {
 
               {API && bundle.paypal && (
                 <Section id="paypal" title="PayPal"
-                  sub="Precedent's PayPal integration, live: the sandbox account it reads disputes and tracking from, and every request it makes.">
+                  sub="MediateAI's PayPal integration, live: the sandbox account it reads disputes and tracking from, and every request it makes.">
                   <div className="panel">
                     <div className="split split-1">
                       <PayPalAccountPane account={bundle.paypal} onRefresh={refreshFromPayPal} refreshing={busy === "paypal"} />

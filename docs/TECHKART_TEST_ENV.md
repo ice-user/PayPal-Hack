@@ -2,7 +2,7 @@
 
 This is the demo's testing environment, built from the team's spec
 `PRECEDENT_Demo_Case_Delivery_Failure.md` (kept outside the repo). It adds one layer to
-Precedent: **dispute-level triage**. The situation level still diagnoses the cause of a
+MediateAI: **dispute-level triage**. The situation level still diagnoses the cause of a
 spike. The new layer decides what to do with each open dispute, based on the parcel's
 real shipment state and the dispute's response deadline.
 
@@ -71,7 +71,7 @@ The policy gate treats these cases as supporting precedent, like situation-level
   there is no tracking. It does not look at shipment state or deadlines. It is scripted,
   because no LLM key is configured. A Claude-based generic baseline can replace it later
   for a stronger comparison.
-- **System B, Precedent:** situation diagnosis plus dispute-level triage by retrieval.
+- **System B, MediateAI:** situation diagnosis plus dispute-level triage by retrieval.
 
 Both get the same orders, the same disputes, the same action list and the same policy gate.
 

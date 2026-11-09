@@ -13,7 +13,7 @@
 # Without the PayPal values everything still works, simulated and labelled.
 services:
   - type: web
-    name: precedent
+    name: mediateai
     runtime: docker
     plan: starter            # always on (no cold start); "free" also works but sleeps when idle
     branch: main

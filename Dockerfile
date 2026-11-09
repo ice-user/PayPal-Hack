@@ -1,6 +1,6 @@
 # One container: FastAPI backend + built dashboard on the same origin.
-# Build:  docker build -t precedent .
-# Run:    docker run -p 8000:8000 --env-file backend/.env precedent
+# Build:  docker build -t mediateai .
+# Run:    docker run -p 8000:8000 --env-file backend/.env mediateai
 # Credentials are passed at runtime (env vars); they are never baked into the image.
 
 FROM node:20.18-alpine AS web

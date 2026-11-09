@@ -31,17 +31,17 @@ export function Sidebar({ open, situations, current, anomalous, onPick, apiMode,
   };
   return (
     <aside className={`sidebar ${open ? "open" : ""}`} aria-label="Navigation">
-      <div className="brand">
+      <a className="brand" href="#" title="Back to the MediateAI home page" aria-label="MediateAI home">
         <span className="logo" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 20V5h7a4.5 4.5 0 0 1 0 9H6" />
           </svg>
         </span>
         <div>
-          <div className="brand-name">Precedent</div>
+          <div className="brand-name">MediateAI</div>
           <div className="brand-sub">Demo electronics store</div>
         </div>
-      </div>
+      </a>
 
       <nav className="side-nav">
         <button className="side-item active" onClick={() => go("top")}>
@@ -129,7 +129,7 @@ export function Topbar({ label, mode, onMode, theme, onTheme, onToggleSidebar, o
         <span className="crumb-current">{label}</span>
       </nav>
       <div className="topbar-right">
-        <div className="segmented" role="group" aria-label="Precedent retrieval">
+        <div className="segmented" role="group" aria-label="Past-case retrieval">
           <button aria-pressed={mode === "with_precedent"} onClick={() => onMode("with_precedent")}>With precedent</button>
           <button aria-pressed={mode === "no_precedent"} onClick={() => onMode("no_precedent")}>Without</button>
         </div>

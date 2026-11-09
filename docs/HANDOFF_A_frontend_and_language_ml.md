@@ -5,7 +5,7 @@ Read first: `docs/BRIEF.md` (decisions and rules), then `docs/DESIGN.md` (sectio
 
 ## 1. The product in three sentences
 
-Precedent is a web dashboard for PayPal merchants. It detects a dispute spike,
+MediateAI is a web dashboard for PayPal merchants. It detects a dispute spike,
 finds similar past cases, explains why, proposes typed actions, and, after policy
 checks and a human click, executes them through the PayPal Sandbox. It then records
 the outcome as a new case. The demo merchant and its orders are synthetic; PayPal
@@ -90,7 +90,7 @@ effect. Authored cases are labelled illustrative and are never presented as real
 
 ## 7. Evaluation (you own the ablation)
 
-- **Precedent ablation:** run 15 to 20 situations through System A (no retrieval) and
+- **MediateAI ablation:** run 15 to 20 situations through System A (no retrieval) and
   System B (with precedents). You and Person B each score every recommendation
   independently on a short rubric: appropriate intervention, grounded in cited
   evidence, unsupported claims, abstains when it should. Agree the rubric before

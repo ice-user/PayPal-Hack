@@ -35,7 +35,7 @@ function useNow(ms: number): number {
   return now;
 }
 
-/** The connected PayPal sandbox account: what Precedent imported, and what PayPal allows now. */
+/** The connected PayPal sandbox account: what MediateAI imported, and what PayPal allows now. */
 export function PayPalAccountPane({ account, onRefresh, refreshing }: {
   account: PayPalAccount; onRefresh: () => void; refreshing: boolean;
 }) {
@@ -73,7 +73,7 @@ export function PayPalAccountPane({ account, onRefresh, refreshing }: {
         <div className="table-wrap">
           <table className="table">
             <thead>
-              <tr><th>Dispute</th><th>PayPal status</th><th>Parcel</th><th>Seller can now</th><th>Precedent</th></tr>
+              <tr><th>Dispute</th><th>PayPal status</th><th>Parcel</th><th>Seller can now</th><th>MediateAI</th></tr>
             </thead>
             <tbody>
               {account.disputes.map((d) => (

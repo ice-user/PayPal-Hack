@@ -48,7 +48,7 @@ Read first: `docs/BRIEF.md` (decisions and rules), then `docs/DESIGN.md` (sectio
 
 ## 1. The product in three sentences
 
-Precedent is a web dashboard for PayPal merchants. It detects a dispute spike, finds
+MediateAI is a web dashboard for PayPal merchants. It detects a dispute spike, finds
 similar past cases, explains why, proposes typed actions, and, after policy checks
 and a human click, executes them through the PayPal Sandbox. It then records the
 outcome as a new case. The demo merchant and its orders are synthetic; PayPal

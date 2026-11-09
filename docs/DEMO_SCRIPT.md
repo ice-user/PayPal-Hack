@@ -14,9 +14,9 @@ wherever the screen says it.
 
 | Time | Screen | Voiceover (aim for about 2.6 words per second) |
 |---|---|---|
-| 0:00 to 0:15 | Title card, then dashboard on situation A | "Disputes cost PayPal merchants money and time. The usual tools tell you the rate went up. They do not tell you why, or what worked last time. Precedent does." |
+| 0:00 to 0:15 | Title card, then dashboard on situation A | "Disputes cost PayPal merchants money and time. The usual tools tell you the rate went up. They do not tell you why, or what worked last time. MediateAI does." |
 | 0:15 to 0:40 | Left column: rate, 4.4x, confidence interval, anomaly p-value, signals | "This store's dispute rate is four times its baseline, and the test says it is not noise. The signals say why: most disputes sit on one carrier, orders ship on time, and few disputed parcels show a delivery scan." |
-| 0:40 to 1:05 | Middle column: precedents, hover matched/differs chips, badges | "Precedent retrieves similar past cases and shows why each one matches and where it differs. Every case is labelled. These are authored playbook cases; the FTC cases in the library are public records. Nothing pretends to be measured when it is not." |
+| 0:40 to 1:05 | Middle column: precedents, hover matched/differs chips, badges | "MediateAI retrieves similar past cases and shows why each one matches and where it differs. Every case is labelled. These are authored playbook cases; the FTC cases in the library are public records. Nothing pretends to be measured when it is not." |
 | 1:05 to 1:25 | Right column: diagnosis, actions, tier badges, "no numeric forecast" | "The plan cites its cases. Preparing a note runs automatically. Anything a buyer or PayPal would see needs my click. And because no precedent has measured numbers, it refuses to invent a forecast." |
 | 1:25 to 1:50 | Click Approve on the evidence action; show live dispute status and the PayPal tab | "I approve. The backend re-checks the policy, re-reads the real sandbox dispute, and files the evidence through the PayPal Disputes API. Here it is in PayPal's Resolution Center." |
 | 1:50 to 2:15 | Switch A, B, C quickly | "Same symptom, different causes. Spread across carriers with slow shipping, it fixes the backlog and messages buyers. Parcels marked delivered, it files proof of delivery." |

@@ -1,6 +1,6 @@
 {
   "version": "dispute_cases_v0",
-  "description": "Dispute-level cases for TechKart triage. Each records one open item-not-received dispute's shipment facts, the response taken, and whether that response was appropriate or backfired. All authored by the Precedent team from common merchant-operations practice; none is a real incident. Outcomes are qualitative; no case carries a measured win rate.",
+  "description": "Dispute-level cases for TechKart triage. Each records one open item-not-received dispute's shipment facts, the response taken, and whether that response was appropriate or backfired. All authored by the MediateAI team from common merchant-operations practice; none is a real incident. Outcomes are qualitative; no case carries a measured win rate.",
   "fingerprint_fields": {
     "status": "delivered | in_transit | lost | unknown",
     "proof": "none | tracking | confirmation | gps | signature",
