@@ -3,6 +3,7 @@ import { Icon, type IconName } from "./Icon";
 
 const SECTIONS: { id: string; label: string; icon: IconName; apiOnly?: boolean }[] = [
   { id: "decision", label: "Decision", icon: "shield" },
+  { id: "paypal", label: "PayPal", icon: "send", apiOnly: true },
   { id: "evidence", label: "Evidence", icon: "activity" },
   { id: "precedents", label: "Precedents", icon: "book" },
   { id: "history", label: "History", icon: "clock" },

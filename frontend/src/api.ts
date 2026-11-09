@@ -1,4 +1,4 @@
-import type { Bundle, LiveDispute, Mode, SituationIndexEntry } from "./types";
+import type { Bundle, LiveDispute, Mode, PayPalAccount, PayPalCall, SituationIndexEntry } from "./types";
 import indexJson from "@contracts/fixtures/index.json";
 
 /**
@@ -77,6 +77,13 @@ export const approveAction = (situation: string, mode: Mode, action_id: string) 
 
 export const rejectAction = (situation: string, mode: Mode, action_id: string) =>
   call<Bundle>("/api/actions/reject", { method: "POST", body: JSON.stringify({ situation, mode, action_id }) });
+
+/** Re-import disputes from the PayPal sandbox account now (the backend limits how often). */
+export const refreshPayPal = () => call<PayPalAccount>("/api/paypal/refresh", { method: "POST" });
+
+/** The latest requests the backend made to PayPal. */
+export const getPayPalActivity = (limit = 20) =>
+  call<{ host: string; calls: PayPalCall[] }>(`/api/paypal/activity?limit=${limit}`).then((r) => r.calls);
 
 /** Clears this visitor's approvals, outcomes and case reviews. Never touches PayPal. */
 export const resetDemo = () => call<{ ok: boolean }>("/api/demo/reset", { method: "POST" });

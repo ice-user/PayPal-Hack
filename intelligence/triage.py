@@ -55,9 +55,11 @@ def _days(a: str, b: date) -> int:
 def fingerprint(d: dict, today: date) -> dict:
     """Shipment facts for one dispute, in the same fields the dispute cases use."""
     deadline_first = 0
-    if d["shipment_status"] == "in_transit" and d.get("expected_delivery"):
-        # Waiting is only safe if the parcel is due at least a day before the deadline.
-        deadline_first = int(_days(d["expected_delivery"], today) > _days(d["response_due"], today) - 1)
+    if d["shipment_status"] == "in_transit":
+        # Waiting is only safe if the parcel is due at least a day before the deadline. With no
+        # delivery estimate (a PayPal tracker that only says SHIPPED) it is not provably safe.
+        deadline_first = (int(_days(d["expected_delivery"], today) > _days(d["response_due"], today) - 1)
+                          if d.get("expected_delivery") else 1)
     return {"status": d["shipment_status"], "proof": d["proof"], "deadline_first": deadline_first,
             "days_to_due": max(0, _days(d["response_due"], today)), "amount": d["amount"]}
 
@@ -109,9 +111,11 @@ def _batches(disputes: list[dict], cap: float) -> list[list[dict]]:
 
 
 def _real_ids(group: list[dict], sandbox: dict[str, str]) -> list[str]:
-    """Real PayPal sandbox dispute IDs mapped to this group's shipment state, if configured."""
-    states = {d["shipment_status"] for d in group}
-    return [sandbox[s] for s in sorted(states) if s in sandbox]
+    """Real PayPal sandbox dispute IDs for this group: disputes imported from PayPal act on
+    themselves; synthetic ones use the optional shipment-state -> sandbox dispute table."""
+    own = [d["dispute_id"] for d in group if d.get("paypal")]
+    states = {d["shipment_status"] for d in group if not d.get("paypal")}
+    return own + [sandbox[s] for s in sorted(states) if s in sandbox and sandbox[s] not in own]
 
 
 def triage(disputes: list[dict], today: date, *, cases: list[dict] | None = None, carrier: str = "the carrier",
@@ -127,15 +131,15 @@ def triage(disputes: list[dict], today: date, *, cases: list[dict] | None = None
     inr = [d for d in disputes if d["reason"] == "ITEM_NOT_RECEIVED"]
     decided = [(d, decide(d, cases, today)) for d in inr]
 
-    grouped: dict[str, list[tuple[dict, dict]]] = defaultdict(list)
+    grouped: dict[tuple[str, bool], list[tuple[dict, dict]]] = defaultdict(list)
     for d, dec in decided:
-        grouped[dec["response"]].append((d, dec))
+        grouped[(dec["response"], bool(d.get("paypal")))].append((d, dec))
 
     order = list(RESPONSES)
     actions, groups = [], []
     idx = start_index
-    for response in sorted(grouped, key=order.index):
-        members = grouped[response]
+    for response, live in sorted(grouped, key=lambda g: (g[1] is False, order.index(g[0]))):
+        members = grouped[(response, live)]
         group_disputes = [d for d, _ in members]
         backers = sorted({b for _, dec in members for b in dec["backers"]})
         warnings = sorted({w for _, dec in members for w in dec["warnings"]})
@@ -147,10 +151,11 @@ def triage(disputes: list[dict], today: date, *, cases: list[dict] | None = None
             total = round(sum(d["amount"] for d in chunk), 2)
             due = min(d["response_due"] for d in chunk)
             batch = f" (batch {n} of {len(chunks)})" if len(chunks) > 1 else ""
-            title = f"{label}: {len(chunk)} dispute{'s' if len(chunk) != 1 else ''}{batch}"
+            where = " in PayPal" if live else ""
+            title = f"{label}: {len(chunk)} dispute{'s' if len(chunk) != 1 else ''}{where}{batch}"
             params = {
                 "triage_group": response, "response": response, "dispute_count": len(chunk),
-                "synthetic_dispute_ids": [d["dispute_id"] for d in chunk],
+                "synthetic_dispute_ids": [d["dispute_id"] for d in chunk if not d.get("paypal")],
                 "dispute_ids": _real_ids(chunk, sandbox) if external else [],
                 "earliest_due": due, "asserts_delivery": asserts, "total_value": total,
             }
@@ -188,12 +193,14 @@ def triage(disputes: list[dict], today: date, *, cases: list[dict] | None = None
             "earliest_due": min(d["response_due"] for d in group_disputes),
             "action_ids": group_action_ids, "cites": backers, "warnings": warnings,
             "confidence": round(sum(dec["confidence"] for _, dec in members) / len(members), 2),
+            "paypal": live,
         })
 
     rows = [{"dispute_id": d["dispute_id"], "order_id": d["order_id"], "carrier": d["carrier"], "sku": d["sku"],
              "amount": d["amount"], "status": d["shipment_status"], "proof": d["proof"],
              "expected_delivery": d.get("expected_delivery"), "response_due": d["response_due"],
-             "response": dec["response"]} for d, dec in sorted(decided, key=lambda t: t[0]["response_due"])]
+             "response": dec["response"], "paypal": bool(d.get("paypal"))}
+            for d, dec in sorted(decided, key=lambda t: (not t[0].get("paypal"), t[0]["response_due"]))]
     used = sorted({c for g in groups for c in g["cites"] + g["warnings"]})
     precedents = [{"case_id": c, "title": by_id[c]["title"], "response": by_id[c]["response"],
                    "appropriate": by_id[c]["appropriate"], "outcome": by_id[c]["outcome"]} for c in used]
@@ -242,5 +249,6 @@ def generic_triage(disputes: list[dict], *, start_index: int = 1) -> dict:
     rows = [{"dispute_id": d["dispute_id"], "order_id": d["order_id"], "carrier": d["carrier"], "sku": d["sku"],
              "amount": d["amount"], "status": d["shipment_status"], "proof": d["proof"],
              "expected_delivery": d.get("expected_delivery"), "response_due": d["response_due"],
-             "response": plan[d["dispute_id"]]} for d in sorted(inr, key=lambda x: x["response_due"])]
+             "response": plan[d["dispute_id"]], "paypal": bool(d.get("paypal"))}
+            for d in sorted(inr, key=lambda x: (not x.get("paypal"), x["response_due"]))]
     return {"actions": actions, "groups": groups, "rows": rows, "precedents": [], "untriaged": len(disputes) - len(inr)}

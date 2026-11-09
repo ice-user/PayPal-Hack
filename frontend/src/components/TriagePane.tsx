@@ -38,7 +38,7 @@ export function TriagePane({ triage, generic }: { triage: Triage; generic: boole
       pill={<Pill tone="neutral">{total} disputes</Pill>}
       sub={generic
         ? "Without precedent: one generic remedy for every dispute. Shipment state and deadlines are not checked."
-        : "Each dispute is matched to past dispute cases by its parcel's real state and deadline. Cases that backfired are shown as warnings."}
+        : "Each dispute is matched to past dispute cases by its parcel's real state and deadline. Cases that backfired are shown as warnings. Rows marked PayPal were imported live from the PayPal sandbox account."}
       footer={
         <button className="link-btn" onClick={() => setShowRows(!showRows)} aria-expanded={showRows}>
           {showRows ? "Hide individual disputes" : `Show all ${total} disputes`} <Icon name="chevron" size={14} />
@@ -52,7 +52,10 @@ export function TriagePane({ triage, generic }: { triage: Triage; generic: boole
           <tbody>
             {triage.groups.map((g) => (
               <tr key={g.response}>
-                <td>{g.states.join(", ")}</td>
+                <td>
+                  {g.states.join(", ")}
+                  {g.paypal && <> <Pill tone="info">Live in PayPal</Pill></>}
+                </td>
                 <td className="num">{g.count}</td>
                 <td className="num nowrap">{money(g.total_value)}</td>
                 <td className="nowrap">{shortDay(g.earliest_due)}</td>
@@ -89,7 +92,7 @@ export function TriagePane({ triage, generic }: { triage: Triage; generic: boole
             <tbody>
               {triage.rows.map((r) => (
                 <tr key={r.dispute_id}>
-                  <td><code>{r.dispute_id}</code></td>
+                  <td><code>{r.dispute_id}</code>{r.paypal && <> <Pill tone="info">PayPal</Pill></>}</td>
                   <td className="nowrap">{r.carrier}</td>
                   <td>{r.sku}</td>
                   <td className="num">{money(r.amount)}</td>

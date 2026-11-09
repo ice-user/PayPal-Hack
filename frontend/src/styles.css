@@ -143,6 +143,13 @@ code { font: var(--t-xs)/1.4 "Geist Mono", ui-monospace, "Cascadia Mono", Consol
 .crumbs { display: flex; align-items: center; gap: 6px; font-size: var(--t-base); min-width: 0; color: var(--muted); }
 .crumb-current { color: var(--fg); font-weight: var(--w-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: var(--s-2); }
+.calls { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2) var(--s-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.calls li { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--s-2); align-items: baseline; font-size: var(--t-sm); }
+.call-status { font-family: var(--mono, ui-monospace, monospace); font-size: var(--t-xs); padding: 1px 6px; border-radius: 6px; border: var(--border-w) solid var(--line); }
+.call-status.ok { color: var(--good, #3fb950); }
+.call-status.bad { color: var(--bad, #f85149); }
+.call-path { overflow-wrap: anywhere; font-size: var(--t-xs); }
+.call-meta { grid-column: 2; font-size: var(--t-xs); }
 .topbar-reset { height: 32px; padding: 0 var(--s-2); color: var(--fg-2); }
 .topbar-reset:disabled { opacity: .6; cursor: progress; }
 .progress { position: sticky; top: 56px; z-index: 5; height: 2px; overflow: hidden; }

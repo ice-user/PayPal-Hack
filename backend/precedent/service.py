@@ -21,6 +21,7 @@ from .executor import CLIENT_STATE, ActionError, Executor  # noqa: E402
 from .orders import generate  # noqa: E402
 from .outcomes import live_simulated_case, simulate  # noqa: E402
 from .paypal_adapter import PayPalAdapter, load_env  # noqa: E402
+from .paypal_feed import PayPalFeed  # noqa: E402
 from .scenarios import DEMO  # noqa: E402
 from .situation_builder import build  # noqa: E402
 from .store import Store  # noqa: E402
@@ -127,26 +128,46 @@ def static_bundle(situation: dict, cases: list[dict], mode: str, disputes: list[
 
 
 def plan(situation: dict, cases: list[dict], mode: str, writer=None, retriever=retrieve,
-         disputes: list[dict] | None = None) -> tuple[dict, list[dict]]:
+         disputes: list[dict] | None = None, live: list[dict] | None = None,
+         live_version: int = 0) -> tuple[dict, list[dict]]:
     precedents = retriever(situation, cases, k=6) if mode == "with_precedent" else []
     rec = recommend(situation, precedents, mode=mode, writer=writer,
                     created_at=situation["window"]["end"] + "T09:00:00Z")
-    if disputes:
-        rec = with_triage(rec, situation, disputes, mode)
+    if disputes or live:
+        rec = with_triage(rec, situation, disputes or [], mode, live=live)
+    if live and live_version:
+        # New PayPal data means new actions: a fresh recommendation ID keeps their approval
+        # state apart from the previous import's.
+        rec = dict(rec, recommendation_id=f"{rec['recommendation_id']}_pp{live_version}")
     return rec, gate_reference.decide(rec)
 
 
-def with_triage(rec: dict, situation: dict, disputes: list[dict], mode: str) -> dict:
+def _merge_triage(first: dict, second: dict) -> dict:
+    seen = {p["case_id"] for p in first["precedents"]}
+    return {"actions": first["actions"] + second["actions"], "groups": first["groups"] + second["groups"],
+            "rows": first["rows"] + second["rows"],
+            "precedents": first["precedents"] + [p for p in second["precedents"] if p["case_id"] not in seen],
+            "untriaged": first["untriaged"] + second["untriaged"]}
+
+
+def with_triage(rec: dict, situation: dict, disputes: list[dict], mode: str, live: list[dict] | None = None) -> dict:
     """Add dispute-level triage (TechKart). With precedent: case-based triage per dispute.
     Without: the spec's generic consultant. See docs/TECHKART_TEST_ENV.md."""
-    from datetime import date
+    from datetime import date, datetime, timezone
     start = len(rec["actions"]) + 1
+    carrier = situation["features"]["concentration"].get("top_carrier") or "the carrier"
     if mode == "with_precedent":
-        t = triage(disputes, date.fromisoformat(situation["window"]["end"]), cases=load_dispute_cases(),
-                   carrier=situation["features"]["concentration"].get("top_carrier") or "the carrier",
-                   sandbox=techkart_sandbox(), start_index=start)
+        cases = load_dispute_cases()
+        # Disputes imported from PayPal come first and are judged against today's date; the
+        # synthetic TechKart disputes against the feed's last day.
+        t = (triage(live, datetime.now(timezone.utc).date(), cases=cases, carrier=carrier, start_index=start)
+             if live else None)
+        rest = triage(disputes, date.fromisoformat(situation["window"]["end"]), cases=cases, carrier=carrier,
+                      sandbox=techkart_sandbox(), start_index=start + len(t["actions"]) if t else start)
     else:
-        t = generic_triage(disputes, start_index=start)
+        t = generic_triage(live, start_index=start) if live else None
+        rest = generic_triage(disputes, start_index=start + len(t["actions"]) if t else start)
+    t = _merge_triage(t, rest) if t else rest
     actions = t.pop("actions")
     rec = dict(rec, actions=rec["actions"] + actions, triage=t)
     validate("recommendation", rec)
@@ -163,8 +184,9 @@ class Service:
         self.cases = usable(load_cases())
         self.situations = {k: demo_situation(k) for k in SITUATION_KEYS}
         self.disputes = {k: demo_disputes(k) for k in SITUATION_KEYS}
-        self._plans: dict[tuple[str, str], tuple[dict, list[dict]]] = {}
+        self._plans: dict[tuple[str, str, int], tuple[dict, list[dict]]] = {}
         self._shared: Service | None = None
+        self.feed = PayPalFeed(self.adapter, ttl=float(load_env().get("PRECEDENT_PAYPAL_TTL", "60") or 60))
 
     def fork(self) -> Service:
         """A private workspace for one visitor of a public deployment: its own in-memory store
@@ -175,20 +197,27 @@ class Service:
         child.adapter, child.retriever = self.adapter, self.retriever
         child.executor = Executor(child.store, self.adapter, max_external_per_hour=self.executor.max_per_hour)
         child.cases, child.situations, child.disputes = self.cases, self.situations, self.disputes
-        child._plans, child._shared = {}, self
+        child._plans, child._shared, child.feed = {}, self, self.feed
         return child
 
     def _cached_plan(self, key: str, mode: str) -> tuple[dict, list[dict]]:
-        cache_key = (key, mode)
+        # A fork with no visitor-approved cases plans from the same library as its parent, so it
+        # reuses the parent's plan (plans are read-only once made), including PayPal refreshes.
+        if self._shared is not None and len(self.library()) == len(self.cases):
+            return self._shared._cached_plan(key, mode)
+        live, version = None, 0
+        if key == "T":  # TechKart also triages the disputes imported from the PayPal sandbox account
+            snap = self.feed.snapshot()
+            live = snap["triage"] or None
+            version = snap["version"] if live else 0
+        cache_key = (key, mode, version)
         if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
-            # A fork with no visitor-approved cases plans from the same library as its parent, so it
-            # reuses the parent's plan (plans are read-only once made).
-            if self._shared is not None and len(self.library()) == len(self.cases):
-                self._plans[cache_key] = self._shared._cached_plan(key, mode)
-            else:
-                situation = self.situations[key]
-                self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation),
-                                             retriever=self.retriever, disputes=self.disputes.get(key))
+            for old in [k for k in self._plans if k[:2] == (key, mode)]:
+                del self._plans[old]
+            situation = self.situations[key]
+            self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation),
+                                         retriever=self.retriever, disputes=self.disputes.get(key),
+                                         live=live, live_version=version)
         return self._plans[cache_key]
 
     def _plan(self, key: str, mode: str) -> tuple[dict, dict, list[dict]]:
@@ -231,7 +260,8 @@ class Service:
                 outcome.update(new_case_id=case_id, case_review_status=case["review_status"] if case else "pending")
         bundle = {"situation": situation, "recommendation": rec, "policy_decisions": decisions,
                   "action_states": states, "outcome": outcome,
-                  "timeline": timeline(situation, rec, decisions, states, outcome)}
+                  "timeline": timeline(situation, rec, decisions, states, outcome),
+                  "paypal": self.feed.public()}
         validate("bundle", bundle)
         return bundle
 

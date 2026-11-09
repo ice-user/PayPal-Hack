@@ -40,6 +40,15 @@
         "case_review_status": {"type": "string", "enum": ["pending", "approved", "rejected"]}
       }
     },
+    "paypal": {
+      "description": "API mode only: live view of the connected PayPal sandbox account. Imported disputes with their PayPal status, allowed seller actions and shipment trackers (backend/precedent/paypal_feed.py).",
+      "type": "object",
+      "required": ["connected", "disputes"],
+      "properties": {
+        "connected": { "type": "boolean" },
+        "disputes": { "type": "array", "items": { "type": "object", "required": ["dispute_id", "status"] } }
+      }
+    },
     "timeline": {
       "type": "array",
       "items": {

@@ -117,19 +117,34 @@ interface ActionsProps {
   views: Record<string, ActionView>;
   busy: string | null;
   disputeIds: string[];
+  /** Action types this deployment runs for real in PayPal (["ALL"] = all), or null for none. */
+  realActions?: string[] | null;
   onApprove: (a: Action) => void;
   onReject: (a: Action) => void;
   onOpenCase: (caseId: string) => void;
 }
 
-export function ActionsPane({ rec, decisions, views, busy, disputeIds, onApprove, onReject, onOpenCase }: ActionsProps) {
+/** The real PayPal sandbox disputes an action would act on. Dispute-level actions name their own. */
+function targetsOf(a: Action, situationIds: string[]): string[] {
+  const own = a.params?.dispute_ids;
+  if (Array.isArray(own) && own.length) return own as string[];
+  return a.params?.triage_group ? [] : situationIds;
+}
+
+function confirmTextFor(a: Action, targets: string[], realActions: string[] | null | undefined): string {
+  if (!targets.length)
+    return "No PayPal sandbox dispute is linked to this action, so it runs as a labelled simulation. Nothing reaches PayPal.";
+  const where = targets.length === 1 ? `PayPal sandbox dispute ${targets[0]}` : `PayPal sandbox disputes ${targets.join(", ")}`;
+  if (realActions === null || (realActions && !realActions.includes("ALL") && !realActions.includes(a.type)))
+    return `Linked to ${where}, but this deployment keeps ${a.type.replaceAll("_", " ").toLowerCase()} simulated. The backend still reads the dispute live from PayPal first.`;
+  return `This goes to ${where}. The backend re-reads the dispute from PayPal first; if PayPal does not allow this action right now, it runs as a labelled simulation instead.`;
+}
+
+export function ActionsPane({ rec, decisions, views, busy, disputeIds, realActions, onApprove, onReject, onOpenCase }: ActionsProps) {
   const [confirming, setConfirming] = useState<string | null>(null);
   const byId = Object.fromEntries(decisions.map((d) => [d.action_id, d]));
   const stateOf = (a: Action) => views[a.action_id]?.state ?? "proposed";
   const waiting = rec.actions.filter((a) => byId[a.action_id]?.decision === "NEEDS_APPROVAL" && stateOf(a) === "proposed").length;
-  const confirmText = disputeIds.length
-    ? `This goes to PayPal sandbox dispute ${disputeIds[0]}. The backend re-checks the dispute first; if PayPal does not allow this action right now, it runs as a labelled simulation instead.`
-    : "No PayPal sandbox dispute is linked to this situation, so this runs as a labelled simulation. Nothing reaches PayPal.";
 
   return (
     <Pane id="actions" className="pane-actions" title="Proposed actions"
@@ -154,6 +169,7 @@ export function ActionsPane({ rec, decisions, views, busy, disputeIds, onApprove
             const needsYou = d?.decision === "NEEDS_APPROVAL" && view.state === "proposed";
             const isBusy = busy === a.action_id;
             const confirmNeeded = d?.tier === "EXTERNAL" || d?.tier === "MONEY";
+            const targets = d?.tier === "PREPARE" ? [] : targetsOf(a, disputeIds);
             return (
               <li key={a.action_id} className={`action ${needsYou ? "needs-you" : ""} decision-${d?.decision.toLowerCase() ?? "none"}`}>
                 <div className="action-index" aria-hidden="true">{i + 1}</div>
@@ -161,6 +177,7 @@ export function ActionsPane({ rec, decisions, views, busy, disputeIds, onApprove
                   <div className="action-kicker">
                     <span>{ACTION_LABEL[a.type] ?? a.type}</span>
                     {d && <span className={`gate gate-${d.decision.toLowerCase()}`}>{DECISION_LABEL[d.decision]}</span>}
+                    {targets.length > 0 && <Pill tone="info">PayPal {targets.join(", ")}</Pill>}
                   </div>
                   <h4 className="action-title">{a.title ?? a.type}</h4>
                   {reach && (
@@ -204,11 +221,11 @@ export function ActionsPane({ rec, decisions, views, busy, disputeIds, onApprove
                   )}
                   {needsYou && confirming === a.action_id && (
                     <div className="confirm" role="group" aria-label="Confirm approval">
-                      <p>{confirmText}</p>
+                      <p>{confirmTextFor(a, targets, realActions)}</p>
                       <div className="decide">
                         <button className="btn primary" autoFocus disabled={busy !== null}
                           onClick={() => { setConfirming(null); onApprove(a); }}>
-                          <Icon name="send" size={14} /> {disputeIds.length ? "Confirm and send" : "Confirm"}
+                          <Icon name="send" size={14} /> {targets.length ? "Confirm and send" : "Confirm"}
                         </button>
                         <button className="btn ghost" onClick={() => setConfirming(null)}>Cancel</button>
                       </div>

@@ -170,6 +170,34 @@ def audit(limit: int = 50, s: Service = Depends(workspace)) -> dict:
     return {"events": s.store.audit_tail(min(limit, 500))}
 
 
+_last_refresh = [0.0]
+
+
+@app.get("/api/paypal/account")
+def paypal_account() -> dict:
+    """The connected sandbox account as Precedent sees it: imported disputes, PayPal status,
+    allowed seller actions and trackers. Cached and shared by all visitors."""
+    return service().feed.public()
+
+
+@app.post("/api/paypal/refresh")
+def paypal_refresh() -> dict:
+    """Re-import disputes from PayPal now (at most once every 10 seconds across all visitors)."""
+    s = service()
+    force = time.monotonic() - _last_refresh[0] >= 10
+    if force:
+        _last_refresh[0] = time.monotonic()
+    return s.feed.public(s.feed.snapshot(force=force))
+
+
+@app.get("/api/paypal/activity")
+def paypal_activity(limit: int = Query(default=25, ge=1, le=60)) -> dict:
+    """The latest requests this deployment made to PayPal: method, path, HTTP status, latency.
+    Paths contain sandbox IDs only; no tokens, bodies or personal data are recorded."""
+    a = service().adapter
+    return {"host": a.base, "calls": list(a.activity)[:limit]}
+
+
 @app.get("/api/paypal/disputes/{dispute_id}")
 def paypal_dispute(dispute_id: str) -> dict:
     s = service()

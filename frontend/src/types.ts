@@ -114,6 +114,8 @@ export interface TriageGroup {
   cites: string[];
   warnings: string[];
   confidence: number;
+  /** True when these disputes were imported from the connected PayPal sandbox account. */
+  paypal?: boolean;
 }
 export interface TriageRow {
   dispute_id: string;
@@ -126,6 +128,7 @@ export interface TriageRow {
   expected_delivery: string | null;
   response_due: string;
   response: string;
+  paypal?: boolean;
 }
 export interface Triage {
   groups: TriageGroup[];
@@ -175,6 +178,44 @@ export interface Bundle {
   timeline: TimelineEvent[];
   action_states?: Record<string, ServerActionState>;
   outcome?: Outcome | null;
+  paypal?: PayPalAccount;
+}
+
+/** A dispute on the connected PayPal sandbox account, as imported by the backend. */
+export interface PayPalDispute {
+  dispute_id: string;
+  reason: string | null;
+  status: string;
+  stage: string | null;
+  amount: { currency_code: string; value: string } | null;
+  created: string | null;
+  response_due: string;
+  allowed: string[];
+  item: string;
+  transaction_id: string;
+  shipment_status: "delivered" | "in_transit" | "lost" | "unknown";
+  tracker_status: string | null;
+  tracking_number: string | null;
+  triaged: boolean;
+}
+
+export interface PayPalAccount {
+  connected: boolean;
+  fetched_at: string | null;
+  error: string | null;
+  host?: string;
+  disputes: PayPalDispute[];
+  /** Action types this deployment runs for real (["ALL"] = every type), or null when none. */
+  real_actions?: string[] | null;
+  real_calls_per_hour?: number | null;
+}
+
+export interface PayPalCall {
+  at: string;
+  method: string;
+  path: string;
+  status: number;
+  ms: number;
 }
 
 export interface LiveDispute {

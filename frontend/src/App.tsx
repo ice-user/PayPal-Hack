@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Action, ActionState, Bundle, LiveDispute, Mode, TimelineEvent } from "./types";
 import {
-  advanceClock, approveAction, dataMode, resetDemo, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
+  advanceClock, approveAction, dataMode, refreshPayPal, resetDemo, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
   type AuditEvent,
 } from "./api";
 import thresholds from "@contracts/thresholds.json";
@@ -11,6 +11,7 @@ import { PrecedentsPanel } from "./components/PrecedentsPanel";
 import { ActionsPane, DiagnosisPane, NextStep, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
 import { TriagePane } from "./components/TriagePane";
+import { PayPalAccountPane, PayPalActivityPane } from "./components/PayPalPane";
 import { CaseDrawer } from "./components/CaseDrawer";
 import { Section } from "./components/Card";
 import { Sidebar, Topbar } from "./components/Shell";
@@ -234,6 +235,14 @@ export default function App() {
     if (b) toast("info", "Demo reset. Your approvals and simulated outcomes are cleared; PayPal was not touched.");
   };
 
+  const refreshFromPayPal = async () => {
+    const b = await run("paypal", async () => {
+      await refreshPayPal();
+      return getBundle(key, mode);
+    });
+    if (b) toast("info", b.paypal?.error ?? "Read the account again from PayPal.");
+  };
+
   const canAdvance =
     API && !!bundle && !bundle.outcome &&
     bundle.policy_decisions.some((d) => d.decision === "NEEDS_APPROVAL" && views[d.action_id]?.state === "succeeded");
@@ -301,6 +310,7 @@ export default function App() {
                       views={views}
                       busy={busy}
                       disputeIds={bundle.situation.paypal_dispute_ids ?? []}
+                      realActions={bundle.paypal ? bundle.paypal.real_actions ?? null : undefined}
                       onApprove={approve}
                       onReject={reject}
                       onOpenCase={setOpenCase}
@@ -317,6 +327,20 @@ export default function App() {
                   />
                 </div>
               </Section>
+
+              {API && bundle.paypal && (
+                <Section id="paypal" title="PayPal"
+                  sub="Precedent's PayPal integration, live: the sandbox account it reads disputes and tracking from, and every request it makes.">
+                  <div className="panel">
+                    <div className="split split-1">
+                      <PayPalAccountPane account={bundle.paypal} onRefresh={refreshFromPayPal} refreshing={busy === "paypal"} />
+                    </div>
+                    <div className="split split-1">
+                      <PayPalActivityPane tick={bundle} />
+                    </div>
+                  </div>
+                </Section>
+              )}
 
               <Section id="evidence" title="Evidence" sub="Why the consultant thinks so: the numbers, then the past cases behind the plan.">
                 <div className="panel">
