@@ -112,9 +112,12 @@ interface TopbarProps {
   theme: "dark" | "light";
   onTheme: () => void;
   onToggleSidebar: () => void;
+  /** API mode only: clears this visitor's approvals and simulated outcomes. */
+  onReset?: () => void;
+  resetting?: boolean;
 }
 
-export function Topbar({ label, mode, onMode, theme, onTheme, onToggleSidebar }: TopbarProps) {
+export function Topbar({ label, mode, onMode, theme, onTheme, onToggleSidebar, onReset, resetting }: TopbarProps) {
   return (
     <header className="topbar">
       <button className="icon-btn" onClick={onToggleSidebar} aria-label="Toggle sidebar"><Icon name="panel" /></button>
@@ -129,6 +132,12 @@ export function Topbar({ label, mode, onMode, theme, onTheme, onToggleSidebar }:
           <button aria-pressed={mode === "with_precedent"} onClick={() => onMode("with_precedent")}>With precedent</button>
           <button aria-pressed={mode === "no_precedent"} onClick={() => onMode("no_precedent")}>Without</button>
         </div>
+        {onReset && (
+          <button className="btn topbar-reset" onClick={onReset} disabled={resetting} aria-label="Reset demo"
+            title="Start the demo again: clears your approvals and simulated outcomes. Nothing is sent to PayPal.">
+            {resetting ? "Resetting…" : <>Reset<span className="wide-only"> demo</span></>}
+          </button>
+        )}
         <button className="icon-btn" onClick={onTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
           <Icon name={theme === "dark" ? "sun" : "moon"} />
         </button>

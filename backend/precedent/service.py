@@ -164,18 +164,39 @@ class Service:
         self.situations = {k: demo_situation(k) for k in SITUATION_KEYS}
         self.disputes = {k: demo_disputes(k) for k in SITUATION_KEYS}
         self._plans: dict[tuple[str, str], tuple[dict, list[dict]]] = {}
+        self._shared: Service | None = None
+
+    def fork(self) -> Service:
+        """A private workspace for one visitor of a public deployment: its own in-memory store
+        (approvals, outcomes, case reviews, audit), executor and plan cache. It shares the
+        read-only parts: case library, situations, synthetic disputes, retriever and adapter."""
+        child = object.__new__(Service)
+        child.store = Store(":memory:")
+        child.adapter, child.retriever = self.adapter, self.retriever
+        child.executor = Executor(child.store, self.adapter, max_external_per_hour=self.executor.max_per_hour)
+        child.cases, child.situations, child.disputes = self.cases, self.situations, self.disputes
+        child._plans, child._shared = {}, self
+        return child
+
+    def _cached_plan(self, key: str, mode: str) -> tuple[dict, list[dict]]:
+        cache_key = (key, mode)
+        if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
+            # A fork with no visitor-approved cases plans from the same library as its parent, so it
+            # reuses the parent's plan (plans are read-only once made).
+            if self._shared is not None and len(self.library()) == len(self.cases):
+                self._plans[cache_key] = self._shared._cached_plan(key, mode)
+            else:
+                situation = self.situations[key]
+                self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation),
+                                             retriever=self.retriever, disputes=self.disputes.get(key))
+        return self._plans[cache_key]
 
     def _plan(self, key: str, mode: str) -> tuple[dict, dict, list[dict]]:
         if key not in self.situations or mode not in MODES:
             raise ActionError(404, f"Unknown situation {key!r} or mode {mode!r}.")
-        situation = self.situations[key]
-        cache_key = (key, mode)
-        if cache_key not in self._plans:  # the LLM writer (if enabled) runs once per plan, not per request
-            self._plans[cache_key] = plan(situation, self.library(), mode, writer=make_writer(situation),
-                                         retriever=self.retriever, disputes=self.disputes.get(key))
-        rec, decisions = self._plans[cache_key]
+        rec, decisions = self._cached_plan(key, mode)
         self.executor.register(rec, decisions)
-        return situation, rec, decisions
+        return self.situations[key], rec, decisions
 
     def library(self) -> list[dict]:
         """Static approved cases plus live_simulated cases a human approved. Simulated cases

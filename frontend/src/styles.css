@@ -143,6 +143,8 @@ code { font: var(--t-xs)/1.4 "Geist Mono", ui-monospace, "Cascadia Mono", Consol
 .crumbs { display: flex; align-items: center; gap: 6px; font-size: var(--t-base); min-width: 0; color: var(--muted); }
 .crumb-current { color: var(--fg); font-weight: var(--w-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: var(--s-2); }
+.topbar-reset { height: 32px; padding: 0 var(--s-2); color: var(--fg-2); }
+.topbar-reset:disabled { opacity: .6; cursor: progress; }
 .progress { position: sticky; top: 56px; z-index: 5; height: 2px; overflow: hidden; }
 .progress.on::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; background: var(--info); animation: slide 900ms var(--ease) infinite; }
 @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
@@ -500,6 +502,9 @@ code { font: var(--t-xs)/1.4 "Geist Mono", ui-monospace, "Cascadia Mono", Consol
   .facts div + div { padding-left: 0; border-left: 0; border-top: var(--border-w) solid var(--line); padding-bottom: var(--s-2); }
   .crumbs > .icon:first-child, .crumbs > span:first-of-type, .crumb-sep, .topbar-sep { display: none; }
   .segmented button { padding: var(--s-1) var(--s-2); font-size: var(--t-xs); }
+  .topbar-right { gap: var(--s-1); }
+  .topbar-reset { font-size: var(--t-xs); padding: 0 var(--s-2); }
+  .wide-only { display: none; }
   .action { padding: var(--s-3); gap: var(--s-3); }
   .action-index { display: none; }
   .action { grid-template-columns: minmax(0, 1fr); }

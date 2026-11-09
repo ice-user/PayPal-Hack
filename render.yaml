@@ -1,0 +1,21 @@
+# Render Blueprint: one public web service (API + dashboard on one URL) for the judges.
+# In Render: New > Blueprint > pick this repository. Render builds the Dockerfile.
+#
+# Safe for the public: every PayPal step is simulated (PRECEDENT_REAL_EXECUTION=0) and each
+# browser gets its own in-memory demo workspace (PRECEDENT_PER_VISITOR=1). No secrets are needed.
+# The real sandbox call is shown in the demo video, from a private local run.
+services:
+  - type: web
+    name: precedent
+    runtime: docker
+    plan: starter            # always on (no cold start); "free" also works but sleeps when idle
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: PRECEDENT_REAL_EXECUTION
+        value: "0"
+      - key: PRECEDENT_PER_VISITOR
+        value: "1"
+      - key: PRECEDENT_LLM_WRITER
+        value: "0"

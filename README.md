@@ -176,10 +176,24 @@ docker build -t precedent .
 docker run -p 8000:8000 --env-file backend/.env precedent
 ```
 
-Any host that runs a Dockerfile works (for example Render or Fly.io). Set the PayPal
-variables from `backend/.env.example` as secrets in the host's settings; never bake them
-into the image. Not yet built here (Docker is not installed on the dev machine). The
-same-origin setup was checked locally by serving the built dashboard from the API.
+**Public demo on Render (for judges):** [`render.yaml`](render.yaml) is a Render Blueprint.
+In Render choose New, then Blueprint, and pick this repository (branch `main`). It builds the
+Dockerfile as one always-on web service with a health check on `/api/health`. No secrets are
+needed:
+- `PRECEDENT_REAL_EXECUTION=0`: every PayPal step is simulated and labelled. The real
+  sandbox call is shown in the video from a private local run.
+- `PRECEDENT_PER_VISITOR=1`: each browser gets its own in-memory demo workspace, keyed by a
+  random id the dashboard keeps in local storage. One judge's approvals, simulated clock and
+  case reviews never appear for another. **Reset demo** in the top bar clears only your own
+  workspace. Workspaces are dropped after 12 idle hours or past 500 visitors
+  (`PRECEDENT_VISITOR_IDLE_HOURS`, `PRECEDENT_MAX_VISITORS`), and all of them on restart.
+
+Any other host that runs a Dockerfile works too (for example Fly.io). For a private
+deployment with real sandbox calls, set the PayPal variables from `backend/.env.example` as
+secrets in the host's settings (never bake them into the image), and leave
+`PRECEDENT_PER_VISITOR` unset. The image has not been built here (Docker is not installed on
+the dev machine). Its exact file layout and environment were checked locally by running
+uvicorn on a copy of only what the Dockerfile copies.
 
 On Windows Git Bash, prefix local builds that set `VITE_API_BASE=/` with
 `MSYS_NO_PATHCONV=1`. Otherwise Bash rewrites `/` into a Windows path.

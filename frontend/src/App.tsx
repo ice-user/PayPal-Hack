@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Action, ActionState, Bundle, LiveDispute, Mode, TimelineEvent } from "./types";
 import {
-  advanceClock, approveAction, dataMode, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
+  advanceClock, approveAction, dataMode, resetDemo, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
   type AuditEvent,
 } from "./api";
 import thresholds from "@contracts/thresholds.json";
@@ -226,6 +226,14 @@ export default function App() {
     if (b) toast(decision === "approved" ? "good" : "info", decision === "approved" ? "Added to the case library as a simulated case." : "Case discarded.");
   };
 
+  const reset = async () => {
+    const b = await run("reset", async () => {
+      await resetDemo();
+      return getBundle(key, mode);
+    });
+    if (b) toast("info", "Demo reset. Your approvals and simulated outcomes are cleared; PayPal was not touched.");
+  };
+
   const canAdvance =
     API && !!bundle && !bundle.outcome &&
     bundle.policy_decisions.some((d) => d.decision === "NEEDS_APPROVAL" && views[d.action_id]?.state === "succeeded");
@@ -258,6 +266,8 @@ export default function App() {
           theme={theme}
           onTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
           onToggleSidebar={toggleSidebar}
+          onReset={API ? reset : undefined}
+          resetting={busy === "reset"}
         />
         <div className={`progress ${loading && bundle ? "on" : ""}`} aria-hidden="true" />
 

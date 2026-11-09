@@ -15,12 +15,15 @@ RUN cd frontend && VITE_API_BASE=/ npx tsc --noEmit -p . && VITE_API_BASE=/ npx 
 FROM python:3.12-slim
 WORKDIR /app
 # Public by default: approvals simulate instead of calling PayPal. Set PRECEDENT_REAL_EXECUTION=1
-# only on a private deployment you control.
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PRECEDENT_STATIC_DIR=/app/frontend/dist PRECEDENT_REAL_EXECUTION=0
+# only on a private deployment you control. PRECEDENT_PER_VISITOR=1 gives every browser its own
+# in-memory demo workspace, so visitors (judges) never see each other's approvals.
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PRECEDENT_STATIC_DIR=/app/frontend/dist PRECEDENT_REAL_EXECUTION=0 \
+    PRECEDENT_PER_VISITOR=1
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY contracts ./contracts
 COPY cases ./cases
+COPY dispute_cases ./dispute_cases
 COPY data ./data
 COPY intelligence ./intelligence
 COPY backend/precedent ./backend/precedent
