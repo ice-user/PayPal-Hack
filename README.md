@@ -1,4 +1,4 @@
-# Precedent
+# MediateAI
 
 An operations consultant for PayPal merchants that cites past cases before it acts.
 
@@ -8,6 +8,9 @@ and a human click, executes them through the PayPal Sandbox. The same symptom
 (an item-not-received spike) leads to three different plans depending on the signals.
 
 Built for the PayPal AI Hackathon. **Work in progress.**
+
+_Formerly called Precedent: the `precedent` Python package, the `PRECEDENT_*` environment variables and
+the `precedent-*` storage keys keep their original names. The name MediateAI is what users see._
 
 ## How it works
 
@@ -117,7 +120,7 @@ explains the uncertainty, offers no action, and skips approval, execution and th
 outcome clock in both precedent modes. A/B/C still demonstrate the three original
 remedies. D reuses the known mixed development case; it is not a new evaluation set.
 
-**PayPal in and out:** Precedent imports the sandbox account's disputes (Disputes API) and
+**PayPal in and out:** MediateAI imports the sandbox account's disputes (Disputes API) and
 each parcel's state (Add Tracking API). It triages them with the same dispute-level cases,
 and sends approved seller actions back to that exact dispute. The dashboard's **PayPal**
 section shows the account live, plus a log of every PayPal request. Details:

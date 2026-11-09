@@ -85,7 +85,7 @@
     "diagnosis": "Chargeback rates hidden rather than reduced",
     "intervention": "processor_compliance_controls",
     "actions": ["FLAG_ONLY"],
-    "outcome": {"summary": "Public record: $1.5M settlement. Lesson for Precedent: splitting volume across accounts to lower a reported rate is a red flag, never a remedy.", "before": null, "after": null, "observed_change": null, "measurement_period_days": null},
+    "outcome": {"summary": "Public record: $1.5M settlement. Lesson for MediateAI: splitting volume across accounts to lower a reported rate is a red flag, never a remedy.", "before": null, "after": null, "observed_change": null, "measurement_period_days": null},
     "tags": ["public", "ftc", "processor", "load_balancing"]
   },
   {

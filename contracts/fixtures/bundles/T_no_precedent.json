@@ -250,7 +250,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-09",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004840",
@@ -262,7 +263,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-15",
           "response_due": "2026-11-12",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004885",
@@ -274,7 +276,8 @@
           "proof": "signature",
           "expected_delivery": null,
           "response_due": "2026-11-12",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004984",
@@ -286,7 +289,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-16",
           "response_due": "2026-11-13",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004882",
@@ -298,7 +302,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-14",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004992",
@@ -310,7 +315,8 @@
           "proof": "tracking",
           "expected_delivery": null,
           "response_due": "2026-11-14",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005058",
@@ -322,7 +328,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-16",
           "response_due": "2026-11-14",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005078",
@@ -334,7 +341,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-09",
           "response_due": "2026-11-14",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005100",
@@ -346,7 +354,8 @@
           "proof": "tracking",
           "expected_delivery": null,
           "response_due": "2026-11-14",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004985",
@@ -358,7 +367,8 @@
           "proof": "gps",
           "expected_delivery": null,
           "response_due": "2026-11-15",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005099",
@@ -370,7 +380,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-15",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005126",
@@ -382,7 +393,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-11",
           "response_due": "2026-11-15",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005251",
@@ -394,7 +406,8 @@
           "proof": "tracking",
           "expected_delivery": "2026-11-09",
           "response_due": "2026-11-15",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005369",
@@ -406,7 +419,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-15",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005553",
@@ -418,7 +432,8 @@
           "proof": "signature",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005555",
@@ -430,7 +445,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005631",
@@ -442,7 +458,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005707",
@@ -454,7 +471,8 @@
           "proof": "gps",
           "expected_delivery": null,
           "response_due": "2026-11-17",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-004756",
@@ -466,7 +484,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005236",
@@ -478,7 +497,8 @@
           "proof": "gps",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005452",
@@ -490,7 +510,8 @@
           "proof": "none",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_refund"
+          "response": "generic_refund",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005535",
@@ -502,7 +523,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005606",
@@ -514,7 +536,8 @@
           "proof": "confirmation",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005806",
@@ -526,7 +549,8 @@
           "proof": "signature",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005829",
@@ -538,7 +562,8 @@
           "proof": "tracking",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_tracking"
+          "response": "generic_tracking",
+          "paypal": false
         },
         {
           "dispute_id": "TKD-005871",
@@ -550,7 +575,8 @@
           "proof": "none",
           "expected_delivery": null,
           "response_due": "2026-11-18",
-          "response": "generic_refund"
+          "response": "generic_refund",
+          "paypal": false
         }
       ],
       "precedents": [],

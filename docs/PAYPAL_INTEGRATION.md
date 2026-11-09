@@ -1,11 +1,11 @@
 # PayPal integration
 
-Precedent uses PayPal in both directions. Disputes and shipment tracking come **in** from
+MediateAI uses PayPal in both directions. Disputes and shipment tracking come **in** from
 the merchant's PayPal account. Case-based reasoning decides what to do. The approved seller
 actions go back **out** to PayPal, on the exact dispute they were decided for. Everything
 runs against the PayPal **sandbox**: the adapter refuses any other host.
 
-| PayPal capability | Endpoint | What Precedent does with it | Code |
+| PayPal capability | Endpoint | What MediateAI does with it | Code |
 |---|---|---|---|
 | OAuth 2.0 client credentials | `POST /v1/oauth2/token` | App token, cached until expiry | `paypal_adapter.py` |
 | Disputes API: list disputes | `GET /v1/customer/disputes` | Imports every dispute on the account | `paypal_feed.py` |
@@ -53,6 +53,6 @@ Run the dashboard locally against the sandbox, read-only:
 `python scripts/run_local_demo.py --paypal`.
 
 **Limits.** PayPal trackers have no "lost" status, so a lost parcel is never inferred from
-PayPal. Imported disputes that are in transit have no delivery estimate, so Precedent treats
+PayPal. Imported disputes that are in transit have no delivery estimate, so MediateAI treats
 the deadline as coming first and does not wait. The situation-level spike numbers still come
 from the synthetic TechKart order feed.

@@ -23,7 +23,7 @@
       "required": ["ref"],
       "additionalProperties": false,
       "properties": {
-        "ref": {"type": "string", "description": "Citation or 'Authored by the Precedent team'."},
+        "ref": {"type": "string", "description": "Citation or 'Authored by the MediateAI team'."},
         "url": {"type": "string"},
         "licence": {"type": "string"},
         "accessed": {"type": "string", "format": "date"}

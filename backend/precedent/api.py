@@ -25,7 +25,7 @@ from .techkart import TECHKART  # noqa: E402
 from .service import MODES, Service
 from .webhooks import MAX_BODY_BYTES, metadata
 
-app = FastAPI(title="Precedent API", version="0.1.0",
+app = FastAPI(title="MediateAI API", version="0.1.0",
               description="Dispute consultant for PayPal merchants. Synthetic order feed; PayPal sandbox only.")
 app.add_middleware(
     CORSMiddleware,
@@ -175,7 +175,7 @@ _last_refresh = [0.0]
 
 @app.get("/api/paypal/account")
 def paypal_account() -> dict:
-    """The connected sandbox account as Precedent sees it: imported disputes, PayPal status,
+    """The connected sandbox account as MediateAI sees it: imported disputes, PayPal status,
     allowed seller actions and trackers. Cached and shared by all visitors."""
     return service().feed.public()
 

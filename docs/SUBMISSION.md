@@ -4,7 +4,7 @@
 > `docs/SPIKE1_RESULT.md` or `docs/SPIKE2_RESULT.md`. Do not add a number that is not in
 > those files.
 
-## Precedent: a dispute consultant for PayPal merchants that cites past cases before it acts
+## MediateAI: a dispute consultant for PayPal merchants that cites past cases before it acts
 
 ### Inspiration
 Doctors and lawyers reason from precedent: what happened last time a case looked like

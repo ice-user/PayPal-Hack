@@ -101,7 +101,8 @@ code { font: var(--t-xs)/1.4 "Geist Mono", ui-monospace, "Cascadia Mono", Consol
   display: flex; flex-direction: column; gap: var(--s-2);
   background: var(--bg); padding: var(--s-3) var(--s-2);
 }
-.brand { display: flex; gap: var(--s-3); align-items: center; padding: var(--s-2) var(--s-2) var(--s-3); }
+.brand { display: flex; gap: var(--s-3); align-items: center; padding: var(--s-2) var(--s-2) var(--s-3);  color: inherit; text-decoration: none; border-radius: var(--r-md); }
+.brand:hover .brand-name { text-decoration: underline; text-underline-offset: 3px; }
 .logo { width: 28px; height: 28px; border-radius: var(--r-md); background: var(--primary); color: var(--primary-fg); display: grid; place-items: center; }
 .brand-name { font-weight: var(--w-semibold); line-height: var(--lh-tight); }
 .brand-sub { color: var(--muted); font-size: var(--t-xs); }

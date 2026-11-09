@@ -1,5 +1,5 @@
 """Add shipment tracking to a PayPal SANDBOX transaction with the Add Tracking API, so
-Precedent reads the parcel's state from PayPal (delivered / in transit) when it imports
+MediateAI reads the parcel's state from PayPal (delivered / in transit) when it imports
 the dispute. Sandbox only (the adapter refuses any other host). Credentials come from
 backend/.env and are never printed.
 

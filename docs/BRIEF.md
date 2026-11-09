@@ -1,4 +1,4 @@
-# Precedent: one-page brief (working title)
+# MediateAI: one-page brief (working title)
 
 **Pitch:** an AI operations consultant for PayPal merchants. It detects a problem
 (first: dispute and chargeback spikes), retrieves similar past cases, explains its

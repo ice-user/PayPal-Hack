@@ -1,4 +1,4 @@
-# Precedent: design (working title)
+# MediateAI: design (working title)
 
 An AI finance consultant for PayPal merchants. It recognises a risk or cash-flow
 situation, retrieves analogous precedents from a case library, proposes a remedy,
@@ -363,7 +363,7 @@ Three headline evals (the rest is ordinary testing):
 
 | Eval | Method |
 |---|---|
-| **Precedent ablation (the main one)** | Same 15 to 20 situations through System A (consultant without retrieval) and System B (with precedents). Both teammates score each recommendation independently on a short rubric: appropriate intervention, grounded in cited evidence, unsupported claims, abstains when it should. Report agreement between raters |
+| **MediateAI ablation (the main one)** | Same 15 to 20 situations through System A (consultant without retrieval) and System B (with precedents). Both teammates score each recommendation independently on a short rubric: appropriate intervention, grounded in cited evidence, unsupported claims, abstains when it should. Report agreement between raters |
 | Retrieval | Hold out cases; Recall@3 of the correct intervention class; optional component ablation (structure only, text only, hybrid) |
 | Policy gate | Unit tests over every rule, including limit boundaries and prohibited actions |
 
