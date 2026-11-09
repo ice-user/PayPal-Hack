@@ -1,0 +1,1026 @@
+{
+  "situation": {
+    "situation_id": "sit_demo_T",
+    "merchant_id": "m_demo_techkart",
+    "window": {
+      "start": "2026-11-02",
+      "end": "2026-11-08"
+    },
+    "source": "synthetic_order_feed",
+    "features": {
+      "transactions_7d": 1123,
+      "disputes_7d": 27,
+      "gmv_7d": 101017.0,
+      "dispute_rate_7d": 0.02404,
+      "dispute_rate_7d_ci95": [
+        0.01658,
+        0.03476
+      ],
+      "transactions_30d_baseline": 4752,
+      "disputes_30d_baseline": 27,
+      "dispute_rate_30d_baseline": 0.00568,
+      "baseline_ci95": [
+        0.00391,
+        0.00825
+      ],
+      "rate_ratio": 4.23,
+      "anomaly": {
+        "method": "binomial_vs_baseline",
+        "p_value": 9e-10,
+        "is_anomalous": true,
+        "min_sample_met": true
+      },
+      "trend_slope": 0.54,
+      "daily_dispute_rate": [
+        0.0123,
+        0.0,
+        0.0,
+        0.0299,
+        0.0176,
+        0.0301,
+        0.0241,
+        0.0123,
+        0.0377,
+        0.0182
+      ],
+      "reason_mix": {
+        "ITEM_NOT_RECEIVED": 0.926,
+        "UNAUTHORISED": 0.037,
+        "OTHER": 0.037
+      },
+      "concentration": {
+        "sku": 0.481,
+        "carrier": 0.63,
+        "country": 1.0,
+        "top_sku": "VX-200 wireless earbuds",
+        "top_carrier": "Carrier X",
+        "top_country": "US"
+      },
+      "carriers_elevated": 1,
+      "ship_delay_hours_p50": 10.0,
+      "disputed_orders_delivered_share": 0.593,
+      "avg_amount": 89.95,
+      "median_response_hours": 52,
+      "open_disputes": 27,
+      "refund_ratio_30d": 0.04,
+      "days_since_txn_median": 9
+    },
+    "narrative": "Item-not-received disputes up 4.2x in 7 days, mostly on Carrier X.",
+    "evidence_ids": [],
+    "paypal_dispute_ids": [],
+    "label": "T: TechKart, delivery failure crisis"
+  },
+  "recommendation": {
+    "recommendation_id": "rec_demo_T_wp",
+    "situation_id": "sit_demo_T",
+    "mode": "with_precedent",
+    "grounding": "precedent",
+    "precedents": [
+      {
+        "case_id": "case_c06_gps_mismatch_driver",
+        "title": "Delivery scans far from the buyer's address",
+        "similarity": 0.85,
+        "matched_on": [
+          "carrier concentration",
+          "share of disputed orders delivered",
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [],
+        "intervention": "delivery_confirmation_tracking",
+        "outcome_summary": "Illustrative: a carrier claim was filed and evidence was not submitted where scans looked wrong. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c05_low_value_delivered_refund",
+        "title": "Low-value delivered orders disputed",
+        "similarity": 0.717,
+        "matched_on": [
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "carrier concentration",
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "partial_refund_offer",
+        "outcome_summary": "Illustrative: partial refunds on low-value disputes, evidence on the rest. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c03_wrong_address_autofill",
+        "title": "Checkout autofill sent parcels to old addresses",
+        "similarity": 0.688,
+        "matched_on": [
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "carrier concentration",
+          "SKU concentration"
+        ],
+        "intervention": "evidence_collection_response",
+        "outcome_summary": "Illustrative: delivery proof filed, buyers messaged to resolve address errors, checkout fixed. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_c01_porch_theft_cluster",
+        "title": "Disputes on parcels marked delivered",
+        "similarity": 0.678,
+        "matched_on": [
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "carrier concentration"
+        ],
+        "intervention": "evidence_collection_response",
+        "outcome_summary": "Illustrative: proof of delivery (scan, location, photo) was filed on each dispute. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      },
+      {
+        "case_id": "case_a02_signature_on_high_value",
+        "title": "High-value parcels lost on one carrier's last mile",
+        "similarity": 0.673,
+        "matched_on": [
+          "fulfilment delay",
+          "number of carriers elevated",
+          "unauthorised share",
+          "trend"
+        ],
+        "differs_on": [
+          "share of disputed orders delivered",
+          "merchant size (small vs mid)"
+        ],
+        "intervention": "delivery_confirmation_tracking",
+        "outcome_summary": "Illustrative: signature confirmation on orders above a value threshold plus tracking evidence on open disputes. No measured numbers.",
+        "measurement_period_days": null,
+        "evidence_quality": "illustrative",
+        "provenance": "authored"
+      }
+    ],
+    "predicted_effect": null,
+    "counterfactual": null,
+    "generated_by": {
+      "engine": "rules",
+      "version": "0.1.0"
+    },
+    "diagnosis": "Carrier-specific delivery or tracking failure",
+    "actions": [
+      {
+        "action_id": "act_1",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "File proof of delivery: 9 disputes",
+        "params": {
+          "triage_group": "evidence_delivery",
+          "response": "evidence_delivery",
+          "dispute_count": 9,
+          "synthetic_dispute_ids": [
+            "TKD-004182",
+            "TKD-004756",
+            "TKD-004882",
+            "TKD-005099",
+            "TKD-005369",
+            "TKD-005535",
+            "TKD-005555",
+            "TKD-005606",
+            "TKD-005631"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-09",
+          "asserts_delivery": true,
+          "total_value": 811.0,
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "include": [
+            "carrier",
+            "tracking_number",
+            "delivery_confirmation"
+          ]
+        },
+        "rationale": "Delivery is confirmed, so file the confirmation itself, not just a tracking number. Followed in 2 similar dispute case(s). Avoid what backfired in 1 case(s), e.g. \"Delivered, but only a tracking number was sent\".",
+        "supporting_cases": [
+          "dc_d01_scan_confirmed",
+          "dc_d02_confirmation_high_value"
+        ]
+      },
+      {
+        "action_id": "act_2",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "File proof of delivery with GPS or signature records: 6 disputes",
+        "params": {
+          "triage_group": "evidence_delivery_documented",
+          "response": "evidence_delivery_documented",
+          "dispute_count": 6,
+          "synthetic_dispute_ids": [
+            "TKD-004885",
+            "TKD-004985",
+            "TKD-005236",
+            "TKD-005553",
+            "TKD-005707",
+            "TKD-005806"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-12",
+          "asserts_delivery": true,
+          "total_value": 584.0,
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "include": [
+            "carrier",
+            "tracking_number",
+            "delivery_confirmation",
+            "gps_or_signature_record"
+          ]
+        },
+        "rationale": "Delivery is confirmed and documented; include the GPS or signature record. Followed in 2 similar dispute case(s). Avoid what backfired in 1 case(s), e.g. \"Delivered, but only a tracking number was sent\".",
+        "supporting_cases": [
+          "dc_d03_gps_photo",
+          "dc_d04_signature"
+        ]
+      },
+      {
+        "action_id": "act_3",
+        "type": "SEND_MESSAGE",
+        "title": "Message buyers with the real delivery window: 3 disputes",
+        "params": {
+          "triage_group": "message_eta",
+          "response": "message_eta",
+          "dispute_count": 3,
+          "synthetic_dispute_ids": [
+            "TKD-005078",
+            "TKD-005126",
+            "TKD-005251"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-14",
+          "asserts_delivery": false,
+          "total_value": 177.0,
+          "template_id": "delivery_window_update"
+        },
+        "rationale": "Parcels are moving and due before the response deadline: tell buyers the real window, re-check before the deadline. Followed in 2 similar dispute case(s).",
+        "supporting_cases": [
+          "dc_t01_eta_before_deadline",
+          "dc_t02_eta_message_low_value"
+        ]
+      },
+      {
+        "action_id": "act_4",
+        "type": "PROVIDE_EVIDENCE",
+        "title": "Respond before the deadline: shipped, still in transit: 3 disputes",
+        "params": {
+          "triage_group": "evidence_in_transit",
+          "response": "evidence_in_transit",
+          "dispute_count": 3,
+          "synthetic_dispute_ids": [
+            "TKD-004840",
+            "TKD-004984",
+            "TKD-005058"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-12",
+          "asserts_delivery": false,
+          "total_value": 317.0,
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "include": [
+            "carrier",
+            "tracking_number",
+            "ship_date",
+            "agreed_delivery_window"
+          ]
+        },
+        "rationale": "The deadline comes before delivery: respond now with shipment proof and the agreed window, without claiming delivery. Followed in 2 similar dispute case(s). Avoid what backfired in 2 case(s), e.g. \"In transit, but the merchant claimed it was delivered\".",
+        "supporting_cases": [
+          "dc_t03_deadline_first",
+          "dc_t04_deadline_first_watch"
+        ]
+      },
+      {
+        "action_id": "act_5",
+        "type": "ACCEPT_CLAIM",
+        "title": "Refund buyers whose parcels were lost: 3 disputes",
+        "params": {
+          "triage_group": "refund_lost",
+          "response": "refund_lost",
+          "dispute_count": 3,
+          "synthetic_dispute_ids": [
+            "TKD-004992",
+            "TKD-005100",
+            "TKD-005829"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-14",
+          "asserts_delivery": false,
+          "total_value": 457.0,
+          "amount": {
+            "currency_code": "USD",
+            "value": 457.0
+          },
+          "note": "Also file carrier claims with Carrier X for these parcels."
+        },
+        "rationale": "The carrier confirmed these parcels lost: resolve with the buyer instead of contesting. Followed in 2 similar dispute case(s). Avoid what backfired in 1 case(s), e.g. \"Lost parcel contested with its tracking number\".",
+        "supporting_cases": [
+          "dc_l01_lost_refund_claim",
+          "dc_l02_lost_high_value"
+        ]
+      },
+      {
+        "action_id": "act_6",
+        "type": "FLAG_ONLY",
+        "title": "Pull dispatch records and request carrier traces: 2 disputes",
+        "params": {
+          "triage_group": "gather_info",
+          "response": "gather_info",
+          "dispute_count": 2,
+          "synthetic_dispute_ids": [
+            "TKD-005452",
+            "TKD-005871"
+          ],
+          "dispute_ids": [],
+          "earliest_due": "2026-11-18",
+          "asserts_delivery": false,
+          "total_value": 138.0
+        },
+        "rationale": "No tracking on file: check dispatch records and ask the carrier for a trace before acting. Followed in 1 similar dispute case(s). Avoid what backfired in 1 case(s), e.g. \"No tracking on file: responded without checking\".",
+        "supporting_cases": [
+          "dc_u01_records_first"
+        ]
+      }
+    ],
+    "playbook_notes": [
+      "Delivery scans far from the buyer's address (authored, illustrative): Illustrative: a carrier claim was filed and evidence was not submitted where scans looked wrong. No measured numbers.",
+      "Checkout autofill sent parcels to old addresses (authored, illustrative): Illustrative: delivery proof filed, buyers messaged to resolve address errors, checkout fixed. No measured numbers.",
+      "Disputes on parcels marked delivered (authored, illustrative): Illustrative: proof of delivery (scan, location, photo) was filed on each dispute. No measured numbers.",
+      "No measured precedents match this pattern, so no numeric forecast is shown."
+    ],
+    "confidence": 0.31,
+    "evidence_quality": "illustrative",
+    "abstain": true,
+    "abstain_reason": "Confidence 0.31 is below the floor 0.5. Precedents disagree or match weakly.",
+    "created_at": "2026-11-08T09:00:00Z",
+    "triage": {
+      "groups": [
+        {
+          "response": "evidence_delivery",
+          "label": "File proof of delivery",
+          "states": [
+            "Delivered"
+          ],
+          "count": 9,
+          "total_value": 811.0,
+          "earliest_due": "2026-11-09",
+          "action_ids": [
+            "act_1"
+          ],
+          "cites": [
+            "dc_d01_scan_confirmed",
+            "dc_d02_confirmation_high_value"
+          ],
+          "warnings": [
+            "dc_d05_tracking_number_only"
+          ],
+          "confidence": 0.54
+        },
+        {
+          "response": "evidence_delivery_documented",
+          "label": "File proof of delivery with GPS or signature records",
+          "states": [
+            "Delivered"
+          ],
+          "count": 6,
+          "total_value": 584.0,
+          "earliest_due": "2026-11-12",
+          "action_ids": [
+            "act_2"
+          ],
+          "cites": [
+            "dc_d03_gps_photo",
+            "dc_d04_signature"
+          ],
+          "warnings": [
+            "dc_d05_tracking_number_only"
+          ],
+          "confidence": 0.55
+        },
+        {
+          "response": "message_eta",
+          "label": "Message buyers with the real delivery window",
+          "states": [
+            "In transit"
+          ],
+          "count": 3,
+          "total_value": 177.0,
+          "earliest_due": "2026-11-14",
+          "action_ids": [
+            "act_3"
+          ],
+          "cites": [
+            "dc_t01_eta_before_deadline",
+            "dc_t02_eta_message_low_value"
+          ],
+          "warnings": [],
+          "confidence": 1.0
+        },
+        {
+          "response": "evidence_in_transit",
+          "label": "Respond before the deadline: shipped, still in transit",
+          "states": [
+            "In transit"
+          ],
+          "count": 3,
+          "total_value": 317.0,
+          "earliest_due": "2026-11-12",
+          "action_ids": [
+            "act_4"
+          ],
+          "cites": [
+            "dc_t03_deadline_first",
+            "dc_t04_deadline_first_watch"
+          ],
+          "warnings": [
+            "dc_t05_claimed_delivered_early",
+            "dc_t06_waited_past_deadline"
+          ],
+          "confidence": 1.0
+        },
+        {
+          "response": "refund_lost",
+          "label": "Refund buyers whose parcels were lost",
+          "states": [
+            "Lost (carrier confirmed)"
+          ],
+          "count": 3,
+          "total_value": 457.0,
+          "earliest_due": "2026-11-14",
+          "action_ids": [
+            "act_5"
+          ],
+          "cites": [
+            "dc_l01_lost_refund_claim",
+            "dc_l02_lost_high_value"
+          ],
+          "warnings": [
+            "dc_l03_lost_but_contested"
+          ],
+          "confidence": 1.0
+        },
+        {
+          "response": "gather_info",
+          "label": "Pull dispatch records and request carrier traces",
+          "states": [
+            "No tracking"
+          ],
+          "count": 2,
+          "total_value": 138.0,
+          "earliest_due": "2026-11-18",
+          "action_ids": [
+            "act_6"
+          ],
+          "cites": [
+            "dc_u01_records_first"
+          ],
+          "warnings": [
+            "dc_u02_guessed_response"
+          ],
+          "confidence": 1.0
+        }
+      ],
+      "rows": [
+        {
+          "dispute_id": "TKD-004182",
+          "order_id": "TK-004182",
+          "carrier": "Swift Freight",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-09",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-004840",
+          "order_id": "TK-004840",
+          "carrier": "Parcelway",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-15",
+          "response_due": "2026-11-12",
+          "response": "evidence_in_transit"
+        },
+        {
+          "dispute_id": "TKD-004885",
+          "order_id": "TK-004885",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "signature",
+          "expected_delivery": null,
+          "response_due": "2026-11-12",
+          "response": "evidence_delivery_documented"
+        },
+        {
+          "dispute_id": "TKD-004984",
+          "order_id": "TK-004984",
+          "carrier": "Carrier X",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-16",
+          "response_due": "2026-11-13",
+          "response": "evidence_in_transit"
+        },
+        {
+          "dispute_id": "TKD-004882",
+          "order_id": "TK-004882",
+          "carrier": "Carrier X",
+          "sku": "Hub-7 USB-C dock",
+          "amount": 99.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-14",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-004992",
+          "order_id": "TK-004992",
+          "carrier": "Swift Freight",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "lost",
+          "proof": "tracking",
+          "expected_delivery": null,
+          "response_due": "2026-11-14",
+          "response": "refund_lost"
+        },
+        {
+          "dispute_id": "TKD-005058",
+          "order_id": "TK-005058",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-16",
+          "response_due": "2026-11-14",
+          "response": "evidence_in_transit"
+        },
+        {
+          "dispute_id": "TKD-005078",
+          "order_id": "TK-005078",
+          "carrier": "Carrier X",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-09",
+          "response_due": "2026-11-14",
+          "response": "message_eta"
+        },
+        {
+          "dispute_id": "TKD-005100",
+          "order_id": "TK-005100",
+          "carrier": "Metro Courier",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "lost",
+          "proof": "tracking",
+          "expected_delivery": null,
+          "response_due": "2026-11-14",
+          "response": "refund_lost"
+        },
+        {
+          "dispute_id": "TKD-004985",
+          "order_id": "TK-004985",
+          "carrier": "Parcelway",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "delivered",
+          "proof": "gps",
+          "expected_delivery": null,
+          "response_due": "2026-11-15",
+          "response": "evidence_delivery_documented"
+        },
+        {
+          "dispute_id": "TKD-005099",
+          "order_id": "TK-005099",
+          "carrier": "Metro Courier",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-15",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005126",
+          "order_id": "TK-005126",
+          "carrier": "Carrier X",
+          "sku": "PowerCell 20k battery",
+          "amount": 49.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-11",
+          "response_due": "2026-11-15",
+          "response": "message_eta"
+        },
+        {
+          "dispute_id": "TKD-005251",
+          "order_id": "TK-005251",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "in_transit",
+          "proof": "tracking",
+          "expected_delivery": "2026-11-09",
+          "response_due": "2026-11-15",
+          "response": "message_eta"
+        },
+        {
+          "dispute_id": "TKD-005369",
+          "order_id": "TK-005369",
+          "carrier": "Carrier X",
+          "sku": "Lumo desk lamp",
+          "amount": 59.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-15",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005553",
+          "order_id": "TK-005553",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "signature",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "evidence_delivery_documented"
+        },
+        {
+          "dispute_id": "TKD-005555",
+          "order_id": "TK-005555",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005631",
+          "order_id": "TK-005631",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005707",
+          "order_id": "TK-005707",
+          "carrier": "Parcelway",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "gps",
+          "expected_delivery": null,
+          "response_due": "2026-11-17",
+          "response": "evidence_delivery_documented"
+        },
+        {
+          "dispute_id": "TKD-004756",
+          "order_id": "TK-004756",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005236",
+          "order_id": "TK-005236",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "gps",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "evidence_delivery_documented"
+        },
+        {
+          "dispute_id": "TKD-005452",
+          "order_id": "TK-005452",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "unknown",
+          "proof": "none",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "gather_info"
+        },
+        {
+          "dispute_id": "TKD-005535",
+          "order_id": "TK-005535",
+          "carrier": "Carrier X",
+          "sku": "Hub-7 USB-C dock",
+          "amount": 99.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005606",
+          "order_id": "TK-005606",
+          "carrier": "Swift Freight",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "delivered",
+          "proof": "confirmation",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "evidence_delivery"
+        },
+        {
+          "dispute_id": "TKD-005806",
+          "order_id": "TK-005806",
+          "carrier": "Carrier X",
+          "sku": "VX-200 wireless earbuds",
+          "amount": 79.0,
+          "status": "delivered",
+          "proof": "signature",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "evidence_delivery_documented"
+        },
+        {
+          "dispute_id": "TKD-005829",
+          "order_id": "TK-005829",
+          "carrier": "Swift Freight",
+          "sku": "TK-Watch 3",
+          "amount": 189.0,
+          "status": "lost",
+          "proof": "tracking",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "refund_lost"
+        },
+        {
+          "dispute_id": "TKD-005871",
+          "order_id": "TK-005871",
+          "carrier": "Parcelway",
+          "sku": "Lumo desk lamp",
+          "amount": 59.0,
+          "status": "unknown",
+          "proof": "none",
+          "expected_delivery": null,
+          "response_due": "2026-11-18",
+          "response": "gather_info"
+        }
+      ],
+      "precedents": [
+        {
+          "case_id": "dc_d01_scan_confirmed",
+          "title": "Delivered with a confirmation scan, evidence filed",
+          "response": "evidence_delivery",
+          "appropriate": true,
+          "outcome": "Dispute closed in the merchant's favour. Illustrative, no measured numbers."
+        },
+        {
+          "case_id": "dc_d02_confirmation_high_value",
+          "title": "High-value parcel delivered with confirmation",
+          "response": "evidence_delivery",
+          "appropriate": true,
+          "outcome": "Resolved for the merchant. Illustrative."
+        },
+        {
+          "case_id": "dc_d03_gps_photo",
+          "title": "Delivered with GPS location and photo",
+          "response": "evidence_delivery_documented",
+          "appropriate": true,
+          "outcome": "Resolved for the merchant. Illustrative."
+        },
+        {
+          "case_id": "dc_d04_signature",
+          "title": "Delivered against a recipient signature",
+          "response": "evidence_delivery_documented",
+          "appropriate": true,
+          "outcome": "Resolved for the merchant. Illustrative."
+        },
+        {
+          "case_id": "dc_d05_tracking_number_only",
+          "title": "Delivered, but only a tracking number was sent",
+          "response": "tracking_number_only",
+          "appropriate": false,
+          "outcome": "Backfired: a tracking number alone did not show delivery and the dispute was lost. Include the delivery confirmation itself."
+        },
+        {
+          "case_id": "dc_l01_lost_refund_claim",
+          "title": "Carrier confirmed the parcel lost",
+          "response": "refund_lost",
+          "appropriate": true,
+          "outcome": "Buyer kept; carrier claim recovered part of the cost. Illustrative."
+        },
+        {
+          "case_id": "dc_l02_lost_high_value",
+          "title": "High-value parcel lost in a carrier hub",
+          "response": "refund_lost",
+          "appropriate": true,
+          "outcome": "Resolved with the buyer; carrier claim filed. Illustrative."
+        },
+        {
+          "case_id": "dc_l03_lost_but_contested",
+          "title": "Lost parcel contested with its tracking number",
+          "response": "tracking_number_only",
+          "appropriate": false,
+          "outcome": "Backfired: the evidence showed the loss, the dispute was lost anyway and the buyer escalated. Do not contest a parcel you know is lost."
+        },
+        {
+          "case_id": "dc_t01_eta_before_deadline",
+          "title": "In transit, arriving well before the deadline",
+          "response": "message_eta",
+          "appropriate": true,
+          "outcome": "Parcel arrived; the buyer closed the dispute. Illustrative."
+        },
+        {
+          "case_id": "dc_t02_eta_message_low_value",
+          "title": "In transit, buyer reassured with the delivery window",
+          "response": "message_eta",
+          "appropriate": true,
+          "outcome": "Buyer withdrew the dispute after delivery. Illustrative."
+        },
+        {
+          "case_id": "dc_t03_deadline_first",
+          "title": "In transit, but the deadline came first",
+          "response": "evidence_in_transit",
+          "appropriate": true,
+          "outcome": "The dispute stayed open until delivery and was then resolved. Illustrative."
+        },
+        {
+          "case_id": "dc_t04_deadline_first_watch",
+          "title": "Late parcel answered truthfully before the deadline",
+          "response": "evidence_in_transit",
+          "appropriate": true,
+          "outcome": "Resolved after delivery. Illustrative."
+        },
+        {
+          "case_id": "dc_t05_claimed_delivered_early",
+          "title": "In transit, but the merchant claimed it was delivered",
+          "response": "claim_delivered",
+          "appropriate": false,
+          "outcome": "Backfired: the tracking page contradicted the claim, the dispute was lost and the buyer complained. Never claim delivery that has not happened."
+        },
+        {
+          "case_id": "dc_t06_waited_past_deadline",
+          "title": "In transit, merchant waited for delivery and missed the deadline",
+          "response": "wait_for_delivery",
+          "appropriate": false,
+          "outcome": "Backfired: the dispute closed in the buyer's favour by default. Waiting only works when the window allows it."
+        },
+        {
+          "case_id": "dc_u01_records_first",
+          "title": "No tracking on file: records gathered first",
+          "response": "gather_info",
+          "appropriate": true,
+          "outcome": "The trace showed the parcel had been delivered; the merchant then responded with evidence. Illustrative."
+        },
+        {
+          "case_id": "dc_u02_guessed_response",
+          "title": "No tracking on file: responded without checking",
+          "response": "refund_without_checking",
+          "appropriate": false,
+          "outcome": "Backfired: the parcel had been delivered, so the refund was money lost. Check the records before acting."
+        }
+      ],
+      "untriaged": 0
+    }
+  },
+  "policy_decisions": [
+    {
+      "action_id": "act_1",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "external_action_requires_approval"
+      ],
+      "explanation": "Visible to buyers or PayPal: one-click approval required."
+    },
+    {
+      "action_id": "act_2",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "external_action_requires_approval"
+      ],
+      "explanation": "Visible to buyers or PayPal: one-click approval required."
+    },
+    {
+      "action_id": "act_3",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "external_action_requires_approval"
+      ],
+      "explanation": "Visible to buyers or PayPal: one-click approval required."
+    },
+    {
+      "action_id": "act_4",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "EXTERNAL",
+      "rules_hit": [
+        "external_action_requires_approval"
+      ],
+      "explanation": "Visible to buyers or PayPal: one-click approval required."
+    },
+    {
+      "action_id": "act_5",
+      "decision": "NEEDS_APPROVAL",
+      "tier": "MONEY",
+      "rules_hit": [
+        "money_requires_approval"
+      ],
+      "explanation": "Moves 457.00 USD: explicit approval required."
+    },
+    {
+      "action_id": "act_6",
+      "decision": "AUTO",
+      "tier": "PREPARE",
+      "rules_hit": [
+        "prepare_only"
+      ],
+      "explanation": "Preparation only: nothing leaves the system."
+    }
+  ],
+  "timeline": [
+    {
+      "step": "detected",
+      "status": "done",
+      "at": "2026-11-08T09:00:00Z",
+      "simulated": true,
+      "detail": "Binomial test vs 30-day baseline, p=9e-10. Run on the synthetic demo order feed."
+    },
+    {
+      "step": "recommended",
+      "status": "done",
+      "at": "2026-11-08T09:00:00Z",
+      "simulated": false,
+      "detail": "Spike-level plan abstained; 6 dispute-level action(s) proposed."
+    },
+    {
+      "step": "approved",
+      "at": null,
+      "simulated": false,
+      "status": "pending",
+      "detail": "5 action(s) waiting for your approval."
+    },
+    {
+      "step": "executed",
+      "at": null,
+      "status": "pending",
+      "simulated": true,
+      "detail": "Runs through the PayPal sandbox adapter. Seller actions the sandbox blocks are simulated (see docs/SPIKE1_RESULT.md)."
+    },
+    {
+      "step": "measured",
+      "at": null,
+      "simulated": true,
+      "status": "pending",
+      "detail": "Outcome clock is simulated. Result is recorded as a live_simulated case pending review."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "situation_id": "sit_demo_T",
+  "merchant_id": "m_demo_techkart",
+  "window": {
+    "start": "2026-11-02",
+    "end": "2026-11-08"
+  },
+  "source": "synthetic_order_feed",
+  "features": {
+    "transactions_7d": 1123,
+    "disputes_7d": 27,
+    "gmv_7d": 101017.0,
+    "dispute_rate_7d": 0.02404,
+    "dispute_rate_7d_ci95": [
+      0.01658,
+      0.03476
+    ],
+    "transactions_30d_baseline": 4752,
+    "disputes_30d_baseline": 27,
+    "dispute_rate_30d_baseline": 0.00568,
+    "baseline_ci95": [
+      0.00391,
+      0.00825
+    ],
+    "rate_ratio": 4.23,
+    "anomaly": {
+      "method": "binomial_vs_baseline",
+      "p_value": 9e-10,
+      "is_anomalous": true,
+      "min_sample_met": true
+    },
+    "trend_slope": 0.54,
+    "daily_dispute_rate": [
+      0.0123,
+      0.0,
+      0.0,
+      0.0299,
+      0.0176,
+      0.0301,
+      0.0241,
+      0.0123,
+      0.0377,
+      0.0182
+    ],
+    "reason_mix": {
+      "ITEM_NOT_RECEIVED": 0.926,
+      "UNAUTHORISED": 0.037,
+      "OTHER": 0.037
+    },
+    "concentration": {
+      "sku": 0.481,
+      "carrier": 0.63,
+      "country": 1.0,
+      "top_sku": "VX-200 wireless earbuds",
+      "top_carrier": "Carrier X",
+      "top_country": "US"
+    },
+    "carriers_elevated": 1,
+    "ship_delay_hours_p50": 10.0,
+    "disputed_orders_delivered_share": 0.593,
+    "avg_amount": 89.95,
+    "median_response_hours": 52,
+    "open_disputes": 27,
+    "refund_ratio_30d": 0.04,
+    "days_since_txn_median": 9
+  },
+  "narrative": "Item-not-received disputes up 4.2x in 7 days, mostly on Carrier X.",
+  "evidence_ids": [],
+  "paypal_dispute_ids": [],
+  "label": "T: TechKart, delivery failure crisis"
+}

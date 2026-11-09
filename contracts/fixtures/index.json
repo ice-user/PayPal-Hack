@@ -19,6 +19,11 @@
       "key": "D",
       "situation_id": "sit_demo_D",
       "label": "D: overlapping signals (review needed)"
+    },
+    {
+      "key": "T",
+      "situation_id": "sit_demo_T",
+      "label": "T: TechKart, delivery failure crisis"
     }
   ],
   "modes": [

@@ -12,7 +12,10 @@ from __future__ import annotations
 import base64
 import json
 import os
+import re
+import threading
 import time
+from collections import deque
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -61,6 +64,16 @@ class PayPalAdapter:
         # Public deployments set PRECEDENT_REAL_EXECUTION=0 so anonymous visitors can only
         # trigger labelled simulations. Reads stay real.
         self.real_execution = env.get("PRECEDENT_REAL_EXECUTION", "1") != "0"
+        # Optionally narrow real execution to some action types (a public demo keeps money
+        # actions simulated) and cap real seller actions per hour across all visitors.
+        raw_types = env.get("PRECEDENT_REAL_ACTIONS", "").strip()
+        self.real_types = {t.strip().upper() for t in raw_types.split(",") if t.strip()} or None
+        self.max_real_per_hour = int(env.get("PRECEDENT_REAL_CALLS_PER_HOUR", "0") or 0)
+        self._real_sent: deque[float] = deque()
+        # The last PayPal requests (method, path, status, time), shown in the dashboard so the
+        # integration is visible. Paths carry sandbox IDs only; no tokens, bodies or personal data.
+        self.activity: deque[dict] = deque(maxlen=60)
+        self._lock = threading.Lock()
         if self.base != SANDBOX:
             raise ValueError("Refusing to run against a non-sandbox PayPal host.")
         self._token: tuple[str, float] | None = None
@@ -84,11 +97,25 @@ class PayPalAdapter:
             except ValueError:
                 return e.code, {"raw": raw[:300]}
 
+    def _logged(self, method: str, path: str, **kw) -> tuple[int, dict]:
+        t0 = time.monotonic()
+        try:
+            status, body = self._transport(method, path, **kw)
+        except Exception:
+            self._record(method, path, 0, t0)
+            raise
+        self._record(method, path, status, t0)
+        return status, body
+
+    def _record(self, method: str, path: str, status: int, t0: float) -> None:
+        self.activity.appendleft({"at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "method": method,
+                                  "path": path, "status": status, "ms": round((time.monotonic() - t0) * 1000)})
+
     def _token_value(self) -> str:
         if self._token and self._token[1] > time.time() + 60:
             return self._token[0]
         basic = base64.b64encode(f"{self.client_id}:{self._secret}".encode()).decode()
-        status, body = self._transport("POST", "/v1/oauth2/token", headers={
+        status, body = self._logged("POST", "/v1/oauth2/token", headers={
             "Authorization": f"Basic {basic}", "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json"}, data=b"grant_type=client_credentials")
         if status != 200:
@@ -107,7 +134,7 @@ class PayPalAdapter:
         elif body is not None:
             data = json.dumps(body).encode()
             headers["Content-Type"] = "application/json"
-        status, resp = self._transport(method, path, headers=headers, data=data)
+        status, resp = self._logged(method, path, headers=headers, data=data)
         if status >= 400:
             raise PayPalError(status, resp)
         return resp
@@ -123,6 +150,41 @@ class PayPalAdapter:
             "allowed_response_options": d.get("allowed_response_options"),
         }
 
+    def list_disputes(self, page_size: int = 20) -> list[dict]:
+        """Disputes on the connected sandbox account, newest first (summary fields only)."""
+        return self._call("GET", f"/v1/customer/disputes?page_size={int(page_size)}").get("items", [])
+
+    def dispute_details(self, dispute_id: str) -> dict:
+        return self._call("GET", f"/v1/customer/disputes/{urllib.parse.quote(dispute_id)}")
+
+    def trackers(self, transaction_id: str) -> list[dict]:
+        """Shipment trackers the seller added to a transaction (Add Tracking API)."""
+        q = urllib.parse.urlencode({"transaction_id": transaction_id})
+        return self._call("GET", f"/v1/shipping/trackers?{q}").get("trackers", [])
+
+    def real_allowed(self, atype: str) -> str | None:
+        """Why a real call of this type may not be made on this deployment, or None."""
+        if not self.configured:
+            return "PayPal sandbox credentials are not configured."
+        if not self.real_execution:
+            return "real PayPal execution is switched off on this deployment (PRECEDENT_REAL_EXECUTION=0)."
+        if self.real_types is not None and atype not in self.real_types:
+            return (f"this public demo keeps {atype} simulated; it runs only "
+                    f"{', '.join(sorted(self.real_types))} for real.")
+        return None
+
+    def _take_real_slot(self) -> bool:
+        if not self.max_real_per_hour:
+            return True
+        with self._lock:
+            now = time.time()
+            while self._real_sent and now - self._real_sent[0] > 3600:
+                self._real_sent.popleft()
+            if len(self._real_sent) >= self.max_real_per_hour:
+                return False
+            self._real_sent.append(now)
+            return True
+
     # ---- execution ----
     def execute(self, action: dict) -> dict:
         """Run one approved action. Returns {mode, detail, paypal_ref?}. Never raises for
@@ -131,10 +193,9 @@ class PayPalAdapter:
         if atype == "FLAG_ONLY":
             return {"mode": "real", "detail": "Prepared internally. Nothing sent to PayPal."}
         dispute_ids = action["params"].get("dispute_ids") or []
-        if not self.configured:
-            return self._sim(action, "PayPal sandbox credentials are not configured.")
-        if not self.real_execution:
-            return self._sim(action, "real PayPal execution is switched off on this deployment (PRECEDENT_REAL_EXECUTION=0).")
+        blocked = self.real_allowed(atype)
+        if blocked:
+            return self._sim(action, blocked)
         if not dispute_ids:
             return self._sim(action, "No real sandbox dispute is linked to this action (the order feed is synthetic).")
         results, sims = [], []
@@ -147,6 +208,9 @@ class PayPalAdapter:
             if ACTION_LINK.get(atype) not in live["allowed"]:
                 sims.append(f"{did}: PayPal does not allow {atype} while the dispute is "
                             f"{live['dispute_state'] or live['status']}")
+                continue
+            if not self._take_real_slot():
+                sims.append(f"{did}: this demo's limit of {self.max_real_per_hour} real PayPal actions an hour is reached")
                 continue
             try:
                 self._send(atype, did, action)

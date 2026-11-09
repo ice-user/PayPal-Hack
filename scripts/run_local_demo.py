@@ -3,6 +3,7 @@
 Build frontend first with VITE_API_BASE=/, then run:
     python scripts/run_local_demo.py
 No credentials, PayPal requests, LLM requests or persistent database writes.
+With --paypal it reads (never writes) the sandbox account configured in backend/.env.
 """
 import argparse
 import os
@@ -17,6 +18,9 @@ sys.path.insert(0, str(ROOT / "backend"))
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--paypal", action="store_true",
+                        help="Read the PayPal sandbox account from backend/.env (disputes, trackers, live status). "
+                             "Seller actions still simulate: nothing is written to PayPal.")
     args = parser.parse_args()
     dashboard = ROOT / "frontend/dist"
     if not (dashboard / "index.html").exists():
@@ -26,12 +30,15 @@ def main():
     import uvicorn
     from intelligence.retrieve_hybrid import retrieve
     from precedent import api
-    from precedent.paypal_adapter import PayPalAdapter
+    from precedent.paypal_adapter import PayPalAdapter, load_env
     from precedent.service import Service
     from precedent.store import Store
 
-    api._service = Service(Store(":memory:"), PayPalAdapter(env={"PRECEDENT_REAL_EXECUTION": "0"}),
-                           retriever=retrieve)
+    env = {"PRECEDENT_REAL_EXECUTION": "0"}
+    if args.paypal:
+        keys = ("PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET", "PAYPAL_BASE_URL")
+        env.update({k: v for k, v in load_env().items() if k in keys})
+    api._service = Service(Store(":memory:"), PayPalAdapter(env=env), retriever=retrieve)
     uvicorn.run(api.app, host="127.0.0.1", port=args.port)
 
 

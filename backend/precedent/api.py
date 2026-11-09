@@ -8,8 +8,12 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import threading
+import time
+from collections import OrderedDict
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
@@ -17,6 +21,7 @@ from pydantic import BaseModel, Field
 from .executor import ActionError
 from .paypal_adapter import PayPalError
 from .scenarios import DEMO
+from .techkart import TECHKART  # noqa: E402
 from .service import MODES, Service
 from .webhooks import MAX_BODY_BYTES, metadata
 
@@ -27,7 +32,7 @@ app.add_middleware(
     allow_origins=os.environ.get(
         "PRECEDENT_CORS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
     ).split(","),
-    allow_methods=["GET", "POST"], allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST"], allow_headers=["Content-Type", "X-Demo-Session"],
 )
 
 _service: Service | None = None
@@ -38,6 +43,34 @@ def service() -> Service:
     if _service is None:
         _service = Service()
     return _service
+
+
+# Public deployments (PRECEDENT_PER_VISITOR=1) give every browser its own demo workspace, keyed by
+# the random X-Demo-Session id the dashboard sends, so one judge's approvals, simulated clock and
+# case reviews never show up for another. Workspaces live in memory; the least recently used ones
+# are dropped past the cap or after the idle limit. PayPal reads and webhooks stay on the shared service.
+_VISITOR_ID = re.compile(r"[A-Za-z0-9-]{8,64}")
+_visitors: OrderedDict[str, tuple[Service, float]] = OrderedDict()
+_visitors_lock = threading.Lock()
+
+
+def workspace(x_demo_session: str | None = Header(default=None)) -> Service:
+    base = service()
+    if os.environ.get("PRECEDENT_PER_VISITOR") != "1":
+        return base
+    vid = x_demo_session if x_demo_session and _VISITOR_ID.fullmatch(x_demo_session) else "anonymous"
+    cap = int(os.environ.get("PRECEDENT_MAX_VISITORS", "500"))
+    idle = float(os.environ.get("PRECEDENT_VISITOR_IDLE_HOURS", "12")) * 3600
+    now = time.monotonic()
+    with _visitors_lock:
+        while _visitors:
+            oldest, (_, seen) = next(iter(_visitors.items()))
+            if len(_visitors) < cap and now - seen < idle:
+                break
+            del _visitors[oldest]
+        ws = _visitors.pop(vid, (None, 0.0))[0] or base.fork()
+        _visitors[vid] = (ws, now)
+    return ws
 
 
 def _guard(fn, *args):
@@ -68,28 +101,29 @@ def health() -> dict:
 
 @app.get("/api/situations")
 def situations() -> dict:
-    return {"situations": [{"key": k, "situation_id": f"sit_demo_{k}", "label": v.name} for k, v in DEMO.items()],
+    labels = {k: v.name for k, v in DEMO.items()} | {"T": TECHKART.name}
+    return {"situations": [{"key": k, "situation_id": f"sit_demo_{k}", "label": v} for k, v in labels.items()],
             "modes": list(MODES)}
 
 
 @app.get("/api/bundles/{key}")
-def bundle(key: str, mode: str = "with_precedent") -> dict:
-    return _guard(service().bundle, key, mode)
+def bundle(key: str, mode: str = "with_precedent", ws: Service = Depends(workspace)) -> dict:
+    return _guard(ws.bundle, key, mode)
 
 
 @app.post("/api/actions/approve")
-def approve(req: ActionRequest) -> dict:
-    return _guard(service().approve, req.situation, req.mode, req.action_id)
+def approve(req: ActionRequest, ws: Service = Depends(workspace)) -> dict:
+    return _guard(ws.approve, req.situation, req.mode, req.action_id)
 
 
 @app.post("/api/actions/reject")
-def reject(req: ActionRequest) -> dict:
-    return _guard(service().reject, req.situation, req.mode, req.action_id)
+def reject(req: ActionRequest, ws: Service = Depends(workspace)) -> dict:
+    return _guard(ws.reject, req.situation, req.mode, req.action_id)
 
 
 @app.post("/api/sim/advance")
-def advance(req: AdvanceRequest) -> dict:
-    return _guard(service().advance, req.situation, req.mode, req.days)
+def advance(req: AdvanceRequest, ws: Service = Depends(workspace)) -> dict:
+    return _guard(ws.advance, req.situation, req.mode, req.days)
 
 
 class ReviewRequest(BaseModel):
@@ -97,15 +131,15 @@ class ReviewRequest(BaseModel):
 
 
 @app.post("/api/cases/{case_id}/review")
-def review_case(case_id: str, req: ReviewRequest) -> dict:
+def review_case(case_id: str, req: ReviewRequest, ws: Service = Depends(workspace)) -> dict:
     """A human approves or rejects a live_simulated case before it can be retrieved."""
-    return _guard(service().review_case, case_id, req.decision)
+    return _guard(ws.review_case, case_id, req.decision)
 
 
 @app.post("/api/demo/reset")
-def demo_reset() -> dict:
-    """Clear approvals, outcomes and pending cases (not the audit log). Does not touch PayPal."""
-    s = service()
+def demo_reset(s: Service = Depends(workspace)) -> dict:
+    """Clear approvals, outcomes and pending cases (not the audit log). Does not touch PayPal.
+    On a public deployment this resets only the caller's own workspace."""
     s.store.reset_demo()
     s._plans.clear()
     s.store.audit("operator", "demo_reset", {})
@@ -113,8 +147,7 @@ def demo_reset() -> dict:
 
 
 @app.get("/api/cases/{case_id}")
-def case(case_id: str) -> dict:
-    s = service()
+def case(case_id: str, s: Service = Depends(workspace)) -> dict:
     for c in s.cases + s.store.pending_cases():
         if c["case_id"] == case_id:
             return c
@@ -122,8 +155,7 @@ def case(case_id: str) -> dict:
 
 
 @app.get("/api/cases")
-def cases(include_pending: bool = False) -> dict:
-    s = service()
+def cases(include_pending: bool = False, s: Service = Depends(workspace)) -> dict:
     out = [{"case_id": c["case_id"], "title": c["title"], "provenance": c["provenance"],
             "evidence_quality": c["evidence_quality"], "review_status": c["review_status"]} for c in s.cases]
     if include_pending:
@@ -134,8 +166,36 @@ def cases(include_pending: bool = False) -> dict:
 
 
 @app.get("/api/audit")
-def audit(limit: int = 50) -> dict:
-    return {"events": service().store.audit_tail(min(limit, 500))}
+def audit(limit: int = 50, s: Service = Depends(workspace)) -> dict:
+    return {"events": s.store.audit_tail(min(limit, 500))}
+
+
+_last_refresh = [0.0]
+
+
+@app.get("/api/paypal/account")
+def paypal_account() -> dict:
+    """The connected sandbox account as Precedent sees it: imported disputes, PayPal status,
+    allowed seller actions and trackers. Cached and shared by all visitors."""
+    return service().feed.public()
+
+
+@app.post("/api/paypal/refresh")
+def paypal_refresh() -> dict:
+    """Re-import disputes from PayPal now (at most once every 10 seconds across all visitors)."""
+    s = service()
+    force = time.monotonic() - _last_refresh[0] >= 10
+    if force:
+        _last_refresh[0] = time.monotonic()
+    return s.feed.public(s.feed.snapshot(force=force))
+
+
+@app.get("/api/paypal/activity")
+def paypal_activity(limit: int = Query(default=25, ge=1, le=60)) -> dict:
+    """The latest requests this deployment made to PayPal: method, path, HTTP status, latency.
+    Paths contain sandbox IDs only; no tokens, bodies or personal data are recorded."""
+    a = service().adapter
+    return {"host": a.base, "calls": list(a.activity)[:limit]}
 
 
 @app.get("/api/paypal/disputes/{dispute_id}")

@@ -117,6 +117,22 @@ explains the uncertainty, offers no action, and skips approval, execution and th
 outcome clock in both precedent modes. A/B/C still demonstrate the three original
 remedies. D reuses the known mixed development case; it is not a new evaluation set.
 
+**PayPal in and out:** Precedent imports the sandbox account's disputes (Disputes API) and
+each parcel's state (Add Tracking API). It triages them with the same dispute-level cases,
+and sends approved seller actions back to that exact dispute. The dashboard's **PayPal**
+section shows the account live, plus a log of every PayPal request. Details:
+[docs/PAYPAL_INTEGRATION.md](docs/PAYPAL_INTEGRATION.md). Locally, read-only:
+`python scripts/run_local_demo.py --paypal`.
+
+**TechKart test environment (dispute-level triage):** situation **T** is the spec's
+delivery-failure merchant. Each open not-received dispute is matched to dispute-level
+cases by its parcel's real state (delivered, in transit, lost, no tracking) and its
+response deadline, then grouped into gated actions. "Without precedent" shows the spec's
+generic consultant. Details: [docs/TECHKART_TEST_ENV.md](docs/TECHKART_TEST_ENV.md).
+Evaluation: `python eval/run_techkart.py` (results in `eval/results/techkart/`). To run
+real sandbox calls per state, set
+`TECHKART_SANDBOX_DISPUTES=delivered:PP-...,in_transit:PP-...,lost:PP-...` in `backend/.env`.
+
 **Ablation:** `python eval/run_ablation.py` (see `eval/README.md`).
 
 **Retrieval integration:** API mode now defaults to structured similarity plus local
@@ -167,10 +183,27 @@ docker build -t precedent .
 docker run -p 8000:8000 --env-file backend/.env precedent
 ```
 
-Any host that runs a Dockerfile works (for example Render or Fly.io). Set the PayPal
-variables from `backend/.env.example` as secrets in the host's settings; never bake them
-into the image. Not yet built here (Docker is not installed on the dev machine). The
-same-origin setup was checked locally by serving the built dashboard from the API.
+**Public demo on Render (for judges):** [`render.yaml`](render.yaml) is a Render Blueprint.
+In Render choose New, then Blueprint, and pick this repository (branch `main`). It builds the
+Dockerfile as one always-on web service with a health check on `/api/health`. Render asks
+for the PayPal **sandbox** app credentials (`PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`):
+- With them, the site reads the sandbox account live and triages its disputes. Approving
+  "send message" or "provide evidence" on an imported dispute calls PayPal for real, capped
+  at 20 real actions an hour. Refunds and offers stay simulated. See
+  [docs/PAYPAL_INTEGRATION.md](docs/PAYPAL_INTEGRATION.md).
+- Without them, everything still works, simulated and labelled.
+- `PRECEDENT_PER_VISITOR=1`: each browser gets its own in-memory demo workspace, keyed by a
+  random id the dashboard keeps in local storage. One judge's approvals, simulated clock and
+  case reviews never appear for another. **Reset demo** in the top bar clears only your own
+  workspace. Workspaces are dropped after 12 idle hours or past 500 visitors
+  (`PRECEDENT_VISITOR_IDLE_HOURS`, `PRECEDENT_MAX_VISITORS`), and all of them on restart.
+
+Any other host that runs a Dockerfile works too (for example Fly.io). For a private
+deployment with real sandbox calls, set the PayPal variables from `backend/.env.example` as
+secrets in the host's settings (never bake them into the image), and leave
+`PRECEDENT_PER_VISITOR` unset. The image has not been built here (Docker is not installed on
+the dev machine). Its exact file layout and environment were checked locally by running
+uvicorn on a copy of only what the Dockerfile copies.
 
 On Windows Git Bash, prefix local builds that set `VITE_API_BASE=/` with
 `MSYS_NO_PATHCONV=1`. Otherwise Bash rewrites `/` into a Windows path.

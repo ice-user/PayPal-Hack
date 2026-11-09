@@ -1,19 +1,39 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Action, ActionState, Bundle, LiveDispute, Mode, TimelineEvent } from "./types";
 import {
-  advanceClock, approveAction, dataMode, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
+  advanceClock, approveAction, dataMode, refreshPayPal, resetDemo, getAudit, getBundle, getLiveDispute, listSituations, rejectAction, reviewCase,
   type AuditEvent,
 } from "./api";
-import { AuditLog } from "./components/AuditLog";
 import thresholds from "@contracts/thresholds.json";
-import { SituationPanel } from "./components/SituationPanel";
+import { AuditLog } from "./components/AuditLog";
+import { ConflictNotice, KpiStrip, PageHeader, RatePane, ReasonsPane, SignalsPane } from "./components/Overview";
 import { PrecedentsPanel } from "./components/PrecedentsPanel";
-import { PlanPanel, type ActionView } from "./components/PlanPanel";
+import { ActionsPane, DiagnosisPane, NextStep, type ActionView } from "./components/PlanPanel";
 import { Timeline } from "./components/Timeline";
+import { TriagePane } from "./components/TriagePane";
+import { PayPalAccountPane, PayPalActivityPane } from "./components/PayPalPane";
 import { CaseDrawer } from "./components/CaseDrawer";
+import { Section } from "./components/Card";
+import { Sidebar, Topbar } from "./components/Shell";
+import { Icon } from "./components/Icon";
 
 const situations = listSituations();
 const API = dataMode === "api";
+
+type Theme = "dark" | "light";
+const THEME_KEY = "precedent-theme";
+
+function initialTheme(): Theme {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "dark" || saved === "light") return saved;
+  } catch {
+    /* storage blocked: fall through to the default */
+  }
+  return "dark";
+}
+
+const narrow = () => window.matchMedia("(max-width: 960px)").matches;
 
 /** Fixture mode only: fold the user's clicks into the static timeline. */
 function liveTimeline(base: TimelineEvent[], states: Record<string, ActionState>): TimelineEvent[] {
@@ -30,17 +50,66 @@ function liveTimeline(base: TimelineEvent[], states: Record<string, ActionState>
   });
 }
 
+interface Toast { id: number; tone: "good" | "bad" | "info"; text: string }
+
+function Toasts({ items, onClose }: { items: Toast[]; onClose: (id: number) => void }) {
+  return (
+    <div className="toasts" aria-live="polite" aria-atomic="false">
+      {items.map((t) => (
+        <div key={t.id} className={`toast toast-${t.tone}`} role={t.tone === "bad" ? "alert" : "status"}>
+          <Icon name={t.tone === "bad" ? "alert" : t.tone === "good" ? "check" : "activity"} />
+          <p>{t.text}</p>
+          <button className="icon-btn sm" onClick={() => onClose(t.id)} aria-label="Dismiss"><Icon name="x" size={14} /></button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Skeleton() {
+  return (
+    <div className="skeleton" aria-hidden="true">
+      <div className="sk sk-line w40" />
+      <div className="sk sk-title" />
+      <div className="sk sk-strip" />
+      <div className="sk sk-panel" />
+      <div className="sk sk-panel short" />
+    </div>
+  );
+}
+
 export default function App() {
   const [key, setKey] = useState(situations[0]?.key ?? "A");
   const [mode, setMode] = useState<Mode>("with_precedent");
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [live, setLive] = useState<{ dispute?: LiveDispute; error?: string } | null>(null);
   const [openCase, setOpenCase] = useState<string | null>(null);
   const [audit, setAudit] = useState<AuditEvent[]>([]);
+  const [theme, setTheme] = useState<Theme>(initialTheme);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const toastId = useRef(0);
+
+  const toast = useCallback((tone: Toast["tone"], text: string) => {
+    const id = ++toastId.current;
+    setToasts((t) => [...t.slice(-2), { id, tone, text }]);
+    window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), tone === "bad" ? 8000 : 5000);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      /* not persisted; fine */
+    }
+  }, [theme]);
+
+  const toggleSidebar = () => (narrow() ? setMobileOpen((o) => !o) : setCollapsed((c) => !c));
 
   useEffect(() => {
     if (!API || !bundle) return;
@@ -53,15 +122,18 @@ export default function App() {
   const recId = bundle?.recommendation.recommendation_id ?? "";
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
+  // Keep the previous situation on screen (dimmed) while the next one loads, so the page does not jump.
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    setNotice(null);
-    setBundle(null);
     getBundle(key, mode)
       .then((b) => !cancelled && setBundle(b))
-      .catch((e: Error) => !cancelled && setError(e.message))
+      .catch((e: Error) => {
+        if (cancelled) return;
+        setError(e.message);
+        setBundle(null);
+      })
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
@@ -99,125 +171,209 @@ export default function App() {
   const setLocal = (rid: string, actionId: string, st: ActionState) =>
     setLocalStates((all) => ({ ...all, [rid]: { ...(all[rid] ?? {}), [actionId]: st } }));
 
-  const run = async (label: string, fn: () => Promise<Bundle>) => {
+  const run = async (label: string, fn: () => Promise<Bundle>): Promise<Bundle | null> => {
     setBusy(label);
-    setNotice(null);
     try {
-      setBundle(await fn());
+      const b = await fn();
+      setBundle(b);
       refreshLive();
+      return b;
     } catch (e) {
-      setNotice((e as Error).message);
+      toast("bad", (e as Error).message);
+      return null;
     } finally {
       setBusy(null);
     }
   };
 
-  const approve = (a: Action) => {
-    if (API) return run(a.action_id, () => approveAction(key, mode, a.action_id));
-    const rid = recId;
-    setLocal(rid, a.action_id, "executing");
-    timers.current.push(window.setTimeout(() => setLocal(rid, a.action_id, "succeeded"), 1200));
-  };
-  const reject = (a: Action) => {
-    if (API) return run(a.action_id, () => rejectAction(key, mode, a.action_id));
-    setLocal(recId, a.action_id, "rejected");
+  const approve = async (a: Action) => {
+    if (!API) {
+      const rid = recId;
+      setLocal(rid, a.action_id, "executing");
+      timers.current.push(window.setTimeout(() => {
+        setLocal(rid, a.action_id, "succeeded");
+        toast("info", "Approved. Executed in the browser only (fixture mode).");
+      }, 1200));
+      return;
+    }
+    const b = await run(a.action_id, () => approveAction(key, mode, a.action_id));
+    const s = b?.action_states?.[a.action_id];
+    if (!s) return;
+    if (s.state === "succeeded")
+      toast(s.execution_mode === "real" ? "good" : "info",
+        s.execution_mode === "real" ? "Approved and sent to the PayPal sandbox." : "Approved. Executed as a labelled simulation.");
+    else if (s.state === "failed") toast("bad", `Approved, but execution failed: ${s.detail ?? "unknown error"}`);
   };
 
-  const review = (caseId: string, decision: "approved" | "rejected") =>
-    run("review", async () => {
+  const reject = async (a: Action) => {
+    if (!API) {
+      setLocal(recId, a.action_id, "rejected");
+      toast("info", "Rejected. Nothing was sent.");
+      return;
+    }
+    if (await run(a.action_id, () => rejectAction(key, mode, a.action_id))) toast("info", "Rejected. Nothing was sent.");
+  };
+
+  const advance = async () => {
+    const b = await run("advance", () => advanceClock(key, mode, 14));
+    if (b?.outcome) toast("info", "Outcome recorded on the simulated clock. Review the new case below the plan.");
+  };
+
+  const review = async (caseId: string, decision: "approved" | "rejected") => {
+    const b = await run("review", async () => {
       await reviewCase(caseId, decision);
       return getBundle(key, mode);
     });
+    if (b) toast(decision === "approved" ? "good" : "info", decision === "approved" ? "Added to the case library as a simulated case." : "Case discarded.");
+  };
+
+  const reset = async () => {
+    const b = await run("reset", async () => {
+      await resetDemo();
+      return getBundle(key, mode);
+    });
+    if (b) toast("info", "Demo reset. Your approvals and simulated outcomes are cleared; PayPal was not touched.");
+  };
+
+  const refreshFromPayPal = async () => {
+    const b = await run("paypal", async () => {
+      await refreshPayPal();
+      return getBundle(key, mode);
+    });
+    if (b) toast("info", b.paypal?.error ?? "Read the account again from PayPal.");
+  };
 
   const canAdvance =
     API && !!bundle && !bundle.outcome &&
     bundle.policy_decisions.some((d) => d.decision === "NEEDS_APPROVAL" && views[d.action_id]?.state === "succeeded");
 
+  const current = situations.find((s) => s.key === key);
+  const anomalous = !!bundle?.situation.features.anomaly.is_anomalous;
+  const showAudit = API && audit.length > 0;
+
   return (
-    <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <span className="logo" aria-hidden="true">P</span>
-          <div>
-            <div className="brand-name">Precedent</div>
-            <div className="brand-sub">Demo electronics store · PayPal sandbox</div>
-          </div>
-        </div>
+    <div className={`layout ${collapsed ? "collapsed" : ""}`}>
+      <a className="skip" href="#decision">Skip to the decision</a>
+      <Sidebar
+        open={mobileOpen}
+        situations={situations}
+        current={key}
+        anomalous={anomalous}
+        onPick={setKey}
+        apiMode={API}
+        disputeIds={bundle?.situation.paypal_dispute_ids ?? []}
+        live={live}
+        onNavigate={() => setMobileOpen(false)}
+      />
+      {mobileOpen && <div className="scrim" onClick={() => setMobileOpen(false)} aria-hidden="true" />}
 
-        <div className="controls">
-          <div className="segmented" role="group" aria-label="Demo situation">
-            {situations.map((s) => (
-              <button key={s.key} aria-pressed={s.key === key} onClick={() => setKey(s.key)}>
-                {s.label}
-              </button>
-            ))}
-          </div>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={mode === "with_precedent"}
-              onChange={(e) => setMode(e.target.checked ? "with_precedent" : "no_precedent")}
-            />
-            <span className="toggle-track" aria-hidden="true"><span className="toggle-thumb" /></span>
-            <span>{mode === "with_precedent" ? "With precedent" : "Without precedent"}</span>
-          </label>
-        </div>
-      </header>
+      <div className="inset">
+        <Topbar
+          label={current?.label ?? key}
+          mode={mode}
+          onMode={setMode}
+          theme={theme}
+          onTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onToggleSidebar={toggleSidebar}
+          onReset={API ? reset : undefined}
+          resetting={busy === "reset"}
+        />
+        <div className={`progress ${loading && bundle ? "on" : ""}`} aria-hidden="true" />
 
-      <div className="banner">
-        {API ? (
-          <>API mode: plans, approvals and the outcome clock run on the backend. Approved actions are sent to the PayPal sandbox when the dispute allows them; otherwise they are simulated and labelled. The order feed is synthetic.</>
-        ) : (
-          <>Fixture mode: data comes from <code>contracts/fixtures</code>. The order feed is synthetic, cases are labelled, and execution is simulated in the browser.</>
-        )}
+        <main className="content" id="top" aria-busy={loading}>
+          {error && (
+            <div className="callout bad" role="alert">
+              <Icon name="alert" />
+              <div><p className="callout-title">Could not load this situation</p><p>{error}</p></div>
+            </div>
+          )}
+          {!bundle && loading && <Skeleton />}
+
+          {bundle && (
+            <div className={`page ${loading ? "is-loading" : ""}`}>
+              <PageHeader situation={bundle.situation} label={current?.label ?? key} anomalous={anomalous} />
+              <KpiStrip situation={bundle.situation} rec={bundle.recommendation} />
+
+              <Section id="decision" title="Decision"
+                sub={mode === "with_precedent" ? "What the consultant proposes, and what is waiting for you." : "Ablation view: the same consultant with case retrieval switched off."}>
+                <ConflictNotice situation={bundle.situation} />
+                <div className="panel panel-hero">
+                  {bundle.recommendation.triage && (
+                    <div className="split split-1">
+                      <TriagePane triage={bundle.recommendation.triage} generic={mode === "no_precedent"} />
+                    </div>
+                  )}
+                  <div className="split split-actions">
+                    <ActionsPane
+                      rec={bundle.recommendation}
+                      decisions={bundle.policy_decisions}
+                      views={views}
+                      busy={busy}
+                      disputeIds={bundle.situation.paypal_dispute_ids ?? []}
+                      realActions={bundle.paypal ? bundle.paypal.real_actions ?? null : undefined}
+                      onApprove={approve}
+                      onReject={reject}
+                      onOpenCase={setOpenCase}
+                    />
+                    <DiagnosisPane rec={bundle.recommendation} />
+                  </div>
+                  <NextStep
+                    canAdvance={canAdvance}
+                    outcome={bundle.outcome ?? null}
+                    busy={busy}
+                    onAdvance={advance}
+                    onOpenCase={setOpenCase}
+                    onReview={API ? review : undefined}
+                  />
+                </div>
+              </Section>
+
+              {API && bundle.paypal && (
+                <Section id="paypal" title="PayPal"
+                  sub="Precedent's PayPal integration, live: the sandbox account it reads disputes and tracking from, and every request it makes.">
+                  <div className="panel">
+                    <div className="split split-1">
+                      <PayPalAccountPane account={bundle.paypal} onRefresh={refreshFromPayPal} refreshing={busy === "paypal"} />
+                    </div>
+                    <div className="split split-1">
+                      <PayPalActivityPane tick={bundle} />
+                    </div>
+                  </div>
+                </Section>
+              )}
+
+              <Section id="evidence" title="Evidence" sub="Why the consultant thinks so: the numbers, then the past cases behind the plan.">
+                <div className="panel">
+                  <div className="split split-8-4">
+                    <RatePane situation={bundle.situation} />
+                    <ReasonsPane situation={bundle.situation} />
+                  </div>
+                  <div className="split split-5-7">
+                    <SignalsPane situation={bundle.situation} />
+                    <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} onOpenCase={setOpenCase} />
+                  </div>
+                </div>
+              </Section>
+
+              <Section id="history" title="History" sub={API ? "The loop so far, and every step the backend recorded." : "The loop so far."}>
+                <div className="panel">
+                  <div className={`split ${showAudit ? "split-4-8" : "split-1"}`}>
+                    <Timeline events={timeline} />
+                    {showAudit && <AuditLog events={audit} />}
+                  </div>
+                </div>
+              </Section>
+            </div>
+          )}
+
+          <footer className="foot">
+            Decision support with cited precedents, not financial advice. Outcomes are observed, never claimed as caused.
+          </footer>
+        </main>
       </div>
 
-      {loading && <div className="loading" role="status">Loading situation…</div>}
-      {error && <div className="error" role="alert">Could not load this situation: {error}</div>}
-      {notice && <div className="notice" role="alert">{notice}</div>}
-
-      {bundle && !error && (
-        <>
-          <div className="narrative">
-            <span className={`pulse ${bundle.situation.features.anomaly.is_anomalous ? "on" : ""}`} aria-hidden="true" />
-            {bundle.situation.narrative}
-          </div>
-          <main className="grid">
-            <SituationPanel situation={bundle.situation} live={live} apiMode={API} />
-            <PrecedentsPanel rec={bundle.recommendation} similarityMin={thresholds.similarity_min} onOpenCase={setOpenCase} />
-            <PlanPanel
-              rec={bundle.recommendation}
-              decisions={bundle.policy_decisions}
-              views={views}
-              busy={busy}
-              outcome={bundle.outcome ?? null}
-              onApprove={approve}
-              onReject={reject}
-              onOpenCase={setOpenCase}
-              onReview={API ? review : undefined}
-            />
-          </main>
-          <Timeline
-            events={timeline}
-            action={
-              canAdvance ? (
-                <button className="btn primary" disabled={busy !== null}
-                  onClick={() => run("advance", () => advanceClock(key, mode, 14))}>
-                  {busy === "advance" ? "Advancing…" : "Advance 14 days (simulated)"}
-                </button>
-              ) : null
-            }
-          />
-        </>
-      )}
-
-      {API && audit.length > 0 && <AuditLog events={audit} />}
-
+      <Toasts items={toasts} onClose={(id) => setToasts((t) => t.filter((x) => x.id !== id))} />
       <CaseDrawer caseId={openCase} onClose={() => setOpenCase(null)} apiMode={API} />
-
-      <footer className="foot">
-        Decision support with cited precedents, not financial advice. Outcomes are observed, never claimed as caused.
-      </footer>
     </div>
   );
 }

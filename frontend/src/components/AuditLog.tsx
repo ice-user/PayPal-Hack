@@ -1,4 +1,7 @@
+import { useState } from "react";
 import type { AuditEvent } from "../api";
+import { Pane } from "./Card";
+import { Icon } from "./Icon";
 
 const LABEL: Record<string, string> = {
   action_registered: "Plan recorded",
@@ -15,6 +18,15 @@ const LABEL: Record<string, string> = {
   demo_reset: "Demo reset",
 };
 
+const TONE: Record<string, string> = {
+  action_succeeded: "ok",
+  action_failed: "bad",
+  approval_refused: "bad",
+  webhook_rejected: "bad",
+  action_approved: "info",
+  outcome_recorded: "sim",
+};
+
 function summary(e: AuditEvent): string {
   const p = e.payload;
   const bits: string[] = [];
@@ -28,19 +40,30 @@ function summary(e: AuditEvent): string {
 }
 
 export function AuditLog({ events }: { events: AuditEvent[] }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? events : events.slice(0, 6);
   return (
-    <details className="audit">
-      <summary>Audit log <span className="panel-meta">({events.length} latest events, newest first)</span></summary>
-      <ol>
-        {events.map((e) => (
-          <li key={e.id}>
-            <time className="num">{e.at.replace("T", " ").replace("+00:00", " UTC")}</time>
-            <span className="audit-actor">{e.actor}</span>
-            <strong>{LABEL[e.event] ?? e.event}</strong>
-            <span className="audit-detail">{summary(e)}</span>
-          </li>
-        ))}
-      </ol>
-    </details>
+    <Pane id="audit" title="Audit log" sub="Every step the backend took, newest first."
+      footer={events.length > 6 ? (
+        <button className="link-btn" onClick={() => setAll(!all)}>
+          {all ? "Show fewer" : `View all ${events.length} events`} <Icon name="arrow" size={14} />
+        </button>
+      ) : null}>
+      <div className="table-wrap">
+        <table className="table">
+          <thead><tr><th>Time (UTC)</th><th>Actor</th><th>Event</th><th>Detail</th></tr></thead>
+          <tbody>
+            {shown.map((e) => (
+              <tr key={e.id}>
+                <td className="num nowrap muted">{e.at.replace("T", " ").replace(/(\.\d+)?\+00:00$/, "")}</td>
+                <td className="nowrap">{e.actor}</td>
+                <td className="nowrap"><span className={`status status-${TONE[e.event] ?? "plain"}`}>{LABEL[e.event] ?? e.event}</span></td>
+                <td className="audit-detail">{summary(e)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Pane>
   );
 }

@@ -1,4 +1,4 @@
-import type { Bundle, LiveDispute, Mode, SituationIndexEntry } from "./types";
+import type { Bundle, LiveDispute, Mode, PayPalAccount, PayPalCall, SituationIndexEntry } from "./types";
 import indexJson from "@contracts/fixtures/index.json";
 
 /**
@@ -23,10 +23,33 @@ export function listSituations(): SituationIndexEntry[] {
   return (indexJson as { situations: SituationIndexEntry[] }).situations;
 }
 
+// A random id per browser. On a public deployment the backend keeps a private demo workspace for
+// each id, so visitors never see each other's approvals. It identifies nothing about the person.
+const SESSION_KEY = "precedent-demo-session";
+function makeId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+  }
+}
+function demoSession(): string {
+  try {
+    const existing = localStorage.getItem(SESSION_KEY);
+    if (existing) return existing;
+    const id = makeId();
+    localStorage.setItem(SESSION_KEY, id);
+    return id;
+  } catch {
+    return fallbackSession;
+  }
+}
+const fallbackSession = makeId(); // storage blocked: keep one id for this page load
+
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+    headers: { "Content-Type": "application/json", "X-Demo-Session": demoSession(), ...(init?.headers ?? {}) },
   });
   if (!res.ok) {
     let msg = `API returned ${res.status}`;
@@ -55,7 +78,17 @@ export const approveAction = (situation: string, mode: Mode, action_id: string) 
 export const rejectAction = (situation: string, mode: Mode, action_id: string) =>
   call<Bundle>("/api/actions/reject", { method: "POST", body: JSON.stringify({ situation, mode, action_id }) });
 
-export const advanceClock = (situation: string, mode: Mode, days = 14) =>
+/** Re-import disputes from the PayPal sandbox account now (the backend limits how often). */
+export const refreshPayPal = () => call<PayPalAccount>("/api/paypal/refresh", { method: "POST" });
+
+/** The latest requests the backend made to PayPal. */
+export const getPayPalActivity = (limit = 20) =>
+  call<{ host: string; calls: PayPalCall[] }>(`/api/paypal/activity?limit=${limit}`).then((r) => r.calls);
+
+/** Clears this visitor's approvals, outcomes and case reviews. Never touches PayPal. */
+export const resetDemo = () => call<{ ok: boolean }>("/api/demo/reset", { method: "POST" });
+
+export const advanceClock =(situation: string, mode: Mode, days = 14) =>
   call<Bundle>("/api/sim/advance", { method: "POST", body: JSON.stringify({ situation, mode, days }) });
 
 export const reviewCase = (caseId: string, decision: "approved" | "rejected") =>
